@@ -160,7 +160,7 @@ public class InitEnvHelper {
         }
 
         try {
-            FileOutputStream oFile = new FileOutputStream("litebuild/env.properties", false);
+            FileOutputStream oFile = new FileOutputStream(Settings.Data.TMP_PATH + "/env.properties", false);
             properties.store(oFile, "Auto create by litebuild.");
         } catch (IOException e) {
             e.printStackTrace();
