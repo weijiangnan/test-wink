@@ -1,0 +1,43 @@
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'maven-publish'
+
+
+group 'com.robothy'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.android.tools.build:gradle:$gradleVersion"
+}
+
+gradlePlugin {
+    plugins {
+        liteBuildPlugin {
+            id = 'com.immomo.litebuild.plugin'
+            implementationClass = 'com.immomo.litebuild.LiteBuildPlugin'
+        }
+    }
+}
+
+publishing {
+    publications {
+        // 这里的 hello 可以任意命名
+        hello(MavenPublication) {
+            // 插件的组ID，建议设置为插件的包名
+            groupId = 'com.immomo.litebuild'
+            // 翻译过来是 工件ID，我的理解是插件的名字
+            artifactId = 'plugin'
+            version = '0.0.1'
+            // 组件类型，我们的插件其实就是Java组件
+            from components.java
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
+}

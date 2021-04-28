@@ -1,0 +1,201 @@
+package com.immomo.litebuild
+
+class LiteBuildPluginGroovy implements Plugin<Project> {
+    private Project project
+    private AppExtension androidExt
+    private FreelineExtension freelineExt
+
+    @Override
+    void apply(Project project) {
+//        project.g
+//        // check
+//        if (!project.plugins.hasPlugin("com.android.application")) {
+//            throw new RuntimeException("Plugin can only be applied for android application module.")
+//        }
+    }
+
+    void initEnv(Project project) {
+        this.project = project
+        this.androidExt = project.extensions.getByName("android") as AppExtension
+        this.freelineExt = project.extensions.create("freeline", FreelineExtension, project)
+
+//        def android = project.extensions.findByName("android") as AppExtension
+//        def extension = project.extensions.findByName("freeline") as FreelineExtension
+//        def productFlavor = extension.productFlavor
+//        def buildScript = extension.buildScript
+//        def buildScriptWorkDirectory = extension.buildScriptWorkDirectory
+//        def apkPath = extension.apkPath
+//        def packageName = extension.packageName
+//        def launcher = extension.launcher
+//        def extraResourcesDependencies = extension.extraResourceDependencyPaths
+//        def excludeResourceDependencyPaths = extension.excludeResourceDependencyPaths
+//        def autoDependency = extension.autoDependency
+//        def ignoreResourceIds = extension.ignoreResourceIds
+//        def checkSourcesMd5 = extension.checkSourcesMd5
+//        def useSystemGradle = extension.useSystemGradle
+//
+//        def projectDescription = [:]
+//
+//        projectDescription.project_type = 'gradle'
+//        projectDescription.android_gradle_plugin_version = FreelineUtils.getAndroidGradlePluginVersion(project)
+//        projectDescription.freeline_gradle_plugin_version = FreelineUtils.getFreelineGradlePluginVersion(project)
+//        projectDescription.java_home = getJavaHome()
+//        projectDescription.freeline_cache_dir = FreelineUtils.getFreelineCacheDir(project.rootDir.absolutePath)
+//        projectDescription.auto_dependency = autoDependency
+//        projectDescription.product_flavor = productFlavor
+//        projectDescription.build_script = buildScript
+//        projectDescription.build_script_work_directory = buildScriptWorkDirectory
+//        projectDescription.root_dir = project.rootDir.toString()
+//        projectDescription.main_project_name = project.name
+//        projectDescription.main_project_dir = FreelineUtils.getRelativePath(project.rootProject.projectDir, project.projectDir)
+//        projectDescription.build_directory = project.buildDir.toString()
+//        projectDescription.build_cache_dir = FreelineUtils.getBuildCacheDir(project.buildDir.absolutePath)
+//        projectDescription.build_tools_version = project.android.buildToolsVersion.toString()
+//        projectDescription.sdk_directory = project.android.sdkDirectory.toString()
+//        projectDescription.build_tools_directory = FreelineUtils.joinPath(projectDescription.sdk_directory, 'build-tools', projectDescription.build_tools_version)
+//        projectDescription.compile_sdk_version = project.android.compileSdkVersion.toString()
+//        projectDescription.compile_sdk_directory = FreelineUtils.joinPath(projectDescription.sdk_directory, 'platforms', projectDescription.compile_sdk_version)
+//        projectDescription.package = packageName  // package -> the package name in the manifest file of main module
+//        projectDescription.debug_package = project.android.defaultConfig.applicationId
+//        // applicationId -> debug_package
+//        projectDescription.main_manifest_path = android.sourceSets.main.manifest.srcFile.path
+//        projectDescription.launcher = launcher
+//        projectDescription.apk_path = apkPath
+//        projectDescription.extra_dep_res_paths = extraResourcesDependencies
+//        projectDescription.exclude_dep_res_paths = excludeResourceDependencyPaths
+//        projectDescription.main_r_path = FreelineGenerator.generateMainRPath(projectDescription.build_directory.toString(), productFlavor, projectDescription.package.toString())
+//        projectDescription.use_jdk8 = isUseJdk8(projectDescription.android_gradle_plugin_version as String)
+//        projectDescription.ignore_resource_ids = FreelineCompat.compatIgnoreResourceIds(ignoreResourceIds)
+//        projectDescription.use_system_gradle = useSystemGradle
+//
+//        def useMd5PathArray = [];
+//        for (String path : checkSourcesMd5) {
+//            useMd5PathArray.add(FreelineUtils.joinPath(project.rootDir.absolutePath, path))
+//        }
+//        projectDescription.check_sources_md5 = useMd5PathArray
+//
+//        if (FreelineUtils.isEmpty(packageName)) {
+//            projectDescription.package = FreelineParser.getPackage(projectDescription.main_manifest_path as String)
+//            if (FreelineUtils.isEmpty(projectDescription.package as String)) {
+//                projectDescription.package = projectDescription.debug_package
+//            }
+//        }
+//
+//        if (FreelineUtils.isEmpty(projectDescription.debug_package as String)) {
+//            projectDescription.debug_package = projectDescription.package
+//        }
+//
+//        boolean invalidFlavor = true;
+//        if (!productFlavor) {
+//            invalidFlavor = false;
+//        }
+//
+//        boolean applicationSuffixAdded = false
+//        android.applicationVariants.each { baseVariant ->
+//            if (productFlavor) {
+//                if (productFlavor.equals(baseVariant.flavorName)) {
+//                    invalidFlavor = false;
+//                }
+//            }
+//            def buildType = baseVariant.buildType;
+//            if (!applicationSuffixAdded && "debug".equalsIgnoreCase(buildType.name as String)) {
+//                if (buildType.applicationIdSuffix) {
+//                    projectDescription.debug_package = projectDescription.debug_package + buildType.applicationIdSuffix
+//                    applicationSuffixAdded = true
+//                }
+//            }
+//        }
+//
+//        if (invalidFlavor) {
+//            throw new InvalidParameterException(" invalid productFlavor : ${productFlavor}");
+//        }
+//
+//        if (apkPath == null || apkPath == '') {
+//            // set default build script
+//            projectDescription.apk_path = FreelineGenerator.generateApkPath(projectDescription.build_directory.toString(), project.name, productFlavor)
+//        }
+//
+//        if (buildScript == null || buildScript == '') {
+//            // set default build script
+//            def isRootModuleTheMainModule = project.rootProject.name == projectDescription.main_project_name
+//            projectDescription.build_script = FreelineGenerator.generateBuildScript(isRootModuleTheMainModule, projectDescription.main_project_name as String, productFlavor)
+//        }
+//
+//        if (launcher == null || launcher == '') {
+//            // get launcher activity name
+//            projectDescription.launcher = FreelineParser.getLauncher(projectDescription.main_manifest_path.toString(), projectDescription.package.toString())
+//        }
+//
+//        Map<String, Project> allProjectMap = new HashMap<>();
+//        def rootProject = project.rootProject;
+//        rootProject.allprojects {
+//            allProjectMap.put(it.name, it);
+//        }
+//        // get module dependencies
+//        def moduleDependencies = findModuleDependencies(project, allProjectMap, productFlavor);
+//
+//        def module_dependencies = [:]
+//        moduleDependencies.keySet().findAll { projectName ->
+//            def deps = [];
+//            module_dependencies[projectName] = deps
+//            moduleDependencies.get(projectName).findAll { dependency ->
+//                deps.add(dependency.name);
+//            }
+//        }
+//
+//        def allProjectProductInfoMap = [:];
+//        allProjectProductInfoMap[project.name] = new ProjectProductInfo("android", project.name, productFlavor, "debug");
+//        moduleDependencies.keySet().findAll { projectName ->
+//            moduleDependencies.get(projectName).findAll { dependency ->
+//                allProjectProductInfoMap[dependency.name] = dependency;
+//            }
+//        }
+//        def project_source_sets = [:]
+//        def modules = []
+//        allProjectProductInfoMap.values().findAll { product ->
+//            def pro = allProjectMap.get(product.name)
+//            def sourceSets = createSourceSets(pro, product.flavor, product.buildType)
+//            project_source_sets[pro.name] = sourceSets
+//            modules.add(['name': pro.name, 'path': pro.projectDir.absolutePath])
+//        }
+//
+//        def mainAppSourceSets = project_source_sets[project.name];
+//        projectDescription.main_src_directory = mainAppSourceSets.main_src_directory;
+//        projectDescription.main_res_directory = mainAppSourceSets.main_res_directory;
+//        projectDescription.main_assets_directory = mainAppSourceSets.main_assets_directory;
+//        projectDescription.main_jni_directory = mainAppSourceSets.main_jni_directory;
+//        projectDescription.main_jniLibs_directory = mainAppSourceSets.main_jniLibs_directory;
+//        projectDescription.project_source_sets = project_source_sets
+//
+//        projectDescription.modules = modules
+//        projectDescription.module_dependencies = module_dependencies
+//
+//        projectDescription.databinding = []
+//        projectDescription.databinding_modules = []
+//        project.rootProject.allprojects.each { pro ->
+//            if (pro.plugins.hasPlugin("com.android.application") || pro.plugins.hasPlugin("com.android.library")) {
+//                if (pro.android.hasProperty("dataBinding")
+//                        && pro.android.dataBinding.enabled
+//                        && projectDescription.project_source_sets[pro.name] != null) {
+//                    def data = [:]
+//                    String manifestPath = projectDescription.project_source_sets[pro.name].main_manifest_path
+//                    data.name = pro.name
+//                    data.isLibrary = pro.plugins.hasPlugin("com.android.library")
+//                    data.minSdkVersion = getMinSdkVersion(pro, manifestPath)
+//                    if (pro.name == project.name) {
+//                        data.packageName = projectDescription.package
+//                    } else if (data.isLibrary) {
+//                        data.packageName = FreelineParser.getPackage(manifestPath)
+//                    }
+//                    projectDescription.databinding.add(data)
+//                    projectDescription.databinding_modules.add(pro.name)
+//                }
+//            }
+//        }
+//
+//        def json = new JsonBuilder(projectDescription).toPrettyString()
+//        println json
+//
+//        FreelineUtils.saveJson(json, FreelineUtils.joinPath(projectDescription.freeline_cache_dir, Constants.FREELINE_PRO_DESC_FILE_NAME), true)
+    }
+}
