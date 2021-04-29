@@ -21,6 +21,7 @@ import com.android.build.gradle.api.ApplicationVariant;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
+import com.immomo.litebuild.helper.ResourceHelper;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -33,24 +34,23 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        project.getTasks().register("litebuild", new Action<Task>() {
-            @Override
-            public void execute(Task task) {
-                task.setGroup("momo");
-                AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-                Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+        project.getTasks().register("litebuild", task -> {
 
-                while (itApp.hasNext()) {
-                    ApplicationVariant variant = itApp.next();
-                    if (!variant.getName().equals("debug")) {
-                        continue;
-                    }
+            System.out.println("插件执行中...");
 
-                    main(project);
+            AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+            Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+
+            while (itApp.hasNext()) {
+                ApplicationVariant variant = itApp.next();
+                if (!variant.getName().equals("debug")) {
+                    continue;
                 }
-            }
-        });
 
+                main(project);
+            }
+
+        });
 
     }
 
@@ -61,7 +61,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         new DiffHelper(project).diff();
 
         // compile resource.
-
+        new ResourceHelper().process();
         // compile java & kotlin
         new CompileHelper().compileCode();
 
