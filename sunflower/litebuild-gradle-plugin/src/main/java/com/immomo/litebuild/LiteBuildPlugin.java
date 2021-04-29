@@ -18,7 +18,6 @@ package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
-import com.android.utils.FileUtils;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
@@ -28,7 +27,6 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LiteBuildPlugin implements Plugin<Project> {
@@ -38,7 +36,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         project.getTasks().register("litebuild", new Action<Task>() {
             @Override
             public void execute(Task task) {
-
+                task.setGroup("momo");
                 AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
                 Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
 
@@ -52,6 +50,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 }
             }
         });
+
+
     }
 
     public void main(Project project) {
@@ -59,7 +59,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Settings.init(project);
 
         // todo diff
-        new DiffHelper().diff();
+        new DiffHelper(project).diff();
 
         // compile resource.
 
