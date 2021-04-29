@@ -14,6 +14,6 @@ object Log {
     }
 
     fun v(tag: String = "momo", str: String) {
-        println("${tag},${str}")
+        println("${tag}: ${str}")
     }
 }

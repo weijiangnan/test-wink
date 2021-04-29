@@ -31,7 +31,7 @@ import java.io.File
 
 class DiffHelper(val project: Project) {
     companion object {
-        const val TAG = "momo.diff"
+        const val TAG = "litebuild.diff"
     }
 
     private var csvPath: String
@@ -65,7 +65,7 @@ class DiffHelper(val project: Project) {
                     File(csvPath).takeIf { it.exists() }?.delete()
 
                     project.allprojects.forEach {
-                        genMd5AndSaveToCsv("${it.projectDir}/src/main/java/")
+                        genMd5AndSaveToCsv("${it.projectDir}/src/main/java/", csvPath)
                     }
                 }
             }
@@ -147,8 +147,8 @@ class DiffHelper(val project: Project) {
         Log.v(TAG, "耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
 
-    private fun genMd5AndSaveToCsv(path: String) {
-        Log.v(TAG, "生成md5并保存到csv文件[$path]")
+    private fun genMd5AndSaveToCsv(path: String, csvPath: String) {
+        Log.v(TAG, "遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
 
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
@@ -170,7 +170,7 @@ class DiffHelper(val project: Project) {
     }
 
     private fun loadMd5MapFromCSV(path: String): Map<String, String> {
-        Log.v(TAG, "从${path}加载md5信息...")
+        Log.v(TAG, "从[${path}]加载md5信息...")
 
         return if (!File(path).exists()) {
             Log.v(TAG, "文件[${path}]不存在")
