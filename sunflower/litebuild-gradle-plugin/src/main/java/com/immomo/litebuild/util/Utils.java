@@ -16,8 +16,12 @@
 
 package com.immomo.litebuild.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,19 +29,18 @@ public class Utils {
     /**
      * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
      *
-     * @param shStr
-     *            需要执行的shell
+     * @param shStr 需要执行的shell
      * @return
      */
     public static List<String> runShell(String shStr) {
         List<String> strList = new ArrayList<String>();
         try {
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh","-c", "`" + shStr + "`"},null,null);
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + shStr + "`"}, null, null);
             InputStreamReader ir = new InputStreamReader(process.getInputStream());
             LineNumberReader input = new LineNumberReader(ir);
             String line;
             process.waitFor();
-            while ((line = input.readLine()) != null){
+            while ((line = input.readLine()) != null) {
                 strList.add(line);
             }
 
@@ -84,5 +87,33 @@ public class Utils {
 //        return strList;
 //    }
 
-
+    /**
+     * 获取单个文件的MD5值
+     *
+     * @param file  文件
+     * @param radix 位 16 32 64
+     * @return
+     */
+    public static String getFileMD5s(File file, int radix) {
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(radix);
+    }
 }

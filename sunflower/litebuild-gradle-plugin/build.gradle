@@ -1,5 +1,6 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'maven-publish'
+apply plugin: 'kotlin'
 
 
 group 'com.robothy'
@@ -12,6 +13,7 @@ repositories {
 
 dependencies {
     implementation "com.android.tools.build:gradle:$gradleVersion"
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2'
 }
 
 gradlePlugin {
