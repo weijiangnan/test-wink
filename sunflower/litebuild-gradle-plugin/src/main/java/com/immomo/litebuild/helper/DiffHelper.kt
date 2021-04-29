@@ -21,6 +21,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.immomo.litebuild.util.Log
 import com.immomo.litebuild.util.Utils
+import org.gradle.BuildAdapter
 import org.gradle.BuildListener
 import org.gradle.BuildResult
 import org.gradle.api.Project
@@ -28,16 +29,47 @@ import org.gradle.api.initialization.Settings
 import org.gradle.api.invocation.Gradle
 import java.io.File
 
-const val KEY_FIRSTGEN = "DIFF_FIRST_GEN"
-
 class DiffHelper(val project: Project) {
+    companion object {
+        const val TAG = "momo.diff"
+    }
+
     private var csvPath: String
     private var diffDir: String
     private var csvReader: CsvReader
     private var csvWriter: CsvWriter
 
-    companion object {
-        const val TAG = "momo.diff"
+    init {
+        Log.v(TAG, "init")
+
+        diffDir = "${project.rootDir}/${com.immomo.litebuild.Settings.Data.TMP_PATH}"
+        csvPath = "${diffDir}/md5.csv"
+
+        val ctxCsvWriter = CsvWriterContext()
+        val ctxCsvReader = CsvReaderContext()
+        csvWriter = CsvWriter(ctxCsvWriter)
+        csvReader = CsvReader(ctxCsvReader)
+
+
+        Log.v(TAG, "rootDir=${project.rootDir}")
+        project.allprojects.forEach {
+            Log.v(TAG, "rootDir=${it.rootDir}")
+            Log.v(TAG, "projectDir=${it.projectDir}")
+        }
+
+        project.gradle.addBuildListener(object : BuildAdapter() {
+            override fun buildFinished(result: BuildResult) {
+                Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
+
+                if (result.failure == null) {
+                    File(csvPath).takeIf { it.exists() }?.delete()
+
+                    project.allprojects.forEach {
+                        genMd5AndSaveToCsv("${it.projectDir}/src/main/java/")
+                    }
+                }
+            }
+        })
     }
 
     fun diff() {
@@ -45,8 +77,8 @@ class DiffHelper(val project: Project) {
 
         val mapOrigin = loadMd5MapFromCSV(csvPath)
 
-        Log.v(TAG, "原始数据:")
-        Log.v(TAG, mapOrigin)
+        //Log.v(TAG, "原始数据:")
+        //Log.v(TAG, mapOrigin)
 
         if (mapOrigin.isEmpty()) {
             Log.v(TAG, "原始数据为空")
@@ -57,10 +89,10 @@ class DiffHelper(val project: Project) {
                 genMd5AndSaveToMap("${it.projectDir}/src/main/java/", mapNew)
             }
 
-            Log.v(TAG, "新数据:")
-            Log.v(TAG, mapNew)
+            //Log.v(TAG, "新数据:")
+            //Log.v(TAG, mapNew)
 
-            Log.v(TAG, "计算差异数据:")
+            Log.v(TAG, "计算差异数据...")
             compareMap(mapOrigin, mapNew).forEach {
                 Log.v(TAG, "差异数据:$it")
 //                com.immomo.litebuild.Settings.getData().changedJavaFiles.add("app/src/main/java/com/google/samples/apps/sunflower/test/TestJava.java")
@@ -97,62 +129,9 @@ class DiffHelper(val project: Project) {
 
     }
 
-    init {
-        Log.v(TAG, "init")
-
-        diffDir = "${project.rootDir}/${com.immomo.litebuild.Settings.Data.TMP_PATH}"
-        csvPath = "${diffDir}/md5.csv"
-
-        val ctxCsvWriter = CsvWriterContext()
-        val ctxCsvReader = CsvReaderContext()
-        csvWriter = CsvWriter(ctxCsvWriter)
-        csvReader = CsvReader(ctxCsvReader)
-
-
-        Log.v(TAG, "rootDir=${project.rootDir}")
-        project.allprojects.forEach {
-            Log.v(TAG, "rootDir=${it.rootDir}")
-            Log.v(TAG, "projectDir=${it.projectDir}")
-        }
-
-        project.gradle.addBuildListener(object : BuildListener {
-            override fun buildStarted(gradle: Gradle) {
-                Log.v(TAG, "buildStarted")
-                gradle.rootProject.childProjects.forEach {
-                    Log.v(TAG, it)
-                }
-
-            }
-
-            override fun settingsEvaluated(settings: Settings) {
-                Log.v(TAG, "settingsEvaluated")
-            }
-
-            override fun projectsLoaded(gradle: Gradle) {
-                Log.v(TAG, "projectsLoaded")
-            }
-
-            override fun projectsEvaluated(gradle: Gradle) {
-                Log.v(TAG, "projectsEvaluated")
-            }
-
-            override fun buildFinished(result: BuildResult) {
-                Log.v(TAG, "构建结束:${if (result.failure == null) "成功" else "失败"}")
-
-                if (result.failure == null) {
-                    File(csvPath).takeIf { it.exists() }?.delete()
-
-                    project.allprojects.forEach {
-                        genMd5AndSaveToCsv("${it.projectDir}/src/main/java/")
-                    }
-                }
-            }
-        })
-    }
-
 
     private fun genMd5AndSaveToMap(path: String, map: HashMap<String, String>) {
-        Log.v(TAG, "生成md5并保存到map,path=$path")
+        Log.v(TAG, "遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
                 .filter {
@@ -169,7 +148,7 @@ class DiffHelper(val project: Project) {
     }
 
     private fun genMd5AndSaveToCsv(path: String) {
-        Log.v(TAG, "生成md5并保存到csv文件,path=$path")
+        Log.v(TAG, "生成md5并保存到csv文件[$path]")
 
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
