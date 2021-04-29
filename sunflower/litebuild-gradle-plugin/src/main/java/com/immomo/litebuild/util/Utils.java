@@ -16,6 +16,8 @@
 
 package com.immomo.litebuild.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
@@ -25,19 +27,19 @@ public class Utils {
     /**
      * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
      *
-     * @param shStr
-     *            需要执行的shell
+     * @param shStr 需要执行的shell
      * @return
      */
     public static List<String> runShell(String shStr) {
+//        System.out.println("准备运行shell : " + shStr);
         List<String> strList = new ArrayList<String>();
         try {
-            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh","-c", "`" + shStr + "`"},null,null);
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + shStr + "`"}, null, null);
             InputStreamReader ir = new InputStreamReader(process.getInputStream());
             LineNumberReader input = new LineNumberReader(ir);
             String line;
             process.waitFor();
-            while ((line = input.readLine()) != null){
+            while ((line = input.readLine()) != null) {
                 strList.add(line);
             }
 
@@ -48,10 +50,28 @@ public class Utils {
         for (String str : strList) {
             System.out.print(str);
         }
-
+//        System.out.println("结束运行shell : " + shStr);
         return strList;
     }
 
+    public static void executeScript(String cmd) throws IOException, InterruptedException {
+        Process p = Runtime.getRuntime().exec(cmd);
+        p.waitFor();
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+
+        String line = "";
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        line = "";
+        while ((line = errorReader.readLine()) != null) {
+            System.out.println(line);
+        }
+    }
 //    /**
 //     * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
 //     *

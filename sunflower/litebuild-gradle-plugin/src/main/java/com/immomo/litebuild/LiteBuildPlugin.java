@@ -18,40 +18,40 @@ package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
-import com.android.utils.FileUtils;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
+import com.immomo.litebuild.helper.ResourceHelper;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        project.getTasks().register("litebuild", new Action<Task>() {
-            @Override
-            public void execute(Task task) {
+        project.getTasks().register("litebuild", task -> {
 
-                AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-                Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+            System.out.println("插件执行中...");
 
-                while (itApp.hasNext()) {
-                    ApplicationVariant variant = itApp.next();
-                    if (!variant.getName().equals("debug")) {
-                        continue;
-                    }
+            AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+            Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
 
-                    main(project);
+            while (itApp.hasNext()) {
+                ApplicationVariant variant = itApp.next();
+                if (!variant.getName().equals("debug")) {
+                    continue;
                 }
+
+                main(project);
             }
+
         });
+
     }
 
     public void main(Project project) {
@@ -62,7 +62,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         new DiffHelper().diff();
 
         // compile resource.
-
+        new ResourceHelper().process();
         // compile java & kotlin
         new CompileHelper().compileCode();
 

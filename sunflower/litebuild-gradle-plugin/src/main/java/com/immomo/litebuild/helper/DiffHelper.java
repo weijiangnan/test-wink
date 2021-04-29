@@ -22,5 +22,6 @@ public class DiffHelper {
     public void diff() {
         // todo
         Settings.getData().changedJavaFiles.add("app/src/main/java/com/google/samples/apps/sunflower/test/TestJava.java");
+        Settings.getData().hasResourceChanged = true;
     }
 }
