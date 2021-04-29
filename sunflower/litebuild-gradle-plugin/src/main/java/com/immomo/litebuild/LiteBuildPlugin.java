@@ -58,7 +58,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
         // init
         Settings.init(project);
 
-        // todo diff
         new DiffHelper(project).diff();
 
         // compile resource.
