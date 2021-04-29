@@ -18,6 +18,6 @@ package com.google.samples.apps.sunflower.test;
 
 public class TestJava {
     public static String getTitle() {
-        return "TestJava00";
+        return "Test..";
     }
 }
