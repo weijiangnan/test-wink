@@ -95,6 +95,10 @@ public class Settings {
                 this.children = children;
                 return this;
             }
+
+            public List<String> changedJavaFiles = new ArrayList<>();
+            public List<String> changedKotlinFiles = new ArrayList<>();
+            public boolean hasResourceChanged = false;
         }
 
         public boolean hasResourceChanged = false;

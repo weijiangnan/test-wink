@@ -64,7 +64,11 @@ public class LiteBuildPlugin implements Plugin<Project> {
         // init
         Settings.init(project);
 
-        new DiffHelper(project).diff();
+        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+            //
+            new DiffHelper(projectInfo).diff();
+        }
+
 
         // compile resource.
         new ResourceHelper().process();
