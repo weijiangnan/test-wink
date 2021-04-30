@@ -17,7 +17,7 @@
 package com.google.samples.apps.sunflower.test;
 
 public class TestJava {
-    public static String getTitle() {
-        return "Test..";
+    public String getTitle() {
+        return "ssss";
     }
 }

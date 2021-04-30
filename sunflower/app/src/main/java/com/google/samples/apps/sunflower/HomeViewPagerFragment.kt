@@ -47,7 +47,7 @@ class HomeViewPagerFragment : Fragment() {
         // Set the icon and text for each tab
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setIcon(getTabIcon(position))
-            tab.text = TestJava.getTitle()
+            tab.text = TestJava().getTitle()
         }.attach()
 
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)

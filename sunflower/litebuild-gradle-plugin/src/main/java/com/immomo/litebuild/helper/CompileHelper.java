@@ -23,10 +23,13 @@ import java.io.File;
 
 public class CompileHelper {
     public void compileCode() {
-        File file = new File(Settings.Data.TMP_PATH + "/tmp_class");
-        if (!file.exists()) {
-            file.mkdirs();
-        }
+//        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
+            File file = new File(Settings.Data.TMP_PATH + "/tmp_class");
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+//        }
+        Settings.getData().changedJavaFiles.add("/Users/weijiangnan/Desktop/git2/litebuild/sunflower/app/src/main/java/com/google/samples/apps/sunflower/test/TestJava.java");
 
         compileJava();
         compileKotlin();
@@ -46,7 +49,7 @@ public class CompileHelper {
         }
 
         Utils.runShell(
-                "javac" + Settings.getEnv().getProperty("main_javac_args")
+                "javac" + Settings.getEnv().getProperty("app_javac_args")
                         + sb.toString()
         );
 

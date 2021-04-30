@@ -48,7 +48,7 @@ public class Settings {
     }
 
     public static class Data {
-        public static String TMP_PATH = "../.idea/litebuild";
+        public static String TMP_PATH = ".idea/litebuild";
         public List<String> changedJavaFiles = new ArrayList<>();
         public List<String> changedKotlinFiles = new ArrayList<>();
         public ProjectInfo projectTreeRoot = null;
