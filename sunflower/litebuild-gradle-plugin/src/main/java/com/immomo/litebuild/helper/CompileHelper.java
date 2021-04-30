@@ -19,6 +19,8 @@ package com.immomo.litebuild.helper;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
+import org.apache.http.util.TextUtils;
+
 import java.io.File;
 
 public class CompileHelper {
@@ -28,8 +30,8 @@ public class CompileHelper {
             file.mkdirs();
         }
 
-        compileJava();
         compileKotlin();
+        compileJava();
 
         createDexPatch();
     }
@@ -54,7 +56,38 @@ public class CompileHelper {
     }
 
     private void compileKotlin() {
-
+        if (Settings.getData().changedKotlinFiles.size() <= 0) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String path : Settings.getData().changedKotlinFiles) {
+            sb.append(" ");
+            sb.append(path);
+        }
+        String kotlincHome = System.getenv("KOTLINC_HOME");
+        if (TextUtils.isEmpty(kotlincHome)) {
+            System.out.println();
+            System.out.println("================== 请配置 KOTLINC_HOME ==================");
+            System.out.println("1. 打开：~/.bash_profile");
+            System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
+            System.out.println("3. 执行：source ~/.bash_profile");
+            System.out.println("========================================================");
+            System.out.println();
+            return;
+        }
+        // 如果路径包含空格，需要替换 " " 为 "\ "
+        if (!kotlincHome.contains("\\")) {
+            kotlincHome = kotlincHome.replace(" ", "\\ ");
+        }
+        System.out.println("kotlincHome : " + kotlincHome);
+        try {
+            String mainKotlincArgs = Settings.getEnv().getProperty("main_kotlinc_args");
+            String javaHomePath = Settings.getEnv().getProperty("java_home");
+            javaHomePath = javaHomePath.replace(" ", "\\ ");
+            Utils.runShell(kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void createDexPatch() {

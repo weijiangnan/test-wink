@@ -115,6 +115,7 @@ public class InitEnvHelper {
         Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
 
         ArrayList<String> args = new ArrayList<>();
+        ArrayList<String> kotlinArgs = new ArrayList<>();
 
         while (itApp.hasNext()) {
             ApplicationVariant variant = itApp.next();
@@ -157,6 +158,26 @@ public class InitEnvHelper {
             }
 
             properties.setProperty("main_javac_args", sb.toString());
+
+            // 路径可能包含空格，动态控制
+//            kotlinArgs.add("-jdk-home");
+//            kotlinArgs.add(getJavaHome());
+
+            kotlinArgs.add("-classpath");
+            kotlinArgs.add(javaCompile.getClasspath().getAsPath());
+
+            kotlinArgs.add("-jvm-target");
+            kotlinArgs.add(javaCompile.getTargetCompatibility());
+
+            kotlinArgs.add("-d");
+            kotlinArgs.add(".litebuild/tmp_class");
+
+            StringBuilder sbKotlin = new StringBuilder();
+            for (int i = 0; i < kotlinArgs.size(); i++) {
+                sbKotlin.append(" ");
+                sbKotlin.append(kotlinArgs.get(i));
+            }
+            properties.setProperty("main_kotlinc_args", sbKotlin.toString());
         }
 
         try {
