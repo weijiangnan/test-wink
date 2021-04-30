@@ -34,7 +34,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
     private var scanPathRes: String
     private var csvPathRes: String
     private val scanPathCode: String
-    private val extensionList = listOf("java", "kt")
+    private val extensionList = listOf("java", "kt", "xml", "json", "png", "jpeg", "webp")
     private var csvPathCode: String
     private var diffDir: String
     private var csvReader: CsvReader
