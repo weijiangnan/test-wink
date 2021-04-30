@@ -21,11 +21,10 @@ import com.android.build.gradle.api.ApplicationVariant;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
+import com.immomo.litebuild.helper.ResourceHelper;
 
-import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,41 +35,39 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        project.getTasks().register("litebuild", new Action<Task>() {
-            @Override
-            public void execute(Task task) {
+        project.getTasks().register("litebuild", task -> {
 
-                AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-                Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+            System.out.println("插件执行中...");
 
-                while (itApp.hasNext()) {
-                    ApplicationVariant variant = itApp.next();
-                    if (!variant.getName().equals("debug")) {
+            AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+            Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+            while (itApp.hasNext()) {
+                ApplicationVariant variant = itApp.next();
+                if (!variant.getName().equals("debug")) {
 
-                        Map<String, Project> allProjectMap = new HashMap<>();
-                        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-                            @Override
-                            public void accept(Project it) {
-                                allProjectMap.put(it.getName(), it);
-                            }
-                        });
+                    Map<String, Project> allProjectMap = new HashMap<>();
+                    project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
+                        @Override
+                        public void accept(Project it) {
+                            allProjectMap.put(it.getName(), it);
+                        }
+                    });
 
-                        main(project);
-                    }
+                    main(project);
                 }
             }
         });
+
     }
 
     public void main(Project project) {
         // init
         Settings.init(project);
 
-        // todo diff
-        new DiffHelper().diff();
+        new DiffHelper(project).diff();
 
         // compile resource.
-
+        new ResourceHelper().process();
         // compile java & kotlin
         new CompileHelper().compileCode();
 

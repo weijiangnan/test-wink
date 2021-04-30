@@ -43,6 +43,7 @@ import java.util.function.Consumer;
 public class InitEnvHelper {
 
     static Properties sProperties = null;
+    Project project;
 
     public Properties getPropertiesEnv() {
         if (null != sProperties) {
@@ -90,6 +91,7 @@ public class InitEnvHelper {
     }
 
     public void initEnv(Project project) {
+        this.project = project;
         Properties properties = getPropertiesEnv();
 
         System.out.println("-------------------------");

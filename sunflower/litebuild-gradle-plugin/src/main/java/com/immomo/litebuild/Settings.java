@@ -26,18 +26,20 @@ import com.immomo.litebuild.helper.InitEnvHelper;
 
 public class Settings {
     static InitEnvHelper sEnvHelper = new InitEnvHelper();
+    public static Project project;
     public static Properties getEnv() {
         return sEnvHelper.getPropertiesEnv();
     }
 
-    public static void init(Project project) {
+    public static void init(Project p) {
+        project = p;
         // 创建文件夹
         File file = new File(Data.TMP_PATH);
         if(!file.exists()) { //如果文件夹不存在
             file.mkdirs(); //创建文件夹
         }
 
-        sEnvHelper.initEnv(project);
+        sEnvHelper.initEnv(p);
     }
 
     static Data sData = new Data();
@@ -94,5 +96,7 @@ public class Settings {
                 return this;
             }
         }
+
+        public boolean hasResourceChanged = false;
     }
 }
