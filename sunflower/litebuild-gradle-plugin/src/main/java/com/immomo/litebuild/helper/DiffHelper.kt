@@ -19,91 +19,104 @@ import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
+import com.immomo.litebuild.Settings
 import com.immomo.litebuild.util.Log
-import com.immomo.litebuild.util.Utils
 import org.gradle.BuildAdapter
-import org.gradle.BuildListener
 import org.gradle.BuildResult
 import org.gradle.api.Project
-import org.gradle.api.initialization.Settings
-import org.gradle.api.invocation.Gradle
 import java.io.File
 
-class DiffHelper(val project: Project) {
+class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
     companion object {
         const val TAG = "litebuild.diff"
     }
 
-    private var csvPath: String
+    private var scanPathRes: String
+    private var csvPathRes: String
+    private val scanPathCode: String
+    private val extensionList = listOf("java", "kt")
+    private var csvPathCode: String
     private var diffDir: String
     private var csvReader: CsvReader
     private var csvWriter: CsvWriter
+    private var project: Project = projectInfo.project
 
     init {
-        Log.v(TAG, "init")
+        Log.v(TAG, "[${project.path}]:init")
 
-        diffDir = "${project.rootDir}/${com.immomo.litebuild.Settings.Data.TMP_PATH}"
-        csvPath = "${diffDir}/md5.csv"
+        val moduleName = project.path.replace(":", "")
+        diffDir = "${project.rootDir}/.idea/litebuild/diff/${moduleName}"
+
+        scanPathCode = "${project.projectDir}/src/main/java"
+        scanPathRes = "${project.projectDir}/src/main/res"
+
+        csvPathCode = "${diffDir}/md5_code.csv"
+        csvPathRes = "${diffDir}/md5_res.csv"
 
         val ctxCsvWriter = CsvWriterContext()
         val ctxCsvReader = CsvReaderContext()
         csvWriter = CsvWriter(ctxCsvWriter)
         csvReader = CsvReader(ctxCsvReader)
 
-
-        Log.v(TAG, "rootDir=${project.rootDir}")
-        project.allprojects.forEach {
-            Log.v(TAG, "rootDir=${it.rootDir}")
-            Log.v(TAG, "projectDir=${it.projectDir}")
-        }
-
         project.gradle.addBuildListener(object : BuildAdapter() {
             override fun buildFinished(result: BuildResult) {
                 Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
 
                 if (result.failure == null) {
-                    File(csvPath).takeIf { it.exists() }?.delete()
+                    File(csvPathCode).takeIf { it.exists() }?.delete()
 
-                    project.allprojects.forEach {
-                        genMd5AndSaveToCsv("${it.projectDir}/src/main/java/", csvPath)
-                    }
+                    genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+                    genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
                 }
             }
         })
     }
 
     fun diff() {
-        Log.v(TAG, "获取差异...")
+        Log.v(TAG, "[${project.path}]:获取差异...")
 
-        val mapOrigin = loadMd5MapFromCSV(csvPath)
+        diffInner(scanPathCode, csvPathCode) {
+            Log.v(TAG, "[${project.path}]:    差异数据:$it")
+            when {
+                it.endsWith(".java") -> projectInfo.changedJavaFiles.add(it)
+                it.endsWith(".kt") -> projectInfo.changedKotlinFiles.add(it)
+            }
+        }
+
+        diffInner(scanPathRes, csvPathRes) {
+            Log.v(TAG, "[${project.path}]:差异数据:$it")
+            projectInfo.hasResourceChanged = true
+        }
+    }
+
+    private fun diffInner(scanPath: String, csvPath: String, block: (String) -> Unit) {
+        val mapOrigin = loadSnapshotToCacheFromDisk(csvPath)
 
         //Log.v(TAG, "原始数据:")
         //Log.v(TAG, mapOrigin)
 
         if (mapOrigin.isEmpty()) {
-            Log.v(TAG, "原始数据为空")
+            Log.v(TAG, "[${project.path}]:原始数据为空")
             return
         } else {
             val mapNew = hashMapOf<String, String>()
-            project.allprojects.forEach {
-                genMd5AndSaveToMap("${it.projectDir}/src/main/java/", mapNew)
-            }
+            genSnapshotAndSaveToCache(scanPath, mapNew)
 
             //Log.v(TAG, "新数据:")
             //Log.v(TAG, mapNew)
 
-            Log.v(TAG, "计算差异数据...")
-            compareMap(mapOrigin, mapNew).forEach {
-                Log.v(TAG, "差异数据:$it")
-//                com.immomo.litebuild.Settings.getData().changedJavaFiles.add("app/src/main/java/com/google/samples/apps/sunflower/test/TestJava.java")
-                com.immomo.litebuild.Settings.getData().changedJavaFiles.add(it)
-            }
+            Log.v(TAG, "[${project.path}]:计算差异数据...")
+            compareMap(mapOrigin, mapNew)
+                    .also { if (it.isEmpty()) Log.v(TAG, "[${project.path}]:差异数据为空") }
+                    .forEach {
+                        block(it)
+                    }
 
         }
     }
 
     private fun compareMap(map1: Map<String, String>, map2: Map<String, String>): Set<String> {
-        Log.v(TAG, "compareMap...")
+        Log.v(TAG, "[${project.path}]:compareMap...")
 
         val rst = hashSetOf<String>()
         var m1 = map1
@@ -130,25 +143,31 @@ class DiffHelper(val project: Project) {
     }
 
 
-    private fun genMd5AndSaveToMap(path: String, map: HashMap<String, String>) {
-        Log.v(TAG, "遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
+    private fun genSnapshotAndSaveToCache(path: String, map: HashMap<String, String>) {
+        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
                 .filter {
                     it.isFile
                 }
                 .filter {
-                    it.extension in listOf<String>("java", "kt")
+                    it.extension in extensionList
                 }
                 .forEach {
-                    map[it.absolutePath] = Utils.getFileMD5s(it, 64)
+                    map[it.absolutePath] = getSnapshot(it)
                 }
 
-        Log.v(TAG, "耗时:${System.currentTimeMillis() - timeBegin}ms")
+        Log.v(TAG, "[${project.path}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
 
-    private fun genMd5AndSaveToCsv(path: String, csvPath: String) {
-        Log.v(TAG, "遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
+    private fun genSnapshotAndSaveToDisk(path: String, csvPath: String) {
+        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
+
+        val csvFile = File(csvPath)
+        if (!csvFile.exists()) {
+            csvFile.parentFile.mkdirs()
+            csvFile.createNewFile()
+        }
 
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
@@ -156,24 +175,24 @@ class DiffHelper(val project: Project) {
                     it.isFile
                 }
                 .filter {
-                    it.extension in listOf<String>("java", "kt")
+                    it.extension in extensionList
                 }
                 .forEach {
-                    val row = listOf(it.absolutePath, Utils.getFileMD5s(it, 64))
+                    val row = listOf(it.absolutePath, getSnapshot(it))
                     csvWriter.open(csvPath, append = true) {
                         writeRow(row)
                     }
                 }
 
-        Log.v(TAG, "耗时:${System.currentTimeMillis() - timeBegin}ms")
+        Log.v(TAG, "[${project.path}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
 
     }
 
-    private fun loadMd5MapFromCSV(path: String): Map<String, String> {
-        Log.v(TAG, "从[${path}]加载md5信息...")
+    private fun loadSnapshotToCacheFromDisk(path: String): Map<String, String> {
+        Log.v(TAG, "[${project.path}]:从[${path}]加载md5信息...")
 
         return if (!File(path).exists()) {
-            Log.v(TAG, "文件[${path}]不存在")
+            Log.v(TAG, "[${project.path}]:文件[${path}]不存在")
             hashMapOf()
         } else {
             val map = hashMapOf<String, String>()
@@ -186,6 +205,8 @@ class DiffHelper(val project: Project) {
             map
         }
     }
+
+    private fun getSnapshot(it: File) = it.lastModified().toString()//Utils.getFileMD5s(it, 64)
 
 
 }
