@@ -22,6 +22,9 @@ import com.android.utils.FileUtils;
 import com.immomo.litebuild.Settings;
 
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
@@ -35,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class InitEnvHelper {
 
@@ -91,31 +95,39 @@ public class InitEnvHelper {
         System.out.println("-------------------------");
 
         AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-
         properties.setProperty("java_home", getJavaHome());
         properties.setProperty("root_dir", project.getPath());
-
         properties.setProperty("java_home", getJavaHome());
-
-        properties.setProperty("main_project_name", project.getName());
-        properties.setProperty("main_project_dir", project.getPath());
-        properties.setProperty("main_build_dir", project.getBuildDir().getPath());
-
         properties.setProperty("sdk_dir", androidExt.getSdkDirectory().getPath());
-
         properties.setProperty("build_tools_version", androidExt.getBuildToolsVersion());
         properties.setProperty("build_tools_dir", FileUtils.join(androidExt.getSdkDirectory().getPath(), "build-tools", properties.getProperty("build_tools_version")));
-
         properties.setProperty("compile_sdk_version", androidExt.getCompileSdkVersion());
         properties.setProperty("compile_sdk_dir", FileUtils.join(properties.getProperty("sdk_dir"), "platforms", properties.getProperty("compile_sdk_version")));
-
         properties.setProperty("debug_package", androidExt.getDefaultConfig().getApplicationId());
-        properties.setProperty("main_manifest_path", androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath());
 
+
+        findModuleTree(project, "");
+        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
+            initProjectData(info.getProject(), androidExt, properties);
+        }
+
+        try {
+            FileOutputStream oFile = new FileOutputStream(Settings.Data.TMP_PATH + "/env.properties", false);
+            properties.store(oFile, "Auto create by litebuild.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initProjectData(Project project, AppExtension androidExt, Properties properties) {
         Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
 
-        ArrayList<String> args = new ArrayList<>();
+        properties.setProperty(project.getName() + "_project_name", project.getName());
+        properties.setProperty(project.getName() + "_project_dir", project.getPath());
+        properties.setProperty(project.getName() + "_build_dir", project.getBuildDir().getPath());
+        properties.setProperty(project.getName() + "_manifest_path", androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath());
 
+        ArrayList<String> args = new ArrayList<>();
         while (itApp.hasNext()) {
             ApplicationVariant variant = itApp.next();
             if (!variant.getName().equals("debug")) {
@@ -148,7 +160,7 @@ public class InitEnvHelper {
             args.add(javaCompile.getClasspath().getAsPath());
 
             args.add("-d");
-            args.add(".litebuild/tmp_class");
+            args.add(Settings.Data.TMP_PATH + "/tmp_class");
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < args.size(); i++) {
@@ -156,14 +168,53 @@ public class InitEnvHelper {
                 sb.append(args.get(i));
             }
 
-            properties.setProperty("main_javac_args", sb.toString());
+            properties.setProperty(project.getName() + "_javac_args", sb.toString());
+        }
+    }
+
+    private void findModuleTree(Project project, String productFlavor) {
+        Settings.getData().projectTreeRoot = new Settings.Data.ProjectInfo();
+        Settings.getData().projectTreeRoot.setProject(project);
+
+        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
+
+        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
+    }
+
+    private void sortBuildList(Settings.Data.ProjectInfo node, List<Settings.Data.ProjectInfo> out) {
+        for (Settings.Data.ProjectInfo child : node.getChildren()) {
+            sortBuildList(child, out);
         }
 
-        try {
-            FileOutputStream oFile = new FileOutputStream(Settings.Data.TMP_PATH + "/env.properties", false);
-            properties.store(oFile, "Auto create by litebuild.");
-        } catch (IOException e) {
-            e.printStackTrace();
+        out.add(node);
+    }
+
+    private void handleAndroidProject(Project project, Settings.Data.ProjectInfo node, String productFlavor, String buildType) {
+        String[] compileNames = new String[] {"compile", "implementation", "api", "debugCompile"};
+        for (String name : compileNames) {
+            Configuration compile = project.getConfigurations().findByName(name);
+            if (compile != null) {
+                collectLocalDependency(node, compile, productFlavor, buildType);
+            }
         }
+    }
+
+    private void collectLocalDependency(Settings.Data.ProjectInfo node,
+                                               Configuration xxxCompile, String productFlavor, String buildType) {
+        xxxCompile.getDependencies().forEach(new Consumer<Dependency>() {
+            @Override
+            public void accept(Dependency dependency) {
+                if (dependency instanceof DefaultProjectDependency) {
+                    DefaultProjectDependency dp = (DefaultProjectDependency) dependency;
+
+                    // 孩子节点
+                    Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
+                    childNode.setProject(dp.getDependencyProject());
+                    node.getChildren().add(childNode);
+
+                    handleAndroidProject(childNode.getProject(), childNode,  productFlavor, buildType);
+                }
+            }
+        });
     }
 }

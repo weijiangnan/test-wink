@@ -1,5 +1,6 @@
 *.iml
 .gradle
+.litebuild
 /local.properties
 .idea/*
 !.idea/copyright

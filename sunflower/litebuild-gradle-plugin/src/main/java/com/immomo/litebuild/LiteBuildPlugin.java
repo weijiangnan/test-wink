@@ -18,7 +18,6 @@ package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
-import com.android.utils.FileUtils;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
@@ -28,8 +27,10 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
@@ -45,10 +46,17 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 while (itApp.hasNext()) {
                     ApplicationVariant variant = itApp.next();
                     if (!variant.getName().equals("debug")) {
-                        continue;
-                    }
 
-                    main(project);
+                        Map<String, Project> allProjectMap = new HashMap<>();
+                        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
+                            @Override
+                            public void accept(Project it) {
+                                allProjectMap.put(it.getName(), it);
+                            }
+                        });
+
+                        main(project);
+                    }
                 }
             }
         });

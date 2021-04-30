@@ -46,8 +46,53 @@ public class Settings {
     }
 
     public static class Data {
-        public static String TMP_PATH = ".litebuild";
+        public static String TMP_PATH = "../.idea/litebuild";
         public List<String> changedJavaFiles = new ArrayList<>();
         public List<String> changedKotlinFiles = new ArrayList<>();
+        public ProjectInfo projectTreeRoot = null;
+        public List<ProjectInfo> projectBuildSortList = new ArrayList<>();
+
+        public static class ProjectInfo {
+            private Project project;
+            private String dir;
+            private String javacArgs;
+            private List<ProjectInfo> children = new ArrayList<>();
+
+            public Project getProject() {
+                return project;
+            }
+
+            public ProjectInfo setProject(Project project) {
+                this.project = project;
+                return this;
+            }
+
+            public String getDir() {
+                return dir;
+            }
+
+            public ProjectInfo setDir(String dir) {
+                this.dir = dir;
+                return this;
+            }
+
+            public String getJavacArgs() {
+                return javacArgs;
+            }
+
+            public ProjectInfo setJavacArgs(String javacArgs) {
+                this.javacArgs = javacArgs;
+                return this;
+            }
+
+            public List<ProjectInfo> getChildren() {
+                return children;
+            }
+
+            public ProjectInfo setChildren(List<ProjectInfo> children) {
+                this.children = children;
+                return this;
+            }
+        }
     }
 }
