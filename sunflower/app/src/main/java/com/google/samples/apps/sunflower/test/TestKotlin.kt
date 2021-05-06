@@ -4,15 +4,13 @@ class TestKotlin {
 
     fun getTitle(): String {
         println("===============")
-        var aaa = "222"
-        aaa += "333"
-        aaa += "444"
+        var aaa = "Tab222"
         aaa += getString1();
         return aaa
     }
 
     fun getString1(): String {
-        return "555"
+        return "666"
 
     }
 }

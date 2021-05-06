@@ -18,6 +18,6 @@ package com.google.samples.apps.sunflower.test;
 
 public class TestJava {
     public String getTitle() {
-        return "Tab";
+        return "Tab111";
     }
 }

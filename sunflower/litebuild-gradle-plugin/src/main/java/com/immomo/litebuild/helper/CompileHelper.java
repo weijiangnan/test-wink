@@ -25,15 +25,13 @@ import org.gradle.api.Project;
 import java.io.File;
 
 public class CompileHelper {
-    public void compileCode(Project project) {
+    public void compileCode(Settings.Data.ProjectInfo project) {
 //        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
             File file = new File(Settings.Data.TMP_PATH + "/tmp_class");
             if (!file.exists()) {
                 file.mkdirs();
             }
 //        }
-        Settings.getData().changedJavaFiles.add("app/src/main/java/com/google/samples/apps/sunflower/test/TestJava.java");
-        Settings.getData().changedKotlinFiles.add("app/src/main/java/com/google/samples/apps/sunflower/test/TestKotlin.kt");
 
         compileKotlin(project);
         compileJava(project);
@@ -41,33 +39,46 @@ public class CompileHelper {
         createDexPatch();
     }
 
-    private int compileJava(Project project) {
-        if (Settings.getData().changedJavaFiles.size() <= 0) {
+    private int compileJava(Settings.Data.ProjectInfo project) {
+
+        System.out.println("compileJava ================================");
+        System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
+        System.out.println("compileJava ================================");
+
+        if (project.changedJavaFiles.size() <= 0) {
             return 0;
         }
 
         StringBuilder sb = new StringBuilder();
-        for (String path : Settings.getData().changedJavaFiles) {
+        for (String path : project.changedJavaFiles) {
             sb.append(" ");
             sb.append(path);
         }
 
+        String shellCommand = "javac" + Settings.getEnv().getProperty(project.getProject().getName() + "_javac_args")
+                + sb.toString();
+//        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
+        System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         Utils.runShell(
 //                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
-                "javac" + Settings.getEnv().getProperty("app_javac_args")
-                        + sb.toString()
+                shellCommand
         );
 
-        return Settings.getData().changedJavaFiles.size();
+        return project.changedJavaFiles.size();
     }
 
-    private void compileKotlin(Project project) {
-        if (Settings.getData().changedKotlinFiles.size() <= 0) {
+    private void compileKotlin(Settings.Data.ProjectInfo project) {
+
+        System.out.println("compileKotlin ================================");
+        System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
+        System.out.println("compileKotlin ================================");
+
+        if (project.changedKotlinFiles.size() <= 0) {
             System.out.println("LiteBuild: ================> 没有 Kotlin 文件变更。");
             return;
         }
         StringBuilder sb = new StringBuilder();
-        for (String path : Settings.getData().changedKotlinFiles) {
+        for (String path : project.changedKotlinFiles) {
             sb.append(" ");
             sb.append(path);
         }
@@ -87,12 +98,13 @@ public class CompileHelper {
             kotlincHome = kotlincHome.replace(" ", "\\ ");
         }
         System.out.println("[LiteBuild] kotlincHome : " + kotlincHome);
+        System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         try {
-            String mainKotlincArgs = Settings.getEnv().getProperty(project.getName() + "_kotlinc_args");
+            String mainKotlincArgs = Settings.getEnv().getProperty(project.getProject().getName() + "_kotlinc_args");
             String javaHomePath = Settings.getEnv().getProperty("java_home");
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             String shellCommand = kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
-            System.out.println("[LiteBuild] shellCommand : " + shellCommand);
+            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
             Utils.runShell(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();

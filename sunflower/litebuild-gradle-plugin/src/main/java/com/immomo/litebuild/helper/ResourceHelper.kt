@@ -9,7 +9,7 @@ class ResourceHelper {
 
     fun process() {
         println("ResourceHelper process")
-//        if (!Settings.getData().hasResourceChanged) return
+        if (!Settings.getData().hasResourceChanged) return
         compileResources()
         packageResources()
     }

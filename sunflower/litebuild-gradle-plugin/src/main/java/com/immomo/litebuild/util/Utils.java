@@ -40,11 +40,16 @@ public class Utils {
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + shStr + "`"}, null, null);
             InputStreamReader ir = new InputStreamReader(process.getInputStream());
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             LineNumberReader input = new LineNumberReader(ir);
             String line;
             process.waitFor();
             while ((line = input.readLine()) != null) {
                 strList.add(line);
+            }
+
+            while ((line = errorReader.readLine()) != null) {
+                System.out.println(line);
             }
 
         } catch (Exception e) {

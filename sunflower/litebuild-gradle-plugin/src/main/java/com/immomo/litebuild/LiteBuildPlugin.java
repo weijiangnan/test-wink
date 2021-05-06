@@ -40,13 +40,13 @@ public class LiteBuildPlugin implements Plugin<Project> {
         for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
             //
             new DiffHelper(projectInfo).diff();
+            // compile java & kotlin
+            new CompileHelper().compileCode(projectInfo);
         }
 
 
         // compile resource.
         new ResourceHelper().process();
-        // compile java & kotlin
-        new CompileHelper().compileCode(project);
 
         // Increment patch to app.
         new IncrementPatchHelper().patchToApp();
