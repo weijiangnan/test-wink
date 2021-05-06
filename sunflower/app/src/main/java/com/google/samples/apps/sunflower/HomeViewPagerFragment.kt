@@ -28,6 +28,7 @@ import com.google.samples.apps.sunflower.adapters.PLANT_LIST_PAGE_INDEX
 import com.google.samples.apps.sunflower.adapters.SunflowerPagerAdapter
 import com.google.samples.apps.sunflower.databinding.FragmentViewPagerBinding
 import com.google.samples.apps.sunflower.test.TestJava
+import com.google.samples.apps.sunflower.test.TestKotlin
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,7 +48,11 @@ class HomeViewPagerFragment : Fragment() {
         // Set the icon and text for each tab
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.setIcon(getTabIcon(position))
-            tab.text = TestJava().getTitle()
+            if (position == 0) {
+                tab.text = TestJava().getTitle()
+            } else {
+                tab.text = TestKotlin().getTitle()
+            }
         }.attach()
 
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
