@@ -1,4 +1,4 @@
-package com.google.samples.apps.sunflower.classloader
+package com.immomo.litebuildlib
 
 import android.content.Context
 import android.util.Log
@@ -17,10 +17,6 @@ import kotlin.jvm.Throws
  *       step2.2:再反射DexPathList中 变量 Element[] dexElements；
  *  step3：将已经加载的apk中的Element数组和补丁中的Element数组合并，把我们的补丁dex放在数组的最前面；
  *  step4：通过反射给PathList里面的Element[] dexElements赋值
- *
- * @author zx
- * @e-mail 374952705@qq.com
- * @time   2020/4/4
  */
 
 

@@ -1,4 +1,4 @@
-package com.google.samples.apps.sunflower.classloader;
+package com.immomo.litebuildlib;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.util.ArrayMap;
 import android.util.Log;
-
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -18,9 +17,9 @@ import java.util.Map;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.KITKAT;
-import static com.google.samples.apps.sunflower.classloader.ShareReflectUtil.findConstructor;
-import static com.google.samples.apps.sunflower.classloader.ShareReflectUtil.findField;
-import static com.google.samples.apps.sunflower.classloader.ShareReflectUtil.findMethod;
+import static com.immomo.litebuildlib.ShareReflectUtil.findConstructor;
+import static com.immomo.litebuildlib.ShareReflectUtil.findField;
+import static com.immomo.litebuildlib.ShareReflectUtil.findMethod;
 
 public class LiteBuildResourcePatcher {
     private static final String TAG = "ResourcePatcher";

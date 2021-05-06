@@ -58,7 +58,6 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
-                        android:background="@color/fasdasdfasd"
                         android:gravity="center"
                         android:text="@string/app_name"
                         android:textAppearance="?attr/textAppearanceHeadline5" />
@@ -72,15 +71,6 @@
                 android:id="@+id/tabs"
                 style="@style/Widget.MaterialComponents.TabLayout.Colored"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:tabIconTint="@drawable/tab_icon_color_selector"
-                app:tabTextColor="?attr/colorPrimaryDark" />
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabs2"
-                style="@style/Widget.MaterialComponents.TabLayout.Colored"
-                android:layout_width="match_parent"
-                android:background="@color/sunflower_yellow_500"
                 android:layout_height="?attr/actionBarSize"
                 app:tabIconTint="@drawable/tab_icon_color_selector"
                 app:tabTextColor="?attr/colorPrimaryDark" />

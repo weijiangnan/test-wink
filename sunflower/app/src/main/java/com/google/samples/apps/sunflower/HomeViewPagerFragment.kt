@@ -62,7 +62,7 @@ class HomeViewPagerFragment : Fragment() {
     }
 
     private fun getTabIcon(position: Int): Int {
-        Toast.makeText(context, "111", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(context, "111", Toast.LENGTH_SHORT).show()
         return when (position) {
             MY_GARDEN_PAGE_INDEX -> R.drawable.garden_tab_selector
             PLANT_LIST_PAGE_INDEX -> R.drawable.plant_list_tab_selector

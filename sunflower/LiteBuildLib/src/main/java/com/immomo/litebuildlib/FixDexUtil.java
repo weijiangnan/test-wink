@@ -1,31 +1,15 @@
-package com.google.samples.apps.sunflower.classloader;
-
-/**
- * @author zhouxu
- * @descripe
- * @e-mail 374952705@qq.com
- * @time 2020/4/3
- */
+package com.immomo.litebuildlib;
 
 import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.HashSet;
-
 import dalvik.system.DexClassLoader;
 import dalvik.system.PathClassLoader;
 
-/**
- *@author Minuit
- *@time 2018/6/25 0025 15:50
- */
 public class FixDexUtil {
 
     private static final String DEX_SUFFIX = ".dex";
