@@ -13,23 +13,23 @@ echo "$lastPath""/app/build/intermediates/processed_res/debug/out"
 time=$(date "+%Y%m%d-%H%M%S")
 echo "${time} - startUnZip"
 
-rm -rf `pwd`"/.litebuild/tempResFolder"
-mkdir `pwd`"/.litebuild/tempResFolder"
+rm -rf `pwd`"/.idea/litebuild/tempResFolder"
+mkdir `pwd`"/.idea/litebuild/tempResFolder"
 # -q 控制台不输出日志
-unzip -o -q "$lastPath""/app/build/intermediates/processed_res/debug/out/resources-debug.ap_" -d .litebuild/tempResFolder
+unzip -o -q "$lastPath""/app/build/intermediates/processed_res/debug/out/resources-debug.ap_" -d .idea/litebuild/tempResFolder
 
 echo `pwd`"/tempResFolder"
 
 time=$(date "+%Y%m%d-%H%M%S")
 echo "${time} - moveFolder"
 
-cp -R "$lastPath""/app/build/intermediates/merged_assets/debug/out/." `pwd`"/.litebuild/tempResFolder/assets"
+cp -R "$lastPath""/app/build/intermediates/merged_assets/debug/out/." `pwd`"/.idea/litebuild/tempResFolder/assets"
 
 echo "============= "`pwd`"/tempResFolder/*"
 
 time=$(date "+%Y%m%d-%H%M%S")
 echo "${time} - startZip"
-cd `pwd`"/.litebuild/tempResFolder"
+cd `pwd`"/.idea/litebuild/tempResFolder"
 
 #echo "============= "`pwd`
 

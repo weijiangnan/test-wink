@@ -53,7 +53,8 @@ public class CompileHelper {
         }
 
         Utils.runShell(
-                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
+//                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
+                "javac" + Settings.getEnv().getProperty("app_javac_args")
                         + sb.toString()
         );
 
@@ -91,7 +92,7 @@ public class CompileHelper {
             String javaHomePath = Settings.getEnv().getProperty("java_home");
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             String shellCommand = kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
-            System.out.println("[LiteBuild] shellCommand : " + kotlincHome);
+            System.out.println("[LiteBuild] shellCommand : " + shellCommand);
             Utils.runShell(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();

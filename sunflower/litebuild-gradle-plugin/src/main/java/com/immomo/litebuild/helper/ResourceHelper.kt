@@ -15,10 +15,11 @@ class ResourceHelper {
     }
 
     private fun compileResources() {
-        val stableId = File(".litebuild/stableIds.txt")
+        val stableId = File(".idea/litebuild/stableIds.txt")
         if (stableId.exists()) {
             println("stableIds存在")
         } else {
+            println("=================================")
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
         Utils.executeScript("./gradlew processDebugResources --offline")
@@ -31,7 +32,7 @@ class ResourceHelper {
         } else {
             throw FileNotFoundException("ap_文件 不 存在")
         }
-        Utils.executeScript("sh .litebuild/resourcesApk.sh")
+        Utils.executeScript("sh ./resourcesApk.sh")
     }
 
 }

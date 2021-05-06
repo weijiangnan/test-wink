@@ -92,9 +92,9 @@ object HotFixEngine {
     }
 
     private fun findClass(loader: Any) {
-        val declareMethod_1 = loader.javaClass.superclass.getDeclaredMethod("findClass", String::class.java)
-        declareMethod_1.isAccessible = true//设置private私有方法可以访问
-        var classs = declareMethod_1.invoke(loader, "com.google.samples.apps.sunflower.CpTest")
+        val declareMethod_1 = loader.javaClass.superclass?.getDeclaredMethod("findClass", String::class.java)
+        declareMethod_1?.isAccessible = true//设置private私有方法可以访问
+        var classs = declareMethod_1?.invoke(loader, "com.google.samples.apps.sunflower.CpTest")
         Log.e("weijiangnan", "classss:" + classs + " hash:" + classs.hashCode())
     }
 

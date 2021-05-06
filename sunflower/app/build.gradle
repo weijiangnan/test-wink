@@ -43,6 +43,23 @@ android {
             }
         }
     }
+    //解决强行修改图片后缀问题 jpg改成png会有问题
+    aaptOptions {
+        cruncherEnabled = false
+
+//        if (gradle.ext.abi_64) {
+//            ignoreAssetsPattern "!lua_32"
+//        } else {
+//            ignoreAssetsPattern "!lua_64"
+//        }
+        def stableIdPath = ".idea/litebuild/stableIds.txt"
+        File publicTxtFile = project.rootProject.file(stableIdPath)
+        if (publicTxtFile.exists()) {
+            additionalParameters "--stable-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
+        } else {
+            additionalParameters "--emit-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
