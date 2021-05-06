@@ -161,7 +161,8 @@ public class InitEnvHelper {
             args.add(javaCompile.getOptions().getAnnotationProcessorPath().getAsPath());
 
             args.add("-classpath");
-            args.add(javaCompile.getClasspath().getAsPath());
+            args.add(javaCompile.getClasspath().getAsPath() + ":"
+                    + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
 
             args.add("-d");
             args.add(Settings.Data.TMP_PATH + "/tmp_class");
