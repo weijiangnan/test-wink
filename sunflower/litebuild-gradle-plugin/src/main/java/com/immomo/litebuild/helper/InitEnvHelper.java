@@ -130,6 +130,8 @@ public class InitEnvHelper {
         properties.setProperty(project.getName() + "_manifest_path", androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath());
 
         ArrayList<String> args = new ArrayList<>();
+        ArrayList<String> kotlinArgs = new ArrayList<>();
+
         while (itApp.hasNext()) {
             ApplicationVariant variant = itApp.next();
             if (!variant.getName().equals("debug")) {
@@ -171,6 +173,26 @@ public class InitEnvHelper {
             }
 
             properties.setProperty(project.getName() + "_javac_args", sb.toString());
+
+            // 路径可能包含空格，动态控制
+//            kotlinArgs.add("-jdk-home");
+//            kotlinArgs.add(getJavaHome());
+
+            kotlinArgs.add("-classpath");
+            kotlinArgs.add(javaCompile.getClasspath().getAsPath());
+
+            kotlinArgs.add("-jvm-target");
+            kotlinArgs.add(javaCompile.getTargetCompatibility());
+
+            kotlinArgs.add("-d");
+            kotlinArgs.add(Settings.Data.TMP_PATH + "/tmp_class");
+
+            StringBuilder sbKotlin = new StringBuilder();
+            for (int i = 0; i < kotlinArgs.size(); i++) {
+                sbKotlin.append(" ");
+                sbKotlin.append(kotlinArgs.get(i));
+            }
+            properties.setProperty(project.getName() + "_kotlinc_args", sbKotlin.toString());
         }
     }
 

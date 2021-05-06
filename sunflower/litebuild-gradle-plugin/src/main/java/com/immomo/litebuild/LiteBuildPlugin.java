@@ -33,6 +33,25 @@ import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
+    public void main(Project project) {
+        // init
+        Settings.init(project);
+
+        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+            //
+            new DiffHelper(projectInfo).diff();
+        }
+
+
+        // compile resource.
+        new ResourceHelper().process();
+        // compile java & kotlin
+        new CompileHelper().compileCode(project);
+
+        // Increment patch to app.
+        new IncrementPatchHelper().patchToApp();
+    }
+
     @Override
     public void apply(Project project) {
         project.getTasks().register("litebuild", task -> {
@@ -58,24 +77,5 @@ public class LiteBuildPlugin implements Plugin<Project> {
             }
         });
 
-    }
-
-    public void main(Project project) {
-        // init
-        Settings.init(project);
-
-        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-            //
-            new DiffHelper(projectInfo).diff();
-        }
-
-
-        // compile resource.
-        new ResourceHelper().process();
-        // compile java & kotlin
-        new CompileHelper().compileCode();
-
-        // Increment patch to app.
-        new IncrementPatchHelper().patchToApp();
     }
 }
