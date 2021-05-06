@@ -20,7 +20,6 @@ import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
 import org.apache.http.util.TextUtils;
-import org.gradle.api.Project;
 
 import java.io.File;
 
@@ -41,9 +40,9 @@ public class CompileHelper {
 
     private int compileJava(Settings.Data.ProjectInfo project) {
 
-        System.out.println("compileJava ================================");
-        System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
-        System.out.println("compileJava ================================");
+//        System.out.println("compileJava ================================");
+//        System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
+//        System.out.println("compileJava ================================");
 
         if (project.changedJavaFiles.size() <= 0) {
             return 0;
@@ -69,9 +68,9 @@ public class CompileHelper {
 
     private void compileKotlin(Settings.Data.ProjectInfo project) {
 
-        System.out.println("compileKotlin ================================");
-        System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
-        System.out.println("compileKotlin ================================");
+//        System.out.println("compileKotlin ================================");
+//        System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
+//        System.out.println("compileKotlin ================================");
 
         if (project.changedKotlinFiles.size() <= 0) {
             System.out.println("LiteBuild: ================> 没有 Kotlin 文件变更。");
@@ -104,7 +103,7 @@ public class CompileHelper {
             String javaHomePath = Settings.getEnv().getProperty("java_home");
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             String shellCommand = kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
-            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
+//            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
             Utils.runShell(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();
