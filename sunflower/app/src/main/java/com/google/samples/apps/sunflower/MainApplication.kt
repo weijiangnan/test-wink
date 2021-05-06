@@ -18,6 +18,7 @@ package com.google.samples.apps.sunflower
 
 import android.app.Application
 import com.google.samples.apps.sunflower.classloader.HotFixEngine
+import com.google.samples.apps.sunflower.classloader.LiteBuildResLoader
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -26,6 +27,7 @@ class MainApplication : Application() {
         super.onCreate()
 
         HotFixEngine.loadPatch(this);
+        LiteBuildResLoader.tryLoad(this)
     }
 }
 

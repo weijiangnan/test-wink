@@ -42,7 +42,8 @@ echo "${time} - end"
 cd ..
 pwd
 rm -rf tempResFolder
-
-adb shell rm -rf /sdcard/Android/data/com.immomo.momo.dev/files/MOMOCARD/patch_file
-adb shell mkdir /sdcard/Android/data/com.immomo.momo.dev/files/MOMOCARD/patch_file
-adb push resources-debug.apk /sdcard/Android/data/com.immomo.momo.dev/files/MOMOCARD/patch_file/
+#TAR_PATH="com.immomo.momo.dev/files/MOMOCARD/patch_file"
+TAR_PATH="com.google.samples.apps.sunflower"
+adb shell rm -rf /sdcard/Android/data/$TAR_PATH
+adb shell mkdir /sdcard/Android/data/$TAR_PATH
+adb push resources-debug.apk /sdcard/Android/data/$TAR_PATH/
