@@ -78,8 +78,16 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         diffInner(scanPathCode, csvPathCode) {
             Log.v(TAG, "[${project.path}]:    差异数据:$it")
             when {
-                it.endsWith(".java") -> projectInfo.changedJavaFiles.add(it)
-                it.endsWith(".kt") -> projectInfo.changedKotlinFiles.add(it)
+                it.endsWith(".java") -> {
+                    if (!projectInfo.changedJavaFiles.contains(it)) {
+                        projectInfo.changedJavaFiles.add(it)
+                    }
+                }
+                it.endsWith(".kt") -> {
+                    if (!projectInfo.changedKotlinFiles.contains(it)) {
+                        projectInfo.changedKotlinFiles.add(it)
+                    }
+                }
             }
         }
 
