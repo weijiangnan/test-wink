@@ -20,6 +20,7 @@ import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.utils.FileUtils;
 import com.immomo.litebuild.Settings;
+import com.immomo.litebuild.util.AndroidManifestUtils;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -107,8 +108,16 @@ public class InitEnvHelper {
         properties.setProperty("compile_sdk_dir", FileUtils.join(properties.getProperty("sdk_dir"), "platforms", properties.getProperty("compile_sdk_version")));
         properties.setProperty("debug_package", androidExt.getDefaultConfig().getApplicationId());
 
+        String packageName = androidExt.getDefaultConfig().getApplicationId();
+        String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
+//        System.out.println("manifestPath : " + manifestPath);
+
+        String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageName);
+//        System.out.println("launcherActivity : " + launcherActivity);
+        properties.setProperty("launcher_activity", launcherActivity);
 
         findModuleTree(project, "");
+
         for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
             initProjectData(info.getProject(), androidExt, properties);
         }

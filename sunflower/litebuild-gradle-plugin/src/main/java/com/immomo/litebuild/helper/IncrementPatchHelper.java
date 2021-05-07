@@ -24,7 +24,8 @@ public class IncrementPatchHelper {
         String cmds = new String();
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell am force-stop " + Settings.getEnv().getProperty("debug_package");
-        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("debug_package") + ".GardenActivity";
+//        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("debug_package") + ".GardenActivity";
+        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("launcher_activity");
 
         Utils.runShell(cmds);
     }
