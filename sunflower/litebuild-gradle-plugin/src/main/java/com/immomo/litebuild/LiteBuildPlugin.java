@@ -34,6 +34,7 @@ import java.util.function.Consumer;
 public class LiteBuildPlugin implements Plugin<Project> {
 
     public void main(Project project) {
+        System.out.println("进入了main函数");
         // init
         Settings.init(project);
 
@@ -56,25 +57,28 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void apply(Project project) {
         project.getTasks().register("litebuild", task -> {
 
-            System.out.println("插件执行中...");
+            System.out.println("插件执行中...11");
 
             AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
             Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-            while (itApp.hasNext()) {
-                ApplicationVariant variant = itApp.next();
-                if (!variant.getName().equals("debug")) {
-
-                    Map<String, Project> allProjectMap = new HashMap<>();
-                    project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-                        @Override
-                        public void accept(Project it) {
-                            allProjectMap.put(it.getName(), it);
-                        }
-                    });
-
-                    main(project);
+            System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
+//            while (itApp.hasNext()) {
+//                ApplicationVariant variant = itApp.next();
+//                System.out.println("variant..." + variant.getName());
+//                if (!variant.getName().equals("debug")) {
+//                    
+//                }
+//            }
+            Map<String, Project> allProjectMap = new HashMap<>();
+            project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
+                @Override
+                public void accept(Project it) {
+                    System.out.println("插件执行中...3 accept itApp=" + itApp.hasNext());
+                    allProjectMap.put(it.getName(), it);
                 }
-            }
+            });
+
+            main(project);
         });
 
     }

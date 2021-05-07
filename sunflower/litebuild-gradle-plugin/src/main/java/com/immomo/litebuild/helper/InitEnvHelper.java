@@ -217,9 +217,19 @@ public class InitEnvHelper {
         Settings.getData().projectTreeRoot = new Settings.Data.ProjectInfo();
         Settings.getData().projectTreeRoot.setProject(project);
 
-        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
+        project.getRootProject().getSubprojects().forEach(subProject -> {
+            if (subProject != null) {
+                System.out.println("subProject name==" + subProject.getName());
+                Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
+                childNode.setProject(subProject);
+                Settings.getData().projectTreeRoot.getChildren().add(childNode);
+                Settings.getData().projectBuildSortList.add(childNode);
+            }
+        });
 
-        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
+//        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
+//
+//        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
     }
 
     private void sortBuildList(Settings.Data.ProjectInfo node, List<Settings.Data.ProjectInfo> out) {

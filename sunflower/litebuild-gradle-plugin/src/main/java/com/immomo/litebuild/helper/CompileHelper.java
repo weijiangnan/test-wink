@@ -40,9 +40,9 @@ public class CompileHelper {
 
     private int compileJava(Settings.Data.ProjectInfo project) {
 
-//        System.out.println("compileJava ================================");
-//        System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
-//        System.out.println("compileJava ================================");
+        System.out.println("compileJava ================================");
+        System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
+        System.out.println("compileJava ================================");
 
         if (project.changedJavaFiles.size() <= 0) {
             return 0;
@@ -56,7 +56,7 @@ public class CompileHelper {
 
         String shellCommand = "javac" + Settings.getEnv().getProperty(project.getProject().getName() + "_javac_args")
                 + sb.toString();
-//        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
+        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
         System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         Utils.runShell(
 //                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
@@ -68,9 +68,9 @@ public class CompileHelper {
 
     private void compileKotlin(Settings.Data.ProjectInfo project) {
 
-//        System.out.println("compileKotlin ================================");
-//        System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
-//        System.out.println("compileKotlin ================================");
+        System.out.println("compileKotlin ================================");
+        System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
+        System.out.println("compileKotlin ================================");
 
         if (project.changedKotlinFiles.size() <= 0) {
             System.out.println("LiteBuild: ================> 没有 Kotlin 文件变更。");

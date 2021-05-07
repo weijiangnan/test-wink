@@ -61,7 +61,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         project.gradle.addBuildListener(object : BuildAdapter() {
             override fun buildFinished(result: BuildResult) {
                 Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
-
+                result.failure?.printStackTrace()
                 if (result.failure == null) {
                     File(csvPathCode).takeIf { it.exists() }?.delete()
 
