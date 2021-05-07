@@ -23,8 +23,10 @@ import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
 
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,6 +34,42 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
+
+    @Override
+    public void apply(Project project) {
+        project.getTasks().register("litebuild", task -> {
+            task.doLast(new Action<Task>() {
+                @Override
+                public void execute(Task task) {
+                    System.out.println("插件执行中...11");
+
+                    AppExtension androidExt1 = project.getExtensions().findByType(AppExtension.class);
+                    AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+                    Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+                    System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
+                    while (itApp.hasNext()) {
+                        ApplicationVariant variant = itApp.next();
+                        System.out.println("variant..." + variant.getName());
+                        if (!variant.getName().equals("debug")) {
+                            Map<String, Project> allProjectMap = new HashMap<>();
+                            project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
+                                @Override
+                                public void accept(Project it) {
+                                    System.out.println("插件执行中...3 accept itApp=" + itApp.hasNext());
+                                    allProjectMap.put(it.getName(), it);
+                                }
+                            });
+
+                            main(project);
+                        }
+                    }
+
+                }
+            });
+
+        });
+
+    }
 
     public void main(Project project) {
         System.out.println("进入了main函数");
@@ -53,33 +91,4 @@ public class LiteBuildPlugin implements Plugin<Project> {
         new IncrementPatchHelper().patchToApp();
     }
 
-    @Override
-    public void apply(Project project) {
-        project.getTasks().register("litebuild", task -> {
-
-            System.out.println("插件执行中...11");
-
-            AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-            Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-            System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
-//            while (itApp.hasNext()) {
-//                ApplicationVariant variant = itApp.next();
-//                System.out.println("variant..." + variant.getName());
-//                if (!variant.getName().equals("debug")) {
-//                    
-//                }
-//            }
-            Map<String, Project> allProjectMap = new HashMap<>();
-            project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-                @Override
-                public void accept(Project it) {
-                    System.out.println("插件执行中...3 accept itApp=" + itApp.hasNext());
-                    allProjectMap.put(it.getName(), it);
-                }
-            });
-
-            main(project);
-        });
-
-    }
 }
