@@ -112,11 +112,12 @@ public class InitEnvHelper {
         properties.setProperty("compile_sdk_dir", FileUtils.join(properties.getProperty("sdk_dir"), "platforms", properties.getProperty("compile_sdk_version")));
 
         String packageName = androidExt.getDefaultConfig().getApplicationId();
+        String packageNameStuff = androidExt.getDefaultConfig().getApplicationId();
 
         while (androidExt.getApplicationVariants().iterator().hasNext()) {
             ApplicationVariant variant = androidExt.getApplicationVariants().iterator().next();
             if (variant.getName().equals("debug")) {
-                packageName = variant.getApplicationId();
+                packageNameStuff = variant.getApplicationId();
                 break;
             }
         }
@@ -129,7 +130,7 @@ public class InitEnvHelper {
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
 //        System.out.println("manifestPath : " + manifestPath);
 
-        String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageName);
+        String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageNameStuff);
 //        System.out.println("launcherActivity : " + launcherActivity);
         properties.setProperty("launcher_activity", launcherActivity);
 

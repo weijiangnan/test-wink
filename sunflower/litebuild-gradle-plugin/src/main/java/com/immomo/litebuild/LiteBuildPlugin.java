@@ -42,7 +42,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
-                    System.out.println("---------------->>>>> " + "task doLast() startTime：" + System.currentTimeMillis());
+                    long startTime = System.currentTimeMillis();
+                    System.out.println("=============================================>>>>> " + "task doLast() startTime：" + startTime);
                     System.out.println("插件执行中...11");
 
                     AppExtension androidExt1 = project.getExtensions().findByType(AppExtension.class);
@@ -62,12 +63,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
                                     allProjectMap.put(it.getName(), it);
                                 }
                             });
-                            System.out.println("========================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + "单个任务启动：" + variant.getName() + variantStartTime);
                             main(project);
-                            System.out.println("========================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + "单个任务结束：" + variant.getName() + (System.currentTimeMillis() - variantStartTime));
                         }
                     }
-                    System.out.println("---------------->>>>> " + "task doLast() endTime：" + System.currentTimeMillis());
+                    System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
             });
 
@@ -80,7 +79,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         System.out.println("进入了main函数");
         // init
         Settings.init(project);
-        System.out.println("---------------->>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
+        System.out.println("【【【===================================================>>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
 
 //        System.out.println("=================>>>>>> projectBuildSortList size : " +  Settings.getData().projectBuildSortList.size() + " === " + Settings.getData().projectBuildSortList.toString());
 //        System.out.println("=============================================>>>>>> ");
@@ -100,18 +99,18 @@ public class LiteBuildPlugin implements Plugin<Project> {
         }
         long diffEndTime = System.currentTimeMillis();
 
-        System.out.println("---------------->>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffEndTime) + " ms");
+        System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffEndTime) + " ms");
 
         // compile resource.
         new ResourceHelper().process();
         long resEndTime = System.currentTimeMillis();
 
-        System.out.println("---------------->>>>> " + "res 耗时" + (System.currentTimeMillis() - resEndTime) + " ms");
+        System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resEndTime) + " ms");
         // Increment patch to app.
         new IncrementPatchHelper().patchToApp();
         long pathEndTime = System.currentTimeMillis();
-        System.out.println("---------------->>>>> " + "path 结束耗时" + (System.currentTimeMillis() - pathEndTime) + " ms");
-        System.out.println("---------------->>>>> " + "main 函数结束" + (System.currentTimeMillis() - mainStartTime) + " ms");
+        System.out.println("【【【===================================================>>>>> " + "path 结束耗时" + (System.currentTimeMillis() - pathEndTime) + " ms");
+        System.out.println("【【【===================================================>>>>> " + "main 函数结束" + (System.currentTimeMillis() - mainStartTime) + " ms");
     }
 
 }

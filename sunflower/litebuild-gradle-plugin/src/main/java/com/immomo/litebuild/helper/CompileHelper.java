@@ -119,6 +119,7 @@ public class CompileHelper {
 //        cmds += '\n' + "adb shell am force-stop " + APP_PACKAGE;
 //        cmds += '\n' + "adb shell am start -n " + APP_PACKAGE + "/" + LAUNCH_ACTIVITY;
 
+        System.out.println("安装 CMD 命令：" + cmds);
         Utils.runShell(cmds);
     }
 }
