@@ -56,7 +56,7 @@ public class CompileHelper {
 
         String shellCommand = "javac" + Settings.getEnv().getProperty(project.getProject().getName() + "_javac_args")
                 + sb.toString();
-        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
+//        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
         System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         Utils.runShell(
 //                "javac" + Settings.getEnv().getProperty(project + "_javac_args")

@@ -18,14 +18,17 @@ package com.immomo.litebuild.helper;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension;
 import com.android.utils.FileUtils;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.AndroidManifestUtils;
 
+import org.apache.http.util.TextUtils;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
+import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
@@ -92,6 +95,7 @@ public class InitEnvHelper {
     }
 
     public void initEnv(Project project) {
+        long initStartTime = System.currentTimeMillis();
         this.project = project;
         Properties properties = getPropertiesEnv();
 
@@ -106,9 +110,22 @@ public class InitEnvHelper {
         properties.setProperty("build_tools_dir", FileUtils.join(androidExt.getSdkDirectory().getPath(), "build-tools", properties.getProperty("build_tools_version")));
         properties.setProperty("compile_sdk_version", androidExt.getCompileSdkVersion());
         properties.setProperty("compile_sdk_dir", FileUtils.join(properties.getProperty("sdk_dir"), "platforms", properties.getProperty("compile_sdk_version")));
-        properties.setProperty("debug_package", androidExt.getDefaultConfig().getApplicationId());
 
         String packageName = androidExt.getDefaultConfig().getApplicationId();
+
+        while (androidExt.getApplicationVariants().iterator().hasNext()) {
+            ApplicationVariant variant = androidExt.getApplicationVariants().iterator().next();
+            if (variant.getName().equals("debug")) {
+                packageName = variant.getApplicationId();
+                break;
+            }
+        }
+//        String applicationIdSuffix = ((BaseAppModuleExtension) androidExt).publicExtensionImpl.buildTypes.getByName("debug").getApplicationIdSuffix();
+//        if (!TextUtils.isEmpty(applicationIdSuffix)) {
+//            packageName += applicationIdSuffix;
+//        }
+        properties.setProperty("debug_package", packageName);
+
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
 //        System.out.println("manifestPath : " + manifestPath);
 
@@ -116,11 +133,18 @@ public class InitEnvHelper {
 //        System.out.println("launcherActivity : " + launcherActivity);
         properties.setProperty("launcher_activity", launcherActivity);
 
+        Settings.getData().projectBuildSortList = new ArrayList<>();
+
+        long findModuleTreeStartTime = System.currentTimeMillis();
         findModuleTree(project, "");
+        System.out.println("ywb 11111111111111 findModuleTree 耗时：" + (System.currentTimeMillis() - findModuleTreeStartTime) + " ms");
+        long findModuleEndTime = System.currentTimeMillis();
 
         for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
             initProjectData(info.getProject(), androidExt, properties);
         }
+        long initProjectDataEndTime = System.currentTimeMillis();
+        System.out.println("ywb 11111111111111 initProjectData 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
 
         try {
             FileOutputStream oFile = new FileOutputStream(Settings.Data.TMP_PATH + "/env.properties", false);
@@ -128,9 +152,12 @@ public class InitEnvHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("ywb 11111111111111 findModuleTree 耗时：" + (System.currentTimeMillis() - initProjectDataEndTime) + " ms");
     }
 
     private void initProjectData(Project project, AppExtension androidExt, Properties properties) {
+        long findModuleEndTime = System.currentTimeMillis();
+
         Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
 
         properties.setProperty(project.getName() + "_project_name", project.getName());
@@ -141,7 +168,10 @@ public class InitEnvHelper {
         ArrayList<String> args = new ArrayList<>();
         ArrayList<String> kotlinArgs = new ArrayList<>();
 
+        System.out.println("ywb 2222222 initProjectData 1111 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
+
         while (itApp.hasNext()) {
+            long findModuleEndTime2 = System.currentTimeMillis();
             ApplicationVariant variant = itApp.next();
             if (!variant.getName().equals("debug")) {
                 continue;
@@ -189,9 +219,9 @@ public class InitEnvHelper {
 //            kotlinArgs.add(getJavaHome());
 
             kotlinArgs.add("-classpath");
-            System.out.println("=============");
-            System.out.println("BootstrapClasspath =========== : " + javaCompile.getOptions().getBootstrapClasspath().getAsPath());
-            System.out.println("=============");
+//            System.out.println("=============");
+//            System.out.println("BootstrapClasspath =========== : " + javaCompile.getOptions().getBootstrapClasspath().getAsPath());
+//            System.out.println("=============");
 
             System.out.println("projectDir : " + project.getProjectDir().toString());
             kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
@@ -210,22 +240,29 @@ public class InitEnvHelper {
                 sbKotlin.append(kotlinArgs.get(i));
             }
             properties.setProperty(project.getName() + "_kotlinc_args", sbKotlin.toString());
+            System.out.println("ywb 2222222 initProjectData 22222 耗时：" + (System.currentTimeMillis() - findModuleEndTime2) + " ms");
+
         }
+
     }
 
     private void findModuleTree(Project project, String productFlavor) {
         Settings.getData().projectTreeRoot = new Settings.Data.ProjectInfo();
         Settings.getData().projectTreeRoot.setProject(project);
 
+        long startTimeOuter = System.currentTimeMillis();
         project.getRootProject().getSubprojects().forEach(subProject -> {
-            if (subProject != null) {
+            if (subProject != null) { // && subProject.getChildProjects().size() == 0) {
+                long startTime = System.currentTimeMillis();
                 System.out.println("subProject name==" + subProject.getName());
                 Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
                 childNode.setProject(subProject);
                 Settings.getData().projectTreeRoot.getChildren().add(childNode);
                 Settings.getData().projectBuildSortList.add(childNode);
+                System.out.println("ywbbbbbbbbbb " + "subProject " + subProject.getName() + ": 耗时：" + (System.currentTimeMillis() - startTime) + " ms");
             }
         });
+        System.out.println("ywbbbbbbbbbb " + "project ~~~ " + project.getName() + ": 耗时：" + (System.currentTimeMillis() - startTimeOuter) + " ms");
 
 //        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
 //
