@@ -92,7 +92,8 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         }
 
         diffInner(scanPathRes, csvPathRes) {
-//            Log.v(TAG, "[${project.path}]:差异数据:$it")
+            Log.v(TAG, "[${project.path}]:有资源被修改了！！！！！！差异数据:$it")
+            Log.v(TAG, "被修改的资源是：$scanPathRes")
             projectInfo.hasResourceChanged = true
         }
     }
