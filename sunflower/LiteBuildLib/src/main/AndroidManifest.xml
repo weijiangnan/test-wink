@@ -2,4 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.immomo.litebuildlib">
 
+    <application>
+        <provider
+            android:name="com.immomo.litebuildlib.LiteBuildInstaller"
+            android:authorities="${applicationId}.litebuild-sentry-installer"
+            android:exported="false"/>
+    </application>
+
 </manifest>
