@@ -34,6 +34,7 @@ public class Settings {
     public static void init(Project p) {
         project = p;
         // 创建文件夹
+        Data.TMP_PATH = project.getRootDir().getPath() + "/.idea/litebuild";
         File file = new File(Data.TMP_PATH);
         if(!file.exists()) { //如果文件夹不存在
             file.mkdirs(); //创建文件夹

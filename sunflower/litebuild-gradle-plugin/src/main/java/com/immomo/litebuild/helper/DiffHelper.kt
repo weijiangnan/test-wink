@@ -73,10 +73,10 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
     }
 
     fun diff() {
-        Log.v(TAG, "[${project.path}]:获取差异...")
+//        Log.v(TAG, "[${project.path}]:获取差异...")
 
         diffInner(scanPathCode, csvPathCode) {
-            Log.v(TAG, "[${project.path}]:    差异数据:$it")
+//            Log.v(TAG, "[${project.path}]:    差异数据:$it")
             when {
                 it.endsWith(".java") -> {
                     if (!projectInfo.changedJavaFiles.contains(it)) {
@@ -92,7 +92,8 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         }
 
         diffInner(scanPathRes, csvPathRes) {
-            Log.v(TAG, "[${project.path}]:差异数据:$it")
+            Log.v(TAG, "[${project.path}]:有资源被修改了！！！！！！差异数据:$it")
+            Log.v(TAG, "被修改的资源是：$scanPathRes")
             projectInfo.hasResourceChanged = true
         }
     }
@@ -152,7 +153,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
 
 
     private fun genSnapshotAndSaveToCache(path: String, map: HashMap<String, String>) {
-        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
+//        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
                 .filter {
@@ -169,7 +170,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
     }
 
     private fun genSnapshotAndSaveToDisk(path: String, csvPath: String) {
-        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
+//        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
 
         val csvFile = File(csvPath)
         if (!csvFile.exists()) {
@@ -197,7 +198,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
     }
 
     private fun loadSnapshotToCacheFromDisk(path: String): Map<String, String> {
-        Log.v(TAG, "[${project.path}]:从[${path}]加载md5信息...")
+//        Log.v(TAG, "[${project.path}]:从[${path}]加载md5信息...")
 
         return if (!File(path).exists()) {
             Log.v(TAG, "[${project.path}]:文件[${path}]不存在")
