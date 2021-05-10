@@ -17,7 +17,9 @@
 package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.ApplicationVariant;
+import com.android.build.gradle.api.BaseVariantOutput;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
@@ -28,7 +30,12 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.execution.TaskExecutionGraph;
+import org.gradle.internal.FileUtils;
+import org.gradle.internal.impldep.org.apache.ivy.util.FileUtil;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -43,6 +50,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             @Override
             public void accept(Project it) {
 
+
                 it.getGradle().getTaskGraph().whenReady(new Action<TaskExecutionGraph>() {
                     @Override
                     public void execute(TaskExecutionGraph taskExecutionGraph) {
@@ -54,6 +62,40 @@ public class LiteBuildPlugin implements Plugin<Project> {
                                         @Override
                                         public void execute(Task task) {
                                             new DiffHelper(it).initSnapshot();
+
+
+                                            //copy apk to litebuild dir
+                                            boolean hasAppPlugin = it.getPlugins().hasPlugin("com.android.application");
+                                            if (hasAppPlugin) {
+                                                System.out.println("该module未包含com.android.application插件");
+                                                AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+                                                Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+                                                while (itApp.hasNext()) {
+                                                    ApplicationVariant variant = itApp.next();
+                                                    if (variant.getName().equals("debug")) {
+                                                        variant.getOutputs().all(new Action<BaseVariantOutput>() {
+                                                            @Override
+                                                            public void execute(BaseVariantOutput baseVariantOutput) {
+                                                                File srcFile = baseVariantOutput.getOutputFile();
+                                                                String moduleName = it.getPath().replace(":", "");
+                                                                String diffDir = project.getRootDir() + "/.idea/litebuild/diff/" + moduleName;
+                                                                File destFile = new File(diffDir, "snapshot.apk");
+                                                                try {
+                                                                    Files.copy(srcFile.toPath(), destFile.toPath());
+                                                                } catch (IOException e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                                System.out.println("momomomomomomomomomomomomomo Output path=" + srcFile);
+                                                            }
+                                                        });
+
+                                                        //
+                                                        String outputApkPath = variant.getPackageApplicationProvider().get().getOutputDirectory().get().toString();
+                                                        System.out.println("momomomomomomomomomomomomomo outputApkPath=" + outputApkPath);
+                                                    }
+                                                }
+                                            }
+
                                         }
                                     });
                                 }
@@ -74,13 +116,29 @@ public class LiteBuildPlugin implements Plugin<Project> {
                     System.out.println("litebuild execute() =============================================>>>>> " + "task doLast() startTime：" + startTime);
                     System.out.println("插件执行中...1");
 
+                    boolean hasAppPlugin = project.getPlugins().hasPlugin("com.android.application");
+                    if (!hasAppPlugin) {
+                        System.out.println("该module未包含com.android.application插件");
+                        return;
+                    }
+
                     AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+
                     Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
                     System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
                     while (itApp.hasNext()) {
                         ApplicationVariant variant = itApp.next();
                         System.out.println("variant..." + variant.getName());
                         if (variant.getName().equals("debug")) {
+
+                            variant.getOutputs().all(new Action<BaseVariantOutput>() {
+                                @Override
+                                public void execute(BaseVariantOutput baseVariantOutput) {
+                                    String path = baseVariantOutput.getOutputFile().getAbsolutePath();
+                                    System.out.println("variant..." + path);
+                                }
+                            });
+
                             System.out.println("插件执行中...3  main()");
                             main(project);
                             break;
