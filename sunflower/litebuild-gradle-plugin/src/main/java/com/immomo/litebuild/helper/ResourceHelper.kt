@@ -10,8 +10,13 @@ class ResourceHelper {
     fun process() {
         println("ResourceHelper process, changed=${Settings.getData().hasResourceChanged}")
         if (!Settings.getData().hasResourceChanged) return
+
+        val st = System.currentTimeMillis()
         compileResources()
+        val pkgtime = System.currentTimeMillis()
+        println("资源编译耗时：" + (System.currentTimeMillis() - st))
         packageResources()
+        println("资源打包耗时：" + (System.currentTimeMillis() - pkgtime))
     }
 
     private fun compileResources() {

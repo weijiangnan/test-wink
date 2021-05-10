@@ -89,6 +89,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
 //        System.out.println("=============================================>>>>>> ");
 
 
+        long diffStartTime = System.currentTimeMillis();
+
         for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
             //
             long startTime = System.currentTimeMillis();
@@ -105,15 +107,14 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 break;
             }
         }
-        long diffEndTime = System.currentTimeMillis();
 
-        System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffEndTime) + " ms");
+        System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
 
         // compile resource.
+        long resStartTime = System.currentTimeMillis();
         new ResourceHelper().process();
-        long resEndTime = System.currentTimeMillis();
 
-        System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resEndTime) + " ms");
+        System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
         // Increment patch to app.
         new IncrementPatchHelper().patchToApp();
         long pathEndTime = System.currentTimeMillis();
