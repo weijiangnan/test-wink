@@ -63,10 +63,10 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
                 Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
                 result.failure?.printStackTrace()
                 if (result.failure == null) {
-                    File(csvPathCode).takeIf { it.exists() }?.delete()
-
-                    genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
-                    genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+                    File(csvPathCode).takeIf { !it.exists() }?.let {
+                        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+                        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+                    }
                 }
             }
         })
@@ -92,7 +92,8 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         }
 
         diffInner(scanPathRes, csvPathRes) {
-//            Log.v(TAG, "[${project.path}]:差异数据:$it")
+            Log.v(TAG, "[${project.path}]:有资源被修改了！！！！！！差异数据:$it")
+            Log.v(TAG, "被修改的资源是：$scanPathRes")
             projectInfo.hasResourceChanged = true
         }
     }

@@ -8,7 +8,7 @@ import java.io.FileNotFoundException
 class ResourceHelper {
 
     fun process() {
-        println("ResourceHelper process")
+        println("ResourceHelper process, changed=${Settings.getData().hasResourceChanged}")
         if (!Settings.getData().hasResourceChanged) return
         compileResources()
         packageResources()

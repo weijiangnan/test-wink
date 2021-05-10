@@ -97,6 +97,14 @@ public class LiteBuildPlugin implements Plugin<Project> {
             // compile java & kotlin
             new CompileHelper().compileCode(projectInfo);
         }
+        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+            if (projectInfo.hasResourceChanged) {
+                System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
+                System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                Settings.getData().hasResourceChanged = true;
+                break;
+            }
+        }
         long diffEndTime = System.currentTimeMillis();
 
         System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffEndTime) + " ms");

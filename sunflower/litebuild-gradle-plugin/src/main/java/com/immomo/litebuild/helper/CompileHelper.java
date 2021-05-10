@@ -22,6 +22,7 @@ import com.immomo.litebuild.util.Utils;
 import org.apache.http.util.TextUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CompileHelper {
     public void compileCode(Settings.Data.ProjectInfo project) {
@@ -115,11 +116,19 @@ public class CompileHelper {
         cmds += "source ~/.bash_profile";
         cmds += '\n' + Settings.getEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
                 + Settings.Data.TMP_PATH + "/patch0.dex " +  Settings.Data.TMP_PATH + "/tmp_class/";
-        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/";
+//        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/";
 //        cmds += '\n' + "adb shell am force-stop " + APP_PACKAGE;
 //        cmds += '\n' + "adb shell am start -n " + APP_PACKAGE + "/" + LAUNCH_ACTIVITY;
 
         System.out.println("安装 CMD 命令：" + cmds);
         Utils.runShell(cmds);
+        try {
+            Utils.executeScript("adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/");
     }
 }

@@ -95,7 +95,6 @@ public class InitEnvHelper {
     }
 
     public void initEnv(Project project) {
-        long initStartTime = System.currentTimeMillis();
         this.project = project;
         Properties properties = getPropertiesEnv();
 
@@ -125,12 +124,12 @@ public class InitEnvHelper {
 //        if (!TextUtils.isEmpty(applicationIdSuffix)) {
 //            packageName += applicationIdSuffix;
 //        }
-        properties.setProperty("debug_package", packageName);
+        properties.setProperty("debug_package", packageNameStuff);
 
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
 //        System.out.println("manifestPath : " + manifestPath);
 
-        String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageNameStuff);
+        String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageName);
 //        System.out.println("launcherActivity : " + launcherActivity);
         properties.setProperty("launcher_activity", launcherActivity);
 
