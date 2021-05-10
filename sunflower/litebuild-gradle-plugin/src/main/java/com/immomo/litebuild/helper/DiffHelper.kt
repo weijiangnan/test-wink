@@ -22,12 +22,10 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.immomo.litebuild.Settings
 import com.immomo.litebuild.util.Log
 import com.immomo.litebuild.util.Utils
-import org.gradle.BuildAdapter
-import org.gradle.BuildResult
 import org.gradle.api.Project
 import java.io.File
 
-class DiffHelper( var project: Project) {
+class DiffHelper(var project: Project) {
     companion object {
         const val TAG = "litebuild.diff"
     }
@@ -75,6 +73,7 @@ class DiffHelper( var project: Project) {
 
 
     fun initSnapshot() {
+        Log.v(TAG, "[${project.path}]:initSnapshot ...")
         genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
