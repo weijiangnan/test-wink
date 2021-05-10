@@ -22,7 +22,6 @@ import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
-import com.immomo.litebuild.helper.Snapshot;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -39,14 +38,13 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
     public static final String GROUP = "momo";
 
+    private Map<Project, DiffHelper> mapDiffHelper = new HashMap<>();
+
     @Override
     public void apply(Project project) {
-
-        System.out.println("momo momo momo " + project);
-
         System.out.println("momo momo momo momo momo momo momo momo momo momo momo momo");
 
-        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
+        project.getRootProject().getSubprojects().forEach(new Consumer<Project>() {
             @Override
             public void accept(Project it) {
 
@@ -60,9 +58,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
                                     task.doLast(new Action<Task>() {
                                         @Override
                                         public void execute(Task task) {
-                                            System.out.println("vvvvvvvvv getTasks :do last assemble:progect.name=" + it.getName());
-                                            System.out.println("vvvvvvvvv getTasks :do last assemble:task.name=" + task.getName());
-                                            new Snapshot(it).initSnapshot();
+                                            System.out.println("momo momo momo momo getTasks :do last assemble:progect.name=" + it.getName());
+                                            System.out.println("momo momo momo momo getTasks :do last assemble:task.name=" + task.getName());
+
+                                            new DiffHelper(it).initSnapshot();
                                         }
                                     });
                                 }
@@ -84,23 +83,13 @@ public class LiteBuildPlugin implements Plugin<Project> {
                     System.out.println("=============================================>>>>> " + "task doLast() startTime：" + startTime);
                     System.out.println("插件执行中...11");
 
-                    AppExtension androidExt1 = project.getExtensions().findByType(AppExtension.class);
                     AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
                     Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
                     System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
                     while (itApp.hasNext()) {
                         ApplicationVariant variant = itApp.next();
                         System.out.println("variant..." + variant.getName());
-                        long variantStartTime = System.currentTimeMillis();
                         if (!variant.getName().equals("debug")) {
-                            Map<String, Project> allProjectMap = new HashMap<>();
-                            project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-                                @Override
-                                public void accept(Project it) {
-                                    System.out.println("插件执行中...3 accept itApp=" + itApp.hasNext());
-                                    allProjectMap.put(it.getName(), it);
-                                }
-                            });
                             main(project);
                         }
                     }
@@ -131,7 +120,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
             //
             long startTime = System.currentTimeMillis();
-            new DiffHelper(projectInfo).diff();
+            new DiffHelper(projectInfo.getProject()).diff(projectInfo);
             System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
             // compile java & kotlin
             new CompileHelper().compileCode(projectInfo);

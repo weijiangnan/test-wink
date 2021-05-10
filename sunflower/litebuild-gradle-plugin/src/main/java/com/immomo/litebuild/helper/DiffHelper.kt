@@ -27,7 +27,7 @@ import org.gradle.BuildResult
 import org.gradle.api.Project
 import java.io.File
 
-class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
+class DiffHelper( var project: Project) {
     companion object {
         const val TAG = "litebuild.diff"
     }
@@ -41,7 +41,6 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
 
     private var csvReader: CsvReader
     private var csvWriter: CsvWriter
-    private var project: Project = projectInfo.project
 
     init {
         Log.v(TAG, "[${project.path}]:init")
@@ -80,7 +79,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
 
-    fun diff() {
+    fun diff(projectInfo: Settings.Data.ProjectInfo) {
 //        Log.v(TAG, "[${project.path}]:获取差异...")
 
         diffInner(scanPathCode, csvPathCode) {
