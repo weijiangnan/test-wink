@@ -22,11 +22,13 @@ import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
+import com.immomo.litebuild.helper.Snapshot;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.execution.TaskExecutionGraph;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,9 +37,45 @@ import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
+    public static final String GROUP = "momo";
+
     @Override
     public void apply(Project project) {
+
+        System.out.println("momo momo momo " + project);
+
+        System.out.println("momo momo momo momo momo momo momo momo momo momo momo momo");
+
+        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
+            @Override
+            public void accept(Project it) {
+
+                it.getGradle().getTaskGraph().whenReady(new Action<TaskExecutionGraph>() {
+                    @Override
+                    public void execute(TaskExecutionGraph taskExecutionGraph) {
+                        taskExecutionGraph.getAllTasks().forEach(new Consumer<Task>() {
+                            @Override
+                            public void accept(Task task) {
+                                if (task.getName().toLowerCase().contains("assemble") || task.getName().toLowerCase().contains("install")) {
+                                    task.doLast(new Action<Task>() {
+                                        @Override
+                                        public void execute(Task task) {
+                                            System.out.println("vvvvvvvvv getTasks :do last assemble:progect.name=" + it.getName());
+                                            System.out.println("vvvvvvvvv getTasks :do last assemble:task.name=" + task.getName());
+                                            new Snapshot(it).initSnapshot();
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
         project.getTasks().register("litebuild", task -> {
+            task.setGroup("momo");
             System.out.println("---------------->>>>> " + "taskStartTime：" + System.currentTimeMillis());
             task.doLast(new Action<Task>() {
                 @Override
@@ -71,6 +109,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             });
 
         });
+
 
     }
 

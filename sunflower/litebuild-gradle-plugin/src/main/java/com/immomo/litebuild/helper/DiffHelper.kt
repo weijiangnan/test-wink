@@ -21,6 +21,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.immomo.litebuild.Settings
 import com.immomo.litebuild.util.Log
+import com.immomo.litebuild.util.Utils
 import org.gradle.BuildAdapter
 import org.gradle.BuildResult
 import org.gradle.api.Project
@@ -31,12 +32,13 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         const val TAG = "litebuild.diff"
     }
 
-    private var scanPathRes: String
+    private var diffDir: String
+    private var csvPathCode: String
     private var csvPathRes: String
     private val scanPathCode: String
+    private var scanPathRes: String
     private val extensionList = listOf("java", "kt", "xml", "json", "png", "jpeg", "webp")
-    private var csvPathCode: String
-    private var diffDir: String
+
     private var csvReader: CsvReader
     private var csvWriter: CsvWriter
     private var project: Project = projectInfo.project
@@ -58,18 +60,24 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         csvWriter = CsvWriter(ctxCsvWriter)
         csvReader = CsvReader(ctxCsvReader)
 
-        project.gradle.addBuildListener(object : BuildAdapter() {
-            override fun buildFinished(result: BuildResult) {
-                Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
-                result.failure?.printStackTrace()
-                if (result.failure == null) {
-                    File(csvPathCode).takeIf { !it.exists() }?.let {
-                        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
-                        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
-                    }
-                }
-            }
-        })
+//        project.gradle.addBuildListener(object : BuildAdapter() {
+//            override fun buildFinished(result: BuildResult) {
+//                Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
+//                result.failure?.printStackTrace()
+//                if (result.failure == null) {
+//                    File(csvPathCode).takeIf { !it.exists() }?.let {
+//                        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+//                        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+//                    }
+//                }
+//            }
+//        })
+    }
+
+
+    fun initSnapshot() {
+        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
 
     fun diff() {
@@ -215,7 +223,7 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
         }
     }
 
-    private fun getSnapshot(it: File) = it.lastModified().toString()//Utils.getFileMD5s(it, 64)
+    private fun getSnapshot(it: File) = Utils.getFileMD5s(it, 64)
 
 
 }
