@@ -63,10 +63,10 @@ class DiffHelper(private val projectInfo: Settings.Data.ProjectInfo) {
                 Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
                 result.failure?.printStackTrace()
                 if (result.failure == null) {
-                    File(csvPathCode).takeIf { it.exists() }?.delete()
-
-                    genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
-                    genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+                    File(csvPathCode).takeIf { !it.exists() }?.let {
+                        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+                        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+                    }
                 }
             }
         })
