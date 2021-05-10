@@ -252,7 +252,7 @@ public class InitEnvHelper {
 
         long startTimeOuter = System.currentTimeMillis();
         project.getRootProject().getSubprojects().forEach(subProject -> {
-            if (subProject != null&&":app".equals(subProject.getPath())) { // && subProject.getChildProjects().size() == 0) {
+            if (subProject != null) { // && subProject.getChildProjects().size() == 0) {
                 long startTime = System.currentTimeMillis();
                 System.out.println("subProject name==" + subProject.getName());
                 Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();

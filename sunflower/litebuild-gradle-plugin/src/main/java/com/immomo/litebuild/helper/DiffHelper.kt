@@ -74,6 +74,10 @@ class DiffHelper(var project: Project) {
 
     fun initSnapshot() {
         Log.v(TAG, "[${project.path}]:initSnapshot ...")
+
+        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
+        File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
+
         genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
