@@ -28,42 +28,31 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
         project.getTasks().register("litebuild", task -> {
-            System.out.println("---------------->>>>> " + "taskStartTime：" + System.currentTimeMillis());
+            System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
                     long startTime = System.currentTimeMillis();
-                    System.out.println("=============================================>>>>> " + "task doLast() startTime：" + startTime);
-                    System.out.println("插件执行中...11");
+                    System.out.println("litebuild execute() =============================================>>>>> " + "task doLast() startTime：" + startTime);
+                    System.out.println("插件执行中...1");
 
-                    AppExtension androidExt1 = project.getExtensions().findByType(AppExtension.class);
                     AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
                     Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
                     System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
                     while (itApp.hasNext()) {
                         ApplicationVariant variant = itApp.next();
                         System.out.println("variant..." + variant.getName());
-                        long variantStartTime = System.currentTimeMillis();
-                        if (!variant.getName().equals("debug")) {
-                            Map<String, Project> allProjectMap = new HashMap<>();
-                            project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-                                @Override
-                                public void accept(Project it) {
-                                    System.out.println("插件执行中...3 accept itApp=" + itApp.hasNext());
-                                    allProjectMap.put(it.getName(), it);
-                                }
-                            });
+                        if (variant.getName().equals("debug")) {
+                            System.out.println("插件执行中...3  main()");
                             main(project);
+                            break;
                         }
                     }
                     System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
