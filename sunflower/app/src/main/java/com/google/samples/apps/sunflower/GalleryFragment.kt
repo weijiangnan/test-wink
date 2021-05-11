@@ -36,6 +36,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class GalleryFragment : Fragment() {
 
+
+
+
     private val adapter = GalleryAdapter()
     private val args: GalleryFragmentArgs by navArgs()
     private var searchJob: Job? = null
