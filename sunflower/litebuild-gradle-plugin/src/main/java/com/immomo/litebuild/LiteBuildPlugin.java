@@ -24,6 +24,7 @@ import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
+import com.immomo.litebuild.util.Utils;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -37,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
@@ -63,7 +65,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
                                         public void execute(Task task) {
                                             new DiffHelper(it).initSnapshot();
 
-
                                             //copy apk to litebuild dir
                                             boolean hasAppPlugin = it.getPlugins().hasPlugin("com.android.application");
                                             if (hasAppPlugin) {
@@ -80,6 +81,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
                                                                 String moduleName = it.getPath().replace(":", "");
                                                                 String diffDir = project.getRootDir() + "/.idea/litebuild/diff/" + moduleName;
                                                                 File destFile = new File(diffDir, "snapshot.apk");
+                                                                if (destFile.exists()) {
+                                                                    destFile.delete();
+                                                                }
                                                                 try {
                                                                     Files.copy(srcFile.toPath(), destFile.toPath());
                                                                 } catch (IOException e) {

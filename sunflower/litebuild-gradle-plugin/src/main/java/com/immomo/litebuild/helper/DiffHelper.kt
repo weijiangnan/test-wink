@@ -19,18 +19,39 @@ import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
+import com.google.gson.Gson
 import com.immomo.litebuild.Settings
 import com.immomo.litebuild.util.Log
 import com.immomo.litebuild.util.Utils
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.diff.DiffEntry
+import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.lib.*
+import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevTree
+import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.treewalk.AbstractTreeIterator
+import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.gradle.api.Project
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
+import java.util.*
+
+const val KEY_COMMIT_ID = "key_commit_id"
 
 class DiffHelper(var project: Project) {
     companion object {
         const val TAG = "litebuild.diff"
     }
 
+
+    private var git: Git
+    private var repo: Repository
     private var diffDir: String
+    private var diffPropertiesPath: String
     private var csvPathCode: String
     private var csvPathRes: String
     private val scanPathCode: String
@@ -39,6 +60,7 @@ class DiffHelper(var project: Project) {
 
     private var csvReader: CsvReader
     private var csvWriter: CsvWriter
+    private val properties = Properties()
 
     init {
         Log.v(TAG, "[${project.path}]:init")
@@ -52,29 +74,60 @@ class DiffHelper(var project: Project) {
         csvPathCode = "${diffDir}/md5_code.csv"
         csvPathRes = "${diffDir}/md5_res.csv"
 
+        diffPropertiesPath = "${project.rootDir}/.idea/litebuild/diff/ps_diff.properties"
+
         val ctxCsvWriter = CsvWriterContext()
         val ctxCsvReader = CsvReaderContext()
         csvWriter = CsvWriter(ctxCsvWriter)
         csvReader = CsvReader(ctxCsvReader)
 
-//        project.gradle.addBuildListener(object : BuildAdapter() {
-//            override fun buildFinished(result: BuildResult) {
-//                Log.v(TAG, "构建结束:[${if (result.failure == null) "成功" else "失败"}]")
-//                result.failure?.printStackTrace()
-//                if (result.failure == null) {
-//                    File(csvPathCode).takeIf { !it.exists() }?.let {
-//                        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
-//                        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
-//                    }
-//                }
-//            }
-//        })
+        if (!File(diffPropertiesPath).exists()) {
+            File(diffPropertiesPath).parentFile.mkdirs()
+            File(diffPropertiesPath).createNewFile()
+        }
+        properties.load(FileReader(diffPropertiesPath))
+
+        //git
+        repo = FileRepositoryBuilder()
+                .findGitDir(project.rootDir)
+                .build()
+
+        git = Git(repo)
     }
 
 
     fun initSnapshot() {
         Log.v(TAG, "[${project.path}]:initSnapshot ...")
 
+//        initSnapshotByMd5()
+        initSnapshotByGit()
+    }
+
+    fun diff(projectInfo: Settings.Data.ProjectInfo) {
+        Log.v(TAG, "[${project.path}]:获取差异...")
+
+        //diffByMd5(projectInfo)
+        val triple = diffByGit()
+        projectInfo.changedJavaFiles.addAll(triple.first)
+        projectInfo.changedKotlinFiles.addAll(triple.second)
+        projectInfo.hasResourceChanged = triple.third
+    }
+
+    /**
+     * 快照:git版
+     */
+    private fun initSnapshotByGit() {
+        val lastCommitId: ObjectId = repo.resolve(Constants.HEAD)
+        println("lastCommitId=$lastCommitId")
+
+        properties.setProperty(KEY_COMMIT_ID, lastCommitId.name)
+        properties.store(FileWriter(diffPropertiesPath), "diff properties")
+    }
+
+    /**
+     * 快照:md5版
+     */
+    private fun initSnapshotByMd5() {
         File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
         File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
 
@@ -82,11 +135,96 @@ class DiffHelper(var project: Project) {
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
 
-    fun diff(projectInfo: Settings.Data.ProjectInfo) {
-//        Log.v(TAG, "[${project.path}]:获取差异...")
 
+    private fun diffByGit(): Triple<Set<String>, Set<String>, Boolean> {
+        val setJava = mutableSetOf<String>()
+        val setKt = mutableSetOf<String>()
+        var isResChanged = false
+        val rst = Triple<Set<String>, Set<String>, Boolean>(setJava, setKt, isResChanged)
+
+        val lastCommitId = properties.getProperty(KEY_COMMIT_ID, "")
+        val lastCommit = git.repository.resolve(lastCommitId)
+        val revCommitOld = git.repository.parseCommit(lastCommit)
+
+        val treeOld: AbstractTreeIterator? = prepareTreeParser(repo, revCommitOld)
+        val diff = git.diff()
+                .setShowNameAndStatusOnly(true)
+                .setOldTree(treeOld)
+                .call()
+
+        println("Gson().toJson(diff)")
+        println(Gson().toJson(diff))
+
+        val rootParentPath = "${project.rootDir.parentFile.absolutePath}/"
+
+        diff.forEach {
+            when (it.changeType) {
+                DiffEntry.ChangeType.ADD, DiffEntry.ChangeType.MODIFY, DiffEntry.ChangeType.COPY -> {
+                    if (rootParentPath.plus(it.newPath).startsWith(scanPathCode)) {
+                        if (it.newPath.endsWith(".java")) {
+                            setJava.add(rootParentPath.plus(it.newPath))
+                        }
+                        if (it.newPath.endsWith(".kt")) {
+                            setKt.add(rootParentPath.plus(it.newPath))
+                        }
+                    }
+                    if (rootParentPath.plus(it.newPath).startsWith(scanPathRes)) {
+                        isResChanged = true
+                    }
+                }
+
+                DiffEntry.ChangeType.DELETE -> {
+                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathCode)) {
+                        if (it.oldPath.endsWith(".java")) {
+                            setJava.add(rootParentPath.plus(it.oldPath))
+                        }
+                        if (it.oldPath.endsWith(".kt")) {
+                            setKt.add(rootParentPath.plus(it.oldPath))
+                        }
+                    }
+                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathRes)) {
+                        isResChanged = true
+                    }
+                }
+
+                DiffEntry.ChangeType.RENAME -> {
+                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathCode)) {
+                        if (it.oldPath.endsWith(".java")) {
+                            setJava.add(rootParentPath.plus(it.oldPath))
+                        }
+                        if (it.oldPath.endsWith(".kt")) {
+                            setKt.add(rootParentPath.plus(it.oldPath))
+                        }
+                    }
+
+                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathRes)) {
+                        isResChanged = true
+                    }
+
+                    if (rootParentPath.plus(it.newPath).startsWith(scanPathCode)) {
+                        if (it.newPath.endsWith(".java")) {
+                            setJava.add(rootParentPath.plus(it.newPath))
+                        }
+                        if (it.newPath.endsWith(".kt")) {
+                            setKt.add(rootParentPath.plus(it.newPath))
+                        }
+                    }
+
+                    if (rootParentPath.plus(it.newPath).startsWith(scanPathRes)) {
+                        isResChanged = true
+                    }
+                }
+
+            }
+        }
+
+
+        return rst
+    }
+
+    private fun diffByMd5(projectInfo: Settings.Data.ProjectInfo) {
         diffInner(scanPathCode, csvPathCode) {
-//            Log.v(TAG, "[${project.path}]:    差异数据:$it")
+            //            Log.v(TAG, "[${project.path}]:    差异数据:$it")
             when {
                 it.endsWith(".java") -> {
                     if (!projectInfo.changedJavaFiles.contains(it)) {
@@ -106,6 +244,22 @@ class DiffHelper(var project: Project) {
             Log.v(TAG, "被修改的资源是：$scanPathRes")
             projectInfo.hasResourceChanged = true
         }
+    }
+
+    private fun prepareTreeParser(repository: Repository, commit: RevCommit): AbstractTreeIterator? {
+        println(commit.id)
+        try {
+            RevWalk(repository).use { walk ->
+                println(commit.tree.id)
+                val tree: RevTree = walk.parseTree(commit.tree.id)
+                val oldTreeParser = CanonicalTreeParser()
+                repository.newObjectReader().use { oldReader -> oldTreeParser.reset(oldReader, tree.id) }
+                walk.dispose()
+                return oldTreeParser
+            }
+        } catch (e: java.lang.Exception) {
+        }
+        return null
     }
 
     private fun diffInner(scanPath: String, csvPath: String, block: (String) -> Unit) {
