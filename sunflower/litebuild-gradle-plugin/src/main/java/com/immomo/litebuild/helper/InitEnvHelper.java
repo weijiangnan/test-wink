@@ -20,6 +20,7 @@ import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension;
 import com.android.utils.FileUtils;
+import com.immomo.litebuild.ModuleConfigs;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.AndroidManifestUtils;
 
@@ -37,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -253,20 +255,38 @@ public class InitEnvHelper {
         long startTimeOuter = System.currentTimeMillis();
         project.getRootProject().getSubprojects().forEach(subProject -> {
             if (subProject != null) { // && subProject.getChildProjects().size() == 0) {
-                long startTime = System.currentTimeMillis();
-                System.out.println("subProject name==" + subProject.getName());
-                Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
-                childNode.setProject(subProject);
-                Settings.getData().projectTreeRoot.getChildren().add(childNode);
-                Settings.getData().projectBuildSortList.add(childNode);
-                System.out.println("ywbbbbbbbbbb " + "subProject " + subProject.getName() + ": 耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+                // build.gradle liteBuildModuleExclude 配置
+                ModuleConfigs moduleConfigs = project.getExtensions().getByType(ModuleConfigs.class);
+                if (moduleConfigs.modules != null) {
+                    System.out.println("===================================");
+                    System.out.println("moduleConfigs: " + Arrays.toString(moduleConfigs.modules));
+                    System.out.println("===================================");
+                    System.out.println("subProject name==" + subProject.getName());
+                    if (!Arrays.asList(moduleConfigs.modules).contains(subProject.getName())) {
+                        addSubProject(subProject);
+                    }
+                } else {
+                    addSubProject(subProject);
+                }
             }
         });
+        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+            System.out.println("Settings.getData().projectBuildItem : " + projectInfo.getProject().getName());
+        }
         System.out.println("ywbbbbbbbbbb " + "project ~~~ " + project.getName() + ": 耗时：" + (System.currentTimeMillis() - startTimeOuter) + " ms");
 
 //        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
 //
 //        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
+    }
+
+    private void addSubProject(Project subProject) {
+        long startTime = System.currentTimeMillis();
+        Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
+        childNode.setProject(subProject);
+        Settings.getData().projectTreeRoot.getChildren().add(childNode);
+        Settings.getData().projectBuildSortList.add(childNode);
+        System.out.println("ywbbbbbbbbbb " + "subProject " + subProject.getName() + ": 耗时：" + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     private void sortBuildList(Settings.Data.ProjectInfo node, List<Settings.Data.ProjectInfo> out) {

@@ -29,10 +29,12 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.execution.TaskExecutionGraph;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -44,6 +46,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void apply(Project project) {
 
         addAssembleLastTask(project);
+
+        project.getExtensions().create("liteBuildModuleExclude", ModuleConfigs.class);
 
         project.getTasks().register("litebuild", task -> {
             task.setGroup("momo");
