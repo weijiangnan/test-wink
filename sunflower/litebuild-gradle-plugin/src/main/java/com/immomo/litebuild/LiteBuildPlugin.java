@@ -17,28 +17,23 @@
 package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
-import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.BaseVariantOutput;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
-import com.immomo.litebuild.util.Utils;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.execution.TaskExecutionGraph;
-import org.gradle.internal.FileUtils;
-import org.gradle.internal.impldep.org.apache.ivy.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
@@ -48,7 +43,107 @@ public class LiteBuildPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
 
-        project.getRootProject().getSubprojects().forEach(new Consumer<Project>() {
+        addAssembleLastTask(project);
+
+        project.getTasks().register("litebuild", task -> {
+            task.setGroup("momo");
+            System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
+            task.doLast(new Action<Task>() {
+                @Override
+                public void execute(Task task) {
+                    long startTime = System.currentTimeMillis();
+                    System.out.println("litebuild execute() =============================================>>>>> " + "task doLast() startTime：" + startTime);
+                    System.out.println("插件执行中...1");
+
+                    boolean hasAppPlugin = project.getPlugins().hasPlugin("com.android.application");
+                    if (!hasAppPlugin) {
+                        System.out.println("该module未包含com.android.application插件");
+                        return;
+                    }
+
+                    AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
+
+                    Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+                    System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
+                    while (itApp.hasNext()) {
+                        ApplicationVariant variant = itApp.next();
+                        System.out.println("variant..." + variant.getName());
+                        if (variant.getName().equals("debug")) {
+
+                            variant.getOutputs().all(new Action<BaseVariantOutput>() {
+                                @Override
+                                public void execute(BaseVariantOutput baseVariantOutput) {
+                                    String path = baseVariantOutput.getOutputFile().getAbsolutePath();
+                                    System.out.println("variant..." + path);
+                                }
+                            });
+
+                            System.out.println("插件执行中...3  main()");
+                            main(project);
+                            break;
+                        }
+                    }
+                    System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
+                }
+            });
+
+        });
+
+    }
+
+
+
+    public void main(Project project) {
+        long mainStartTime = System.currentTimeMillis();
+        System.out.println("进入了main函数");
+        // init
+        Settings.init(project);
+        System.out.println("【【【===================================================>>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
+
+//        System.out.println("=================>>>>>> projectBuildSortList size : " +  Settings.getData().projectBuildSortList.size() + " === " + Settings.getData().projectBuildSortList.toString());
+//        System.out.println("=============================================>>>>>> ");
+//        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+//            System.out.println("=================>>>>>> " + projectInfo.getProject().getName());
+//        }
+//        System.out.println("=============================================>>>>>> ");
+
+
+        long diffStartTime = System.currentTimeMillis();
+
+        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+            //
+            long startTime = System.currentTimeMillis();
+            new DiffHelper(projectInfo.getProject()).diff(projectInfo);
+            System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+            // compile java & kotlin
+            new CompileHelper().compileCode(projectInfo);
+        }
+        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+            if (projectInfo.hasResourceChanged) {
+                System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
+                System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                Settings.getData().hasResourceChanged = true;
+                break;
+            }
+        }
+
+        System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
+
+        // compile resource.
+        long resStartTime = System.currentTimeMillis();
+        new ResourceHelper().process();
+
+        System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
+        // Increment patch to app.
+        new IncrementPatchHelper().patchToApp();
+        long pathEndTime = System.currentTimeMillis();
+        System.out.println("【【【===================================================>>>>> " + "path 结束耗时" + (System.currentTimeMillis() - pathEndTime) + " ms");
+        System.out.println("【【【===================================================>>>>> " + "main 函数结束" + (System.currentTimeMillis() - mainStartTime) + " ms");
+    }
+
+
+    private void addAssembleLastTask(Project project) {
+        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
             @Override
             public void accept(Project it) {
 
@@ -109,99 +204,5 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 });
             }
         });
-
-        project.getTasks().register("litebuild", task -> {
-            task.setGroup("momo");
-            System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
-            task.doLast(new Action<Task>() {
-                @Override
-                public void execute(Task task) {
-                    long startTime = System.currentTimeMillis();
-                    System.out.println("litebuild execute() =============================================>>>>> " + "task doLast() startTime：" + startTime);
-                    System.out.println("插件执行中...1");
-
-                    boolean hasAppPlugin = project.getPlugins().hasPlugin("com.android.application");
-                    if (!hasAppPlugin) {
-                        System.out.println("该module未包含com.android.application插件");
-                        return;
-                    }
-
-                    AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-
-                    Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-                    System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
-                    while (itApp.hasNext()) {
-                        ApplicationVariant variant = itApp.next();
-                        System.out.println("variant..." + variant.getName());
-                        if (variant.getName().equals("debug")) {
-
-                            variant.getOutputs().all(new Action<BaseVariantOutput>() {
-                                @Override
-                                public void execute(BaseVariantOutput baseVariantOutput) {
-                                    String path = baseVariantOutput.getOutputFile().getAbsolutePath();
-                                    System.out.println("variant..." + path);
-                                }
-                            });
-
-                            System.out.println("插件执行中...3  main()");
-                            main(project);
-                            break;
-                        }
-                    }
-                    System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
-                }
-            });
-
-        });
-
     }
-
-    public void main(Project project) {
-        long mainStartTime = System.currentTimeMillis();
-        System.out.println("进入了main函数");
-        // init
-        Settings.init(project);
-        System.out.println("【【【===================================================>>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
-
-//        System.out.println("=================>>>>>> projectBuildSortList size : " +  Settings.getData().projectBuildSortList.size() + " === " + Settings.getData().projectBuildSortList.toString());
-//        System.out.println("=============================================>>>>>> ");
-//        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-//            System.out.println("=================>>>>>> " + projectInfo.getProject().getName());
-//        }
-//        System.out.println("=============================================>>>>>> ");
-
-
-        long diffStartTime = System.currentTimeMillis();
-
-        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-            //
-            long startTime = System.currentTimeMillis();
-            new DiffHelper(projectInfo.getProject()).diff(projectInfo);
-            System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
-            // compile java & kotlin
-            new CompileHelper().compileCode(projectInfo);
-        }
-        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-            if (projectInfo.hasResourceChanged) {
-                System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
-                System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                Settings.getData().hasResourceChanged = true;
-                break;
-            }
-        }
-
-        System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
-
-        // compile resource.
-        long resStartTime = System.currentTimeMillis();
-        new ResourceHelper().process();
-
-        System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
-        // Increment patch to app.
-        new IncrementPatchHelper().patchToApp();
-        long pathEndTime = System.currentTimeMillis();
-        System.out.println("【【【===================================================>>>>> " + "path 结束耗时" + (System.currentTimeMillis() - pathEndTime) + " ms");
-        System.out.println("【【【===================================================>>>>> " + "main 函数结束" + (System.currentTimeMillis() - mainStartTime) + " ms");
-    }
-
 }

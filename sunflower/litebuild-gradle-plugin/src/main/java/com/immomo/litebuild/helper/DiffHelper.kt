@@ -74,7 +74,7 @@ class DiffHelper(var project: Project) {
         csvPathCode = "${diffDir}/md5_code.csv"
         csvPathRes = "${diffDir}/md5_res.csv"
 
-        diffPropertiesPath = "${project.rootDir}/.idea/litebuild/diff/ps_diff.properties"
+        diffPropertiesPath = "${diffDir}/ps_diff.properties"
 
         val ctxCsvWriter = CsvWriterContext()
         val ctxCsvReader = CsvReaderContext()
@@ -89,7 +89,7 @@ class DiffHelper(var project: Project) {
 
         //git
         repo = FileRepositoryBuilder()
-                .findGitDir(project.rootDir)
+                .findGitDir(project.projectDir)
                 .build()
 
         git = Git(repo)
@@ -107,6 +107,9 @@ class DiffHelper(var project: Project) {
         Log.v(TAG, "[${project.path}]:获取差异...")
 
         //diffByMd5(projectInfo)
+        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
+        File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
+
         val triple = diffByGit()
         projectInfo.changedJavaFiles.addAll(triple.first)
         projectInfo.changedKotlinFiles.addAll(triple.second)
@@ -155,65 +158,41 @@ class DiffHelper(var project: Project) {
         println("Gson().toJson(diff)")
         println(Gson().toJson(diff))
 
-        val rootParentPath = "${project.rootDir.parentFile.absolutePath}/"
+        val rootParentPath = "${git.repository.directory.absolutePath.replace(".git", "")}"
+        Log.v(str = "rootParentPath=${rootParentPath}")
 
         diff.forEach {
             when (it.changeType) {
-                DiffEntry.ChangeType.ADD, DiffEntry.ChangeType.MODIFY, DiffEntry.ChangeType.COPY -> {
-                    if (rootParentPath.plus(it.newPath).startsWith(scanPathCode)) {
+                DiffEntry.ChangeType.ADD, DiffEntry.ChangeType.MODIFY, DiffEntry.ChangeType.COPY, DiffEntry.ChangeType.RENAME -> {
+                    Log.v(str = "${it.changeType} newPath=${it.newPath}")
+                    if (rootParentPath.plus(it.newPath).startsWith(project.projectDir.absolutePath)) {
                         if (it.newPath.endsWith(".java")) {
                             setJava.add(rootParentPath.plus(it.newPath))
                         }
                         if (it.newPath.endsWith(".kt")) {
                             setKt.add(rootParentPath.plus(it.newPath))
                         }
-                    }
-                    if (rootParentPath.plus(it.newPath).startsWith(scanPathRes)) {
-                        isResChanged = true
-                    }
-                }
-
-                DiffEntry.ChangeType.DELETE -> {
-                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathCode)) {
-                        if (it.oldPath.endsWith(".java")) {
-                            setJava.add(rootParentPath.plus(it.oldPath))
-                        }
-                        if (it.oldPath.endsWith(".kt")) {
-                            setKt.add(rootParentPath.plus(it.oldPath))
-                        }
-                    }
-                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathRes)) {
-                        isResChanged = true
-                    }
-                }
-
-                DiffEntry.ChangeType.RENAME -> {
-                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathCode)) {
-                        if (it.oldPath.endsWith(".java")) {
-                            setJava.add(rootParentPath.plus(it.oldPath))
-                        }
-                        if (it.oldPath.endsWith(".kt")) {
-                            setKt.add(rootParentPath.plus(it.oldPath))
-                        }
-                    }
-
-                    if (rootParentPath.plus(it.oldPath).startsWith(scanPathRes)) {
-                        isResChanged = true
-                    }
-
-                    if (rootParentPath.plus(it.newPath).startsWith(scanPathCode)) {
-                        if (it.newPath.endsWith(".java")) {
-                            setJava.add(rootParentPath.plus(it.newPath))
-                        }
                         if (it.newPath.endsWith(".kt")) {
-                            setKt.add(rootParentPath.plus(it.newPath))
+                            isResChanged = true
                         }
                     }
+                }
 
-                    if (rootParentPath.plus(it.newPath).startsWith(scanPathRes)) {
-                        isResChanged = true
+                DiffEntry.ChangeType.DELETE, DiffEntry.ChangeType.RENAME -> {
+                    if (rootParentPath.plus(it.oldPath).startsWith(project.projectDir.absolutePath)) {
+                        Log.v(str = "${it.changeType} oldPath=${it.oldPath}")
+                        if (it.oldPath.endsWith(".java")) {
+                            setJava.add(rootParentPath.plus(it.oldPath))
+                        }
+                        if (it.oldPath.endsWith(".kt")) {
+                            setKt.add(rootParentPath.plus(it.oldPath))
+                        }
+                        if (it.oldPath.contains("/src/main/res")) {
+                            isResChanged = true
+                        }
                     }
                 }
+
 
             }
         }
