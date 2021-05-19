@@ -56,7 +56,7 @@ public class Settings {
         public List<ProjectInfo> projectBuildSortList = new ArrayList<>();
         public boolean hasResourceChanged = false;
         public boolean needProcessDebugResources = false;
-
+        public boolean hasClassChanged = false;
         public static class ProjectInfo {
             private Project project;
             private String dir;
