@@ -23,24 +23,27 @@ import org.apache.http.util.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 public class CompileHelper {
-    public void compileCode(Settings.Data.ProjectInfo project) {
-//        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
-            File file = new File(Settings.Data.TMP_PATH + "/tmp_class");
-            if (!file.exists()) {
-                file.mkdirs();
-            }
-//        }
+    public void compileCode() {
+        File file = new File(Settings.Data.TMP_PATH + "/tmp_class");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
 
-        compileKotlin(project);
-        compileJava(project);
+        for (Settings.Data.ProjectInfo project : Settings.getData().projectBuildSortList) {
+            compileKotlin(project);
+        }
+
+        for (Settings.Data.ProjectInfo project : Settings.getData().projectBuildSortList) {
+            compileJava(project);
+        }
 
         createDexPatch();
     }
 
     private int compileJava(Settings.Data.ProjectInfo project) {
-
         System.out.println("compileJava ================================");
         System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
         System.out.println("compileJava ================================");
@@ -112,6 +115,12 @@ public class CompileHelper {
     }
 
     private void createDexPatch() {
+        if (Settings.getData().changedJavaFiles.size() == 0
+                && Settings.getData().changedKotlinFiles.size() == 0) {
+            // 没有数据变更
+            return;
+        }
+
         String cmds = new String();
         cmds += "source ~/.bash_profile";
         cmds += '\n' + Settings.getEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "

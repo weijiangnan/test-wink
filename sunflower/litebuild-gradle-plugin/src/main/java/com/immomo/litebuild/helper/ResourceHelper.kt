@@ -27,7 +27,9 @@ class ResourceHelper {
             println("=================================")
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
-        Utils.executeScript("./gradlew processDebugResources --offline")
+
+        Settings.getData().needProcessDebugResources = true;
+//        Utils.executeScript("./gradlew processDebugResources --offline")
     }
 
     private fun packageResources() {
