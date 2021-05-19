@@ -58,7 +58,7 @@ public class Settings {
         public boolean hasResourceChanged = false;
         public boolean hasClassChanged = false;
         public boolean needProcessDebugResources = false;
-
+        public boolean hasClassChanged = false;
         public static class ProjectInfo {
             private Project project;
             private String dir;

@@ -255,6 +255,9 @@ public class InitEnvHelper {
         long startTimeOuter = System.currentTimeMillis();
         project.getRootProject().getSubprojects().forEach(subProject -> {
             if (subProject != null) { // && subProject.getChildProjects().size() == 0) {
+                if (subProject.getName().equals("litebuild-gradle-plugin")) {
+                    return;
+                }
                 // build.gradle liteBuildModuleExclude 配置
                 ModuleConfigs moduleConfigs = project.getExtensions().getByType(ModuleConfigs.class);
                 if (moduleConfigs.modules != null) {
