@@ -29,6 +29,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.execution.TaskExecutionGraph;
+import org.gradle.api.tasks.TaskProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,7 +132,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 System.out.println("【【【===================================================>>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
             });
 
-        });
+        }).get().setGroup(Settings.getData().NAME);
     }
 
     public void createCompileTask(Project project) {
@@ -139,7 +140,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(it -> {
                 new CompileHelper().compileCode();
             });
-        });
+        }).get().setGroup(Settings.getData().NAME);
     }
 
     public void createResourcesTask(Project project) {
@@ -155,13 +156,11 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
                 System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
             });
-        });
+        }).get().setGroup(Settings.getData().NAME);
     }
 
     public void createLiteBuildTask(Project project) {
         project.getTasks().register("litebuild", task -> {
-            task.setGroup("momo");
-            System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
@@ -201,7 +200,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
                     System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
             });
-        });
+        }).get().setGroup(Settings.getData().NAME);
+        System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
+
     }
 
     public void createDiffTask(Project project) {
@@ -229,7 +230,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
 
-        });
+        }).get().setGroup(Settings.getData().NAME);
     }
 
     public void main(Project project) {

@@ -50,11 +50,13 @@ public class Settings {
 
     public static class Data {
         public static String TMP_PATH = "../.idea/litebuild";
+        public static String NAME = "litebuild";
         public List<String> changedJavaFiles = new ArrayList<>();
         public List<String> changedKotlinFiles = new ArrayList<>();
         public ProjectInfo projectTreeRoot = null;
         public List<ProjectInfo> projectBuildSortList = new ArrayList<>();
         public boolean hasResourceChanged = false;
+        public boolean hasClassChanged = false;
         public boolean needProcessDebugResources = false;
 
         public static class ProjectInfo {
@@ -65,6 +67,7 @@ public class Settings {
             public List<String> changedJavaFiles = new ArrayList<>();
             public List<String> changedKotlinFiles = new ArrayList<>();
             public boolean hasResourceChanged = false;
+            public boolean hasClassChanged = false;
 
             public Project getProject() {
                 return project;
