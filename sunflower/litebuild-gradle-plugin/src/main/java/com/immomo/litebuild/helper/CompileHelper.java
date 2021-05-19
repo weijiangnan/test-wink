@@ -67,6 +67,8 @@ public class CompileHelper {
                 shellCommand
         );
 
+        Settings.getData().hasClassChanged = true;
+
         return project.changedJavaFiles.size();
     }
 
@@ -112,11 +114,12 @@ public class CompileHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        Settings.getData().hasClassChanged = true;
     }
 
     private void createDexPatch() {
-        if (Settings.getData().changedJavaFiles.size() == 0
-                && Settings.getData().changedKotlinFiles.size() == 0) {
+        if (!Settings.getData().hasClassChanged) {
             // 没有数据变更
             return;
         }
