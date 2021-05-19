@@ -19,27 +19,13 @@ package com.immomo.litebuild.helper;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
-import java.io.IOException;
-
 public class IncrementPatchHelper {
     public void patchToApp() {
         String cmds = new String();
-//        cmds += "source ~/.bash_profile";
-//        cmds += '\n' + "adb shell am force-stop " + Settings.getEnv().getProperty("debug_package");
-////        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("debug_package") + ".GardenActivity";
-//        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("launcher_activity");
-
-//        Utils.runShell(cmds);
-        try {
-//            Utils.executeScript("source ~/.bash_profile");
-            Utils.executeScript("adb shell am force-stop " + Settings.getEnv().getProperty("debug_package"));
-            Utils.executeScript("adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("launcher_activity"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        cmds += "source ~/.bash_profile";
+        cmds += '\n' + "adb shell am force-stop " + Settings.getEnv().getProperty("debug_package");
+        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("launcher_activity");
+        Utils.runShell(cmds);
     }
 
     public void patchDex() {

@@ -106,14 +106,14 @@ class DiffHelper(var project: Project) {
     fun diff(projectInfo: Settings.Data.ProjectInfo) {
         Log.v(TAG, "[${project.path}]:获取差异...")
 
-        //diffByMd5(projectInfo)
+        diffByMd5(projectInfo)
         File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
         File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
 
-        val triple = diffByGit()
-        projectInfo.changedJavaFiles.addAll(triple.first)
-        projectInfo.changedKotlinFiles.addAll(triple.second)
-        projectInfo.hasResourceChanged = triple.third
+//        val triple = diffByGit()
+//        projectInfo.changedJavaFiles.addAll(triple.first)
+//        projectInfo.changedKotlinFiles.addAll(triple.second)
+//        projectInfo.hasResourceChanged = triple.third
     }
 
     /**
