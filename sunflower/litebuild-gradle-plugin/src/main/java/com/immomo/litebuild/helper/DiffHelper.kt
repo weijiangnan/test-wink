@@ -99,16 +99,16 @@ class DiffHelper(var project: Project) {
     fun initSnapshot() {
         Log.v(TAG, "[${project.path}]:initSnapshot ...")
 
-//        initSnapshotByMd5()
-        initSnapshotByGit()
+        initSnapshotByMd5()
+//        initSnapshotByGit()
     }
 
     fun diff(projectInfo: Settings.Data.ProjectInfo) {
         Log.v(TAG, "[${project.path}]:获取差异...")
 
         diffByMd5(projectInfo)
-        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
-        File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
+//        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
+//        File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
 
 //        val triple = diffByGit()
 //        projectInfo.changedJavaFiles.addAll(triple.first)
