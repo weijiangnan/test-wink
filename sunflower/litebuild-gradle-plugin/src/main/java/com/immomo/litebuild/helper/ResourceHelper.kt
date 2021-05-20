@@ -34,7 +34,9 @@ class ResourceHelper {
     }
 
     fun packageResources() {
-        val ap_ = File("build/intermediates/processed_res/debug/out/resources-debug.ap_")
+        val ap_ = File("${Settings.project.rootDir.path}/app/build/intermediates/processed_res/debug/out/resources-debug.ap_")
+        println("packageResources-packageResources rootPath=====${Settings.project.rootDir.path}")
+
         if (ap_.exists()) {
             println("ap_文件存在")
         } else {
@@ -43,9 +45,10 @@ class ResourceHelper {
 
         var cmds = String()
         cmds += "source ~/.bash_profile"
-        cmds += "\n cd ../"
-        cmds += "\n sh ./resourcesApk.sh"
+//        cmds += "\n cd ../"
+        cmds += "\n sh resourcesApk.sh"
 
+        println("准备执行resourcesApk.sh")
         Utils.executeScript(cmds);
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))
