@@ -1,6 +1,7 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'kotlin'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 group 'com.robothy'
 version '1.0-SNAPSHOT'
@@ -25,6 +26,32 @@ gradlePlugin {
     }
 }
 
+//afterEvaluate { project ->
+//    uploadArchives {
+//        repositories {
+//            maven {
+//                pom.groupId = "com.immomo.litebuild"
+//                pom.artifactId = "plugin"
+//                pom.version = "0.0.1"
+//                //去除对aar的引用
+//                repository(url: "http://maven.wemomo.com:18081/nexus/content/repositories/android_snapshot/") {
+//                    authentication(userName: "an.ervoux", password: "Aa12345678")
+//                }
+//                snapshotRepository(url: "http://maven.wemomo.com:18081/nexus/content/repositories/android_snapshot/") {
+//                    authentication(userName: "an.ervoux", password: "Aa12345678")
+//                }
+//            }
+//        }
+//    }
+//    task androidSourcesJar(type: Jar) {
+//        classifier = 'sources'
+//        from android.sourceSets.main.java.sourceFiles
+//    }
+//    artifacts {
+//        archives androidSourcesJar
+//    }
+//}
+
 publishing {
     publications {
         // 这里的 hello 可以任意命名
@@ -38,8 +65,49 @@ publishing {
             from components.java
         }
     }
-
+//
+////    uploadArchives {
+////        repositories {
+////            mavenDeployer {
+////                pom.groupId = MOMOAGORA_GROUP
+////                pom.artifactId = MOMOAGORA_ARTIFACT_ID
+////                pom.version = rootProject.ext.mediaArgoVersion
+////                repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
+////                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+////                }
+////                snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
+////                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+////                }
+////            }
+////        }
+////    }
+//
+//
     repositories {
         mavenLocal()
+//        maven {
+//            // 可以有且仅有一个仓库不指定 name 属性，会隐式设置为 Maven
+//            // 根据 versionName 来判断仓库地址
+//            url = "http://maven.wemomo.com:18081/nexus/content/repositories/android/"
+//            // 仓库用户名密码
+//            credentials {
+//                username = "an.ervoux"
+//                password = "Aa12345678"
+//            }
+//        }
+//
+////        mavenDeployer {
+//////            pom.groupId = MOMOAGORA_GROUP
+//////            pom.artifactId = MOMOAGORA_ARTIFACT_ID
+//////            pom.version = MOMOAGORA_VERSION_NAME
+//////            NEXUS_PASSWORD=video123
+//////            NEXUS_USERNAME=momo.video
+////            repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
+////                authentication(userName: "momo.video", password: "video123")
+////            }
+////            snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
+////                authentication(userName: "momo.video", password: "video123")
+////            }
+////        }
     }
 }
