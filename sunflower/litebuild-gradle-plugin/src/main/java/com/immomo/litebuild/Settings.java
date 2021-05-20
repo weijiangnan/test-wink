@@ -49,6 +49,7 @@ public class Settings {
     }
 
     public static class Data {
+        public static String APP_PROJECT_DIR = "";
         public static String TMP_PATH = "../.idea/litebuild";
         public static String NAME = "litebuild";
         public List<String> changedJavaFiles = new ArrayList<>();

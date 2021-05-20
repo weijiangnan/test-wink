@@ -105,6 +105,10 @@ public class InitEnvHelper {
         AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
         properties.setProperty("java_home", getJavaHome());
         properties.setProperty("root_dir", project.getPath());
+
+        Settings.getData().APP_PROJECT_DIR = project.getProjectDir().getAbsolutePath();
+        Settings.getData().TMP_PATH = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/litebuild";
+
         properties.setProperty("java_home", getJavaHome());
         properties.setProperty("sdk_dir", androidExt.getSdkDirectory().getPath());
         properties.setProperty("build_tools_version", androidExt.getBuildToolsVersion());
