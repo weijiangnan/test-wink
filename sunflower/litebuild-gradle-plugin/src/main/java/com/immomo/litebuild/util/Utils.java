@@ -64,7 +64,7 @@ public class Utils {
     }
 
     public static void executeScript(String cmd) throws IOException, InterruptedException {
-        Process p = Runtime.getRuntime().exec(cmd);
+        Process p = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + cmd + "`"}, null, null);
         p.waitFor();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));

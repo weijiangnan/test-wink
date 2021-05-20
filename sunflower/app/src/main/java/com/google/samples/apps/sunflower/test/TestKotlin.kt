@@ -4,7 +4,7 @@ class TestKotlin {
 
     fun getTitle(): String {
         println("===============")
-        var aaa = "Tab 222"
+        var aaa = "1111"
 //        aaa += getString1();
         return aaa
     }

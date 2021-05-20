@@ -72,13 +72,17 @@ public class CompileHelper {
         }
         String kotlincHome = System.getenv("KOTLINC_HOME");
         if (TextUtils.isEmpty(kotlincHome)) {
-            System.out.println();
-            System.out.println("================== 请配置 KOTLINC_HOME ==================");
-            System.out.println("1. 打开：~/.bash_profile");
-            System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
-            System.out.println("3. 执行：source ~/.bash_profile");
-            System.out.println("========================================================");
-            System.out.println();
+            kotlincHome = "/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+            if (!new File(kotlincHome).exists()) {
+                System.out.println();
+                System.out.println("================== 请配置 KOTLINC_HOME ==================");
+                System.out.println("1. 打开：~/.bash_profile");
+                System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
+                System.out.println("3. 执行：source ~/.bash_profile");
+                System.out.println("========================================================");
+                System.out.println();
+            }
+
             return;
         }
         // 如果路径包含空格，需要替换 " " 为 "\ "
@@ -111,19 +115,20 @@ public class CompileHelper {
         cmds += "source ~/.bash_profile";
         cmds += '\n' + Settings.getEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
                 + Settings.Data.TMP_PATH + "/patch0.dex " +  Settings.Data.TMP_PATH + "/tmp_class/";
-//        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/";
+        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/";
 //        cmds += '\n' + "adb shell am force-stop " + APP_PACKAGE;
 //        cmds += '\n' + "adb shell am start -n " + APP_PACKAGE + "/" + LAUNCH_ACTIVITY;
 
         System.out.println("安装 CMD 命令：" + cmds);
+
         Utils.runShell(cmds);
-        try {
-            Utils.executeScript("adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Utils.executeScript(cmds);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         System.out.println("adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/");
     }
 }

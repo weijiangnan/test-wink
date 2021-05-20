@@ -59,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         android:gravity="center"
-                        android:text="@string/app_name"
+                        android:text="12-10"
                         android:textAppearance="?attr/textAppearanceHeadline5" />
 
                 </com.google.android.material.appbar.MaterialToolbar>

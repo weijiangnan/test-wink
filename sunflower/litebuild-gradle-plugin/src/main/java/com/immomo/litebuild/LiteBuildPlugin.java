@@ -56,7 +56,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             createCompileTask(it);
             createResourcesTask(it);
             createLiteBuildTask(it);
-//
+
             combineTask(it);
         });
 
@@ -109,17 +109,24 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task taskDiff = project.getTasks().getByName("litebuildDiff");
         Task taskCompile = project.getTasks().getByName("litebuildCompile");
 
+        Task taskProcessResources = project.getTasks().getByName("litebuildProcessResources");
         Task taskResources = project.getTasks().getByName("litebuildResources");
         Task taskGradleProcessDebugResources = project.getTasks().getByName("processDebugResources");
         Task taskLitebuild = project.getTasks().getByName("litebuild");
+        Task taskPackageResources = project.getTasks().getByName("litebuildPackageResources");
+
+
 
         taskDiff.dependsOn(taskInit);
         taskCompile.dependsOn(taskDiff);
         taskLitebuild.dependsOn(taskCompile);
         taskLitebuild.dependsOn(taskResources);
-        taskLitebuild.dependsOn(taskGradleProcessDebugResources);
+        taskLitebuild.dependsOn(taskPackageResources);
 
-        taskGradleProcessDebugResources.mustRunAfter(taskResources);
+        taskPackageResources.dependsOn(taskResources);
+        taskPackageResources.dependsOn(taskProcessResources);
+        taskProcessResources.mustRunAfter(taskResources);
+        taskProcessResources.dependsOn(taskGradleProcessDebugResources);
     }
 
     public void createInitTask(Project project) {
@@ -144,7 +151,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
     }
 
     public void createResourcesTask(Project project) {
-        project.getTasks().getByName("processDebugResources").setOnlyIf(it2 -> {
+        project.getTasks().register("litebuildProcessResources", task -> {
+        }).get().setGroup(Settings.getData().NAME);
+
+        project.getTasks().getByName("litebuildProcessResources").setOnlyIf(it2 -> {
             return Settings.getData().hasResourceChanged;
         });
 
@@ -152,9 +162,17 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(it -> {
                 // compile resource.
                 long resStartTime = System.currentTimeMillis();
-                new ResourceHelper().process();
+                new ResourceHelper().checkResource();
 
                 System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
+            });
+        }).get().setGroup(Settings.getData().NAME);
+
+        project.getTasks().register("litebuildPackageResources", task -> {
+            task.doLast(it -> {
+                if (Settings.getData().hasResourceChanged) {
+                    new ResourceHelper().packageResources();
+                }
             });
         }).get().setGroup(Settings.getData().NAME);
     }

@@ -58,7 +58,6 @@ public class Settings {
         public boolean hasResourceChanged = false;
         public boolean hasClassChanged = false;
         public boolean needProcessDebugResources = false;
-        public boolean hasClassChanged = false;
         public static class ProjectInfo {
             private Project project;
             private String dir;
@@ -67,7 +66,6 @@ public class Settings {
             public List<String> changedJavaFiles = new ArrayList<>();
             public List<String> changedKotlinFiles = new ArrayList<>();
             public boolean hasResourceChanged = false;
-            public boolean hasClassChanged = false;
 
             public Project getProject() {
                 return project;

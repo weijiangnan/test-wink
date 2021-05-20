@@ -1,10 +1,12 @@
 #!/bin/bash 
-
+pwd
 echo "开始资源解压，重新压缩！";
-echo "执行文件路径：$0";
+pwd
+#echo "执行文件路径：$0";
 #echo "需解压的文件：$1";
 #echo "待拷贝的文件：$2";
 pwd
+#lastPath=$(dirname "$PWD")
 #lastPath=$(dirname "$PWD")
 lastPath=$(pwd)
 echo "$lastPath"
