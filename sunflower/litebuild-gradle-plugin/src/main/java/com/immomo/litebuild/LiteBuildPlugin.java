@@ -29,15 +29,12 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.execution.TaskExecutionGraph;
-import org.gradle.api.tasks.TaskProvider;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Iterator;
 import java.util.function.Consumer;
-
-import groovy.lang.Closure;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
@@ -48,7 +45,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         addAssembleLastTask(project);
 
-        project.getExtensions().create("liteBuildModuleExclude", ModuleConfigs.class);
+        project.getExtensions().create("liteBuildModuleExclude",
+                ModuleConfigs.class);
 
         project.afterEvaluate(it -> {
             createInitTask(it);
@@ -60,48 +58,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
             combineTask(it);
         });
 
-//        project.getTasks().register("litebuild", task -> {
-//            task.setGroup("momo");
-//            System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
-//            task.doLast(new Action<Task>() {
-//                @Override
-//                public void execute(Task task) {
-//                    long startTime = System.currentTimeMillis();
-//                    System.out.println("litebuild execute() =============================================>>>>> " + "task doLast() startTime：" + startTime);
-//                    System.out.println("插件执行中...1");
-//
-//                    boolean hasAppPlugin = project.getPlugins().hasPlugin("com.android.application");
-//                    if (!hasAppPlugin) {
-//                        System.out.println("该module未包含com.android.application插件");
-//                        return;
-//                    }
-//
-//                    AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-//
-//                    Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-//                    System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
-//                    while (itApp.hasNext()) {
-//                        ApplicationVariant variant = itApp.next();
-//                        System.out.println("variant..." + variant.getName());
-//                        if (variant.getName().equals("debug")) {
-//
-//                            variant.getOutputs().all(new Action<BaseVariantOutput>() {
-//                                @Override
-//                                public void execute(BaseVariantOutput baseVariantOutput) {
-//                                    String path = baseVariantOutput.getOutputFile().getAbsolutePath();
-//                                    System.out.println("variant..." + path);
-//                                }
-//                            });
-//
-//                            System.out.println("插件执行中...3  main()");
-//                            main(project);
-//                            break;
-//                        }
-//                    }
-//                    System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
-//                }
-//            });
-//        });
+        project.getDependencies().add("implementation",
+                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.5-SNAPSHOT"));
     }
 
     public void combineTask(Project project) {
@@ -114,8 +72,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task taskGradleProcessDebugResources = project.getTasks().getByName("processDebugResources");
         Task taskLitebuild = project.getTasks().getByName("litebuild");
         Task taskPackageResources = project.getTasks().getByName("litebuildPackageResources");
-
-
 
         taskDiff.dependsOn(taskInit);
         taskCompile.dependsOn(taskDiff);

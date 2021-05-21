@@ -57,6 +57,13 @@ buildscript {
         google()
         jcenter()
         mavenLocal()
+        maven {
+            url 'http://maven.wemomo.com:18081/nexus/content/repositories/android_snapshot'
+            credentials {
+                username NEXUS_USERNAME
+                password NEXUS_PASSWORD
+            }
+        }
     }
 
     dependencies {
@@ -65,7 +72,7 @@ buildscript {
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
-        classpath "com.immomo.litebuild:plugin:0.0.1"
+        classpath "com.immomo.litebuild:plugin:0.0.5-SNAPSHOT"
     }
 }
 
@@ -77,6 +84,13 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url 'http://maven.wemomo.com:18081/nexus/content/repositories/android_snapshot'
+            credentials {
+                username NEXUS_USERNAME
+                password NEXUS_PASSWORD
+            }
+        }
     }
 }
 
