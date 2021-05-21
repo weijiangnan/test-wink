@@ -19,7 +19,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'androidx.navigation.safeargs.kotlin'
-apply plugin: 'com.immomo.litebuild.plugin'
+//apply plugin: 'com.immomo.litebuild.plugin'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -137,7 +137,7 @@ def getUnsplashAccess() {
     return project.findProperty("unsplash_access_key")
 }
 
-liteBuildModuleExclude {
-    modules = ["LiteBuildLib"]
+//liteBuildModuleExclude {
 //    modules = ["LiteBuildLib"]
-}
+////    modules = ["LiteBuildLib"]
+//}

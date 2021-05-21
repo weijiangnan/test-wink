@@ -43,16 +43,27 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
+def getRepositoryUsername() {
+    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
+}
+
+def getRepositoryPassword() {
+    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
+}
+
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository(url: uri('http://maven.wemomo.com:18081/nexus/content/repositories/android_snapshot/')) {
-                    authentication(userName: "an.ervoux", password: "Aa12345678")
-                } //定义本地maven仓库的地址
-                pom.groupId = 'com.immomo.litebuild'   //groupId
-                pom.artifactId = 'build-lib'  //artifactId
-                pom.version = '0.0.5-SNAPSHOT' //版本号
+                pom.groupId = 'com.immomo.litebuild'
+                pom.artifactId = 'build-lib'
+                pom.version = '0.0.5'
+                repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
+                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                }
+                snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
+                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                }
             }
         }
     }
