@@ -43,15 +43,29 @@ class ResourceHelper {
             throw FileNotFoundException("ap_文件 不 存在")
         }
 
+        val lastPath = Settings.project.rootDir
         var cmds = String()
         cmds += "source ~/.bash_profile"
 //        cmds += "\n cd ../"
         cmds += "\n sh resourcesApk.sh"
+        val localScript = """
+            echo "开始资源解压，重新压缩！";
+            pwd
+            echo $lastPath/app/build/intermediates/processed_res/debug/out
+            rm -rf $lastPath/.idea/litebuild/tempResFolder
+            mkdir $lastPath/.idea/litebuild/tempResFolder
+            unzip -o -q $lastPath/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d .idea/litebuild/tempResFolder
+            cp -R $lastPath/app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
+            cd $lastPath/.idea/litebuild/tempResFolder
+            
+        """.trimIndent()
 
-        println("准备执行resourcesApk.sh")
+        println("准备执行第5版资源脚本")
         Utils.executeScript(cmds);
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))
     }
+
+
 
 }

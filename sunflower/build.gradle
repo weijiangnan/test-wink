@@ -66,13 +66,20 @@ buildscript {
         }
     }
 
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+    }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
-        classpath "com.immomo.litebuild:plugin:0.0.5-SNAPSHOT"
+
+        classpath("com.immomo.litebuild:plugin:0.0.7-SNAPSHOT") {
+            changing(true)
+        }
     }
 }
 

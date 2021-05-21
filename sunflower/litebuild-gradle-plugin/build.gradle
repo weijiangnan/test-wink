@@ -45,7 +45,7 @@ uploadArchives {
         mavenDeployer {
             pom.groupId = 'com.immomo.litebuild'
             pom.artifactId = 'plugin'
-            pom.version = '0.0.5'
+            pom.version = '0.0.7-SNAPSHOT'
             repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                 authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
             }
