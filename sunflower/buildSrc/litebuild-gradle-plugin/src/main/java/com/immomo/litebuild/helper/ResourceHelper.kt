@@ -65,7 +65,7 @@ class ResourceHelper {
             adb push resources-debug.apk $pushSdcardPath/
         """.trimIndent()
 
-        println("准备执行第7版资源脚本")
+        println("准备执行第8版资源脚本")
         Utils.executeScript(localScript)
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))

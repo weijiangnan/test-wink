@@ -59,7 +59,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         });
         // implementation project(":pipline")
         project.getDependencies().add("implementation",
-                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.5-SNAPSHOT"));
+                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.7-SNAPSHOT"));
     }
 
     public void combineTask(Project project) {

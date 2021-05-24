@@ -25,7 +25,6 @@ import com.immomo.litebuild.util.Log
 import com.immomo.litebuild.util.Utils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
-import org.eclipse.jgit.diff.DiffFormatter
 import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevTree
@@ -34,7 +33,6 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.treewalk.AbstractTreeIterator
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.gradle.api.Project
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
