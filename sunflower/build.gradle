@@ -77,9 +77,9 @@ buildscript {
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
 
-        classpath("com.immomo.litebuild:plugin:0.0.7-SNAPSHOT") {
-            changing(true)
-        }
+//        classpath("com.immomo.litebuild:plugin:0.0.7-SNAPSHOT") {
+//            changing(true)
+//        }
     }
 }
 

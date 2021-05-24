@@ -29,8 +29,8 @@ class ResourceHelper {
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
 
-        Settings.getData().needProcessDebugResources = true;
-//        Utils.executeScript("./gradlew processDebugResources --offline")
+        Settings.getData().needProcessDebugResources = true
+        Utils.executeScript("./gradlew processDebugResources --offline")
     }
 
     fun packageResources() {
@@ -44,24 +44,29 @@ class ResourceHelper {
         }
 
         val lastPath = Settings.project.rootDir
-        var cmds = String()
-        cmds += "source ~/.bash_profile"
-//        cmds += "\n cd ../"
-        cmds += "\n sh resourcesApk.sh"
+        val litebuildFolderPath = Settings.Data.TMP_PATH
+        val apkPath = "$litebuildFolderPath/resources-debug.apk"
+        val pushSdcardPath = "/sdcard/Android/data/${Settings.Data.PACKAGE_NAME}/patch_file"
+
         val localScript = """
-            echo "开始资源解压，重新压缩！";
-            pwd
+            source ~/.bash_profile
+            echo "开始资源解压，重新压缩！"
             echo $lastPath/app/build/intermediates/processed_res/debug/out
             rm -rf $lastPath/.idea/litebuild/tempResFolder
             mkdir $lastPath/.idea/litebuild/tempResFolder
             unzip -o -q $lastPath/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d .idea/litebuild/tempResFolder
             cp -R $lastPath/app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
             cd $lastPath/.idea/litebuild/tempResFolder
-            
+            zip -r -o -q $apkPath *
+            cd ..
+            rm -rf tempResFolder
+            adb shell rm -rf $pushSdcardPath
+            adb shell mkdir $pushSdcardPath
+            adb push resources-debug.apk $pushSdcardPath/
         """.trimIndent()
 
-        println("准备执行第5版资源脚本")
-        Utils.executeScript(localScript);
+        println("准备执行第7版资源脚本")
+        Utils.executeScript(localScript)
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))
     }

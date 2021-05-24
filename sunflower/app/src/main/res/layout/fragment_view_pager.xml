@@ -59,7 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
                         android:gravity="center"
-                        android:text="12-10"
+                        android:text="03:26"
                         android:textAppearance="?attr/textAppearanceHeadline5" />
 
                 </com.google.android.material.appbar.MaterialToolbar>
