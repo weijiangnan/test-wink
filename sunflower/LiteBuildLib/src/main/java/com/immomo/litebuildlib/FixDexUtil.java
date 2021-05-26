@@ -2,7 +2,6 @@ package com.immomo.litebuildlib;
 
 import android.content.Context;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -50,7 +49,7 @@ public class FixDexUtil {
      *@time 2018/6/25 0025 15:51
      *@desc 验证是否需要热修复
      */
-    public static boolean isGoingToFix(@NonNull Context context) {
+    public static boolean isGoingToFix(Context context) {
         boolean canFix = false;
 //        var dexFilePath: String = filesDir.path + "/classes.dex"
         File externalStorageDirectory = new File(context.getFilesDir().getPath() + "/classes.dex");
