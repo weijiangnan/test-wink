@@ -43,12 +43,12 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        Log.TimerLog timer = Log.timerStart("apply", "_________");
+        Log.TimerLog timer = Log.timerStart("apply init", "_________");
 
         addAssembleLastTask(project);
 
-        project.getExtensions().create("liteBuildModuleExclude",
-                ModuleConfigs.class);
+        project.getExtensions().create("litebuildOptions",
+                LitebuildOptions.class);
 
         project.afterEvaluate(it -> {
             Log.TimerLog timerAfterEvaluate = Log.timerStart("timerAfterEvaluate");
@@ -62,12 +62,12 @@ public class LiteBuildPlugin implements Plugin<Project> {
             combineTask(it);
 
             timerAfterEvaluate.end();
+
+            timer.end("_________");
         });
         // implementation project(":pipline")
         project.getDependencies().add("implementation",
-                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.7-SNAPSHOT"));
-
-        timer.end("_________");
+                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.61-SNAPSHOT"));
     }
 
     public void combineTask(Project project) {
