@@ -4,7 +4,7 @@
 
     <application>
         <provider
-            android:name="com.immomo.litebuildlib.LiteBuildInstaller"
+            android:name="com.immomo.litebuildlib.LiteBuildProvider"
             android:authorities="${applicationId}.litebuild-sentry-installer"
             android:exported="false"/>
     </application>
