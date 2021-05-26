@@ -1,6 +1,7 @@
 package com.immomo.litebuild.helper;
 
 
+import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 import org.apache.http.util.TextUtils;
@@ -116,17 +117,19 @@ public class CompileHelper {
     }
 
     private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.Data.ProjectInfo projectInfo) {
-        String pluginHome = kotlinHome + "/kotlinc/lib/android-extensions-compiler.jar";
-        String packageName = Settings.getPropertiesEnv().getProperty("debug_package");
-        String flavor = "main";
-        String resPath = projectInfo.getProject().getProjectDir() + "/src/" + flavor + "/res";
+        LitebuildOptions options = projectInfo.getProject().getExtensions().getByType(LitebuildOptions.class);
+        String args = "";
+        if (options.kotlinSyntheticsEnable) {
+            String pluginHome = kotlinHome + "/kotlinc/lib/android-extensions-compiler.jar";
+            String packageName = Settings.getPropertiesEnv().getProperty("debug_package");
+            String flavor = "main";
+            String resPath = projectInfo.getProject().getProjectDir() + "/src/" + flavor + "/res";
 
-        String args = String.format(Locale.US, " -Xplugin=%s " +
-                "-P plugin:org.jetbrains.kotlin.android:package=%s " +
-                "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
-
+            args = String.format(Locale.US, " -Xplugin=%s " +
+                    "-P plugin:org.jetbrains.kotlin.android:package=%s " +
+                    "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
+        }
 //        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
-
         return args;
     }
 

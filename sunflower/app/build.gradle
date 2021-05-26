@@ -140,7 +140,7 @@ def getUnsplashAccess() {
 }
 
 litebuildOptions {
-
+    kotlinSyntheticsEnable = false
 }
 //liteBuildModuleExclude {
 //    modules = ["LiteBuildLib"]
