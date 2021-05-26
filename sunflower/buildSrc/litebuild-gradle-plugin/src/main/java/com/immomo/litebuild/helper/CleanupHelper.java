@@ -17,8 +17,10 @@
 package com.immomo.litebuild.helper;
 
 import com.immomo.litebuild.Settings;
+import com.immomo.litebuild.util.Utils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CleanupHelper {
     public void cleanup() {
@@ -28,6 +30,18 @@ public class CleanupHelper {
         delete("tmp_class");
         delete("env.properties");
         delete("stableIds.txt");
+
+        // 删除手机上的patch文件
+        deletePatchFileOnPhone();
+    }
+
+    public void deletePatchFileOnPhone() {
+        String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
+        String cmds = "";
+        cmds += "source ~/.bash_profile";
+        cmds += '\n' + "adb shell rm -rf " + destPath;
+        cmds += '\n' + "adb shell mkdir " + destPath;
+        Utils.runShell(cmds);
     }
 
     public void delete(String path) {
