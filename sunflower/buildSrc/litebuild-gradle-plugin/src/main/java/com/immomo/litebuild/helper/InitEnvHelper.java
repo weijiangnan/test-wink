@@ -250,7 +250,6 @@ public class InitEnvHelper {
             System.out.println("ywb 2222222 initProjectData 22222 耗时：" + (System.currentTimeMillis() - findModuleEndTime2) + " ms");
 
         }
-
     }
 
     private void findModuleTree(Project project, String productFlavor) {

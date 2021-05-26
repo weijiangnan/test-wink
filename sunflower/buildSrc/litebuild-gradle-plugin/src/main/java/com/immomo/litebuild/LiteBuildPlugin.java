@@ -23,6 +23,7 @@ import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
+import com.immomo.litebuild.util.Log;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -42,6 +43,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        Log.TimerLog timer = Log.timerStart("apply", "_________");
 
         addAssembleLastTask(project);
 
@@ -49,17 +51,23 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 ModuleConfigs.class);
 
         project.afterEvaluate(it -> {
+            Log.TimerLog timerAfterEvaluate = Log.timerStart("timerAfterEvaluate");
             createInitTask(it);
             createDiffTask(it);
             createCompileTask(it);
             createResourcesTask(it);
             createLiteBuildTask(it);
+            createCleanupTask(it);
 
             combineTask(it);
+
+            timerAfterEvaluate.end();
         });
         // implementation project(":pipline")
         project.getDependencies().add("implementation",
                 project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.7-SNAPSHOT"));
+
+        timer.end("_________");
     }
 
     public void combineTask(Project project) {
@@ -88,11 +96,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void createInitTask(Project project) {
         project.getTasks().register("litebuildInit", task -> {
             task.doLast(it -> {
-                long mainStartTime = System.currentTimeMillis();
-                System.out.println("进入了main函数");
+                Log.TimerLog timer = Log.timerStart("litebuildInit");
                 // init
                 Settings.init(project);
-                System.out.println("【【【===================================================>>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
+                timer.end();
             });
 
         }).get().setGroup(Settings.getData().NAME);
@@ -101,7 +108,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void createCompileTask(Project project) {
         project.getTasks().register("litebuildCompile", task -> {
             task.doLast(it -> {
+                Log.TimerLog timer = Log.timerStart("litebuildCompile");
                 new CompileHelper().compileCode();
+                timer.end();
             });
         }).get().setGroup(Settings.getData().NAME);
     }
@@ -116,19 +125,21 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         project.getTasks().register("litebuildResources", task -> {
             task.doLast(it -> {
+                Log.TimerLog timer = Log.timerStart("litebuildResources");
                 // compile resource.
-                long resStartTime = System.currentTimeMillis();
                 new ResourceHelper().checkResource();
-
-                System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
+                timer.end();
             });
         }).get().setGroup(Settings.getData().NAME);
 
         project.getTasks().register("litebuildPackageResources", task -> {
             task.doLast(it -> {
+                Log.TimerLog timer = Log.timerStart("litebuildPackageResources");
                 if (Settings.getData().hasResourceChanged) {
                     new ResourceHelper().packageResources();
                 }
+
+                timer.end();
             });
         }).get().setGroup(Settings.getData().NAME);
     }
@@ -138,45 +149,27 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
-                    long startTime = System.currentTimeMillis();
-                    System.out.println("litebuild execute() =============================================>>>>> " + "task doLast() startTime：" + startTime);
-                    System.out.println("插件执行中...1");
-
-                    boolean hasAppPlugin = project.getPlugins().hasPlugin("com.android.application");
-                    if (!hasAppPlugin) {
-                        System.out.println("该module未包含com.android.application插件");
-                        return;
-                    }
-
-                    AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-
-                    Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-                    System.out.println("插件执行中...2  itApp=" + itApp.hasNext());
-                    while (itApp.hasNext()) {
-                        ApplicationVariant variant = itApp.next();
-                        System.out.println("variant..." + variant.getName());
-                        if (variant.getName().equals("debug")) {
-
-                            variant.getOutputs().all(new Action<BaseVariantOutput>() {
-                                @Override
-                                public void execute(BaseVariantOutput baseVariantOutput) {
-                                    String path = baseVariantOutput.getOutputFile().getAbsolutePath();
-                                    System.out.println("variant..." + path);
-                                }
-                            });
-
-                            System.out.println("插件执行中...3  main()");
-                            main(project);
-                            break;
-                        }
-                    }
-
-                    System.out.println("=============================================>>>>> " + "task doLast() endTime：" + (System.currentTimeMillis() - startTime) + " ms");
+                    Log.TimerLog timer = Log.timerStart("litebuild", "patchToApp...");
+                    // patch
+                    new IncrementPatchHelper().patchToApp();
+                    timer.end("patchToApp...");
                 }
             });
         }).get().setGroup(Settings.getData().NAME);
-        System.out.println("litebuild apply()------------------------------------------------>>>>> " + "taskStartTime：" + System.currentTimeMillis());
+    }
 
+    public void createCleanupTask(Project project) {
+        project.getTasks().register("litebuildCleanup", task -> {
+            task.doLast(new Action<Task>() {
+                @Override
+                public void execute(Task task) {
+                    Log.TimerLog timer = Log.timerStart("litebuildCleanup", "patchToApp...");
+                    // patch
+                    new IncrementPatchHelper().patchToApp();
+                    timer.end("patchToApp...");
+                }
+            });
+        }).get().setGroup(Settings.getData().NAME);
     }
 
     public void createDiffTask(Project project) {
@@ -206,54 +199,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         }).get().setGroup(Settings.getData().NAME);
     }
-
-    public void main(Project project) {
-//        long mainStartTime = System.currentTimeMillis();
-//        System.out.println("进入了main函数");
-//        // init
-//        Settings.init(project);
-//        System.out.println("【【【===================================================>>>>> " + "init 耗时：" + (System.currentTimeMillis() - mainStartTime) + " ms");
-
-//        System.out.println("=================>>>>>> projectBuildSortList size : " +  Settings.getData().projectBuildSortList.size() + " === " + Settings.getData().projectBuildSortList.toString());
-//        System.out.println("=============================================>>>>>> ");
-//        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-//            System.out.println("=================>>>>>> " + projectInfo.getProject().getName());
-//        }
-//        System.out.println("=============================================>>>>>> ");
-
-//        long diffStartTime = System.currentTimeMillis();
-//
-//        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-//            //
-//            long startTime = System.currentTimeMillis();
-//            new DiffHelper(projectInfo.getProject()).diff(projectInfo);
-//            System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
-//            // compile java & kotlin
-//            new CompileHelper().compileCode(projectInfo);
-//        }
-//        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-//            if (projectInfo.hasResourceChanged) {
-//                System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
-//                System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-//                Settings.getData().hasResourceChanged = true;
-//                break;
-//            }
-//        }
-//
-//        System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
-//
-//        // compile resource.
-//        long resStartTime = System.currentTimeMillis();
-//        new ResourceHelper().process();
-
-//        System.out.println("【【【===================================================>>>>> " + "res 耗时" + (System.currentTimeMillis() - resStartTime) + " ms");
-        // Increment patch to app.
-        new IncrementPatchHelper().patchToApp();
-        long pathEndTime = System.currentTimeMillis();
-        System.out.println("【【【===================================================>>>>> " + "path 结束耗时" + (System.currentTimeMillis() - pathEndTime) + " ms");
-//        System.out.println("【【【===================================================>>>>> " + "main 函数结束" + (System.currentTimeMillis() - mainStartTime) + " ms");
-    }
-
 
     private void addAssembleLastTask(Project project) {
         project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
