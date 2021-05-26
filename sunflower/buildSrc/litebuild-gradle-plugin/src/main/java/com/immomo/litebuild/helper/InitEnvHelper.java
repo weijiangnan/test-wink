@@ -261,17 +261,17 @@ public class InitEnvHelper {
                 }
                 // build.gradle liteBuildModuleExclude 配置
                 LitebuildOptions litebuildOptions = project.getExtensions().getByType(LitebuildOptions.class);
-                if (litebuildOptions.moduleBlacklist != null) {
-                    System.out.println("===================================");
-                    System.out.println("moduleConfigs: " + Arrays.toString(litebuildOptions.moduleBlacklist));
-                    System.out.println("===================================");
-                    System.out.println("subProject name==" + subProject.getName());
-                    if (!Arrays.asList(litebuildOptions.moduleBlacklist).contains(subProject.getName())) {
-                        addSubProject(subProject);
-                    }
-                } else {
+//                if (litebuildOptions.moduleBlacklist != null) {
+//                    System.out.println("===================================");
+//                    System.out.println("moduleConfigs: " + Arrays.toString(litebuildOptions.moduleBlacklist));
+//                    System.out.println("===================================");
+//                    System.out.println("subProject name==" + subProject.getName());
+//                    if (!Arrays.asList(litebuildOptions.moduleBlacklist).contains(subProject.getName())) {
+//                        addSubProject(subProject);
+//                    }
+//                } else {
                     addSubProject(subProject);
-                }
+//                }
             }
         });
         for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
