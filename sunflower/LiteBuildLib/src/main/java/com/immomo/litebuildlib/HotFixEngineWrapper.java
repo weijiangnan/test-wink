@@ -1,6 +1,7 @@
 package com.immomo.litebuildlib;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 
@@ -105,7 +106,7 @@ public final class HotFixEngineWrapper {
     }
 
     public final void loadPatch( Context context) {
-        dexPath = "/sdcard/patch0.dex";
+        dexPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + context.getPackageName() + "/patch_file/patch0.dex";
         Log.e("weijiangnan", dexPath);
         if ((new File(dexPath)).exists()) {
             StringBuilder var10000 = new StringBuilder();

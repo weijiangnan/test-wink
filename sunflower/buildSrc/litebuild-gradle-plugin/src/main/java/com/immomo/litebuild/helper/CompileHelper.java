@@ -113,12 +113,15 @@ public class CompileHelper {
             // 没有数据变更
             return;
         }
+        String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
 
         String cmds = new String();
         cmds += "source ~/.bash_profile";
         cmds += '\n' + Settings.getEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
                 + Settings.Data.TMP_PATH + "/patch0.dex " +  Settings.Data.TMP_PATH + "/tmp_class/";
-        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/";
+        cmds += '\n' + "adb shell mkdir " + destPath;
+        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex " + destPath;
+
 //        cmds += '\n' + "adb shell am force-stop " + APP_PACKAGE;
 //        cmds += '\n' + "adb shell am start -n " + APP_PACKAGE + "/" + LAUNCH_ACTIVITY;
 
