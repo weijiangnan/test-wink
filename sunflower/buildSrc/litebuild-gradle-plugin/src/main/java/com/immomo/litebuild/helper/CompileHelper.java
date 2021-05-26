@@ -102,10 +102,10 @@ public class CompileHelper {
         System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         try {
             String mainKotlincArgs = Settings.getPropertiesEnv().getProperty(project.getProject().getName() + "_kotlinc_args");
-            mainKotlincArgs = mainKotlincArgs + buildKotlinAndroidPluginCommand(kotlinHome, project);
+            String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
             String javaHomePath = Settings.getPropertiesEnv().getProperty("java_home");
             javaHomePath = javaHomePath.replace(" ", "\\ ");
-            String shellCommand = kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
+            String shellCommand = "sh " + kotlincHome + kotlinxArgs + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
 //            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
             Utils.runShell(shellCommand);
         } catch (Exception e) {
@@ -121,11 +121,11 @@ public class CompileHelper {
         String flavor = "main";
         String resPath = projectInfo.getProject().getProjectDir() + "/src/" + flavor + "/res";
 
-        String args = String.format(Locale.US, "-Xplugin=%s \\\n" +
-                "-P plugin:org.jetbrains.kotlin.android:package=%s \\\n" +
-                "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' \\", pluginHome, packageName, flavor, resPath);
+        String args = String.format(Locale.US, " -Xplugin=%s " +
+                "-P plugin:org.jetbrains.kotlin.android:package=%s " +
+                "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
 
-        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
+//        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
 
         return args;
     }
