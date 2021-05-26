@@ -6,6 +6,7 @@ import com.immomo.litebuild.util.Utils;
 import org.apache.http.util.TextUtils;
 
 import java.io.File;
+import java.util.Locale;
 
 public class CompileHelper {
     public void compileCode() {
@@ -69,6 +70,12 @@ public class CompileHelper {
             sb.append(" ");
             sb.append(path);
         }
+
+        String kotlinHome = System.getenv("KOTLIN_HOME");
+        if (TextUtils.isEmpty(kotlinHome)) {
+            kotlinHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin";
+        }
+
         String kotlincHome = System.getenv("KOTLINC_HOME");
         if (TextUtils.isEmpty(kotlincHome)) {
             kotlincHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
@@ -95,6 +102,7 @@ public class CompileHelper {
         System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         try {
             String mainKotlincArgs = Settings.getPropertiesEnv().getProperty(project.getProject().getName() + "_kotlinc_args");
+            mainKotlincArgs = mainKotlincArgs + buildKotlinAndroidPluginCommand(kotlinHome, project);
             String javaHomePath = Settings.getPropertiesEnv().getProperty("java_home");
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             String shellCommand = kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
@@ -105,6 +113,21 @@ public class CompileHelper {
         }
 
         Settings.getData().hasClassChanged = true;
+    }
+
+    private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.Data.ProjectInfo projectInfo) {
+        String pluginHome = kotlinHome + "/kotlinc/lib/android-extensions-compiler.jar";
+        String packageName = Settings.getPropertiesEnv().getProperty("debug_package");
+        String flavor = "main";
+        String resPath = projectInfo.getProject().getProjectDir() + "/src/" + flavor + "/res";
+
+        String args = String.format(Locale.US, "-Xplugin=%s \\\n" +
+                "-P plugin:org.jetbrains.kotlin.android:package=%s \\\n" +
+                "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' \\", pluginHome, packageName, flavor, resPath);
+
+        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
+
+        return args;
     }
 
     private void createDexPatch() {
