@@ -18,18 +18,15 @@ package com.immomo.litebuild.helper;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension;
 import com.android.utils.FileUtils;
-import com.immomo.litebuild.ModuleConfigs;
+import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.AndroidManifestUtils;
 
-import org.apache.http.util.TextUtils;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
-import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
@@ -263,13 +260,13 @@ public class InitEnvHelper {
                     return;
                 }
                 // build.gradle liteBuildModuleExclude 配置
-                ModuleConfigs moduleConfigs = project.getExtensions().getByType(ModuleConfigs.class);
-                if (moduleConfigs.modules != null) {
+                LitebuildOptions litebuildOptions = project.getExtensions().getByType(LitebuildOptions.class);
+                if (litebuildOptions.moduleBlacklist != null) {
                     System.out.println("===================================");
-                    System.out.println("moduleConfigs: " + Arrays.toString(moduleConfigs.modules));
+                    System.out.println("moduleConfigs: " + Arrays.toString(litebuildOptions.moduleBlacklist));
                     System.out.println("===================================");
                     System.out.println("subProject name==" + subProject.getName());
-                    if (!Arrays.asList(moduleConfigs.modules).contains(subProject.getName())) {
+                    if (!Arrays.asList(litebuildOptions.moduleBlacklist).contains(subProject.getName())) {
                         addSubProject(subProject);
                     }
                 } else {

@@ -139,7 +139,10 @@ def getUnsplashAccess() {
     return project.findProperty("unsplash_access_key")
 }
 
-liteBuildModuleExclude {
-    modules = ["LiteBuildLib"]
-//    modules = ["LiteBuildLib"]
+litebuildOptions {
+
 }
+//liteBuildModuleExclude {
+//    modules = ["LiteBuildLib"]
+////    modules = ["LiteBuildLib"]
+//}
