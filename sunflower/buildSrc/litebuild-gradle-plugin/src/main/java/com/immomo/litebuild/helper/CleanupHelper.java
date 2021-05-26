@@ -16,8 +16,41 @@
 
 package com.immomo.litebuild.helper;
 
+import com.immomo.litebuild.Settings;
+
+import java.io.File;
+
 public class CleanupHelper {
     public void cleanup() {
+        delete("patch0.dex");
+        delete("resources-debug.apk");
+        delete("diff");
+        delete("tmp_class");
+        delete("env.properties");
+        delete("stableIds.txt");
+    }
 
+    public void delete(String path) {
+        System.out.println("删除文件:" + Settings.Data.TMP_PATH + "/" + path);
+        File f = new File(Settings.Data.TMP_PATH + "/" + path);
+        deleteFile(f);
+    }
+
+    public boolean deleteFile(File dirFile) {
+        // 如果dir对应的文件不存在，则退出
+        if (!dirFile.exists()) {
+            return false;
+        }
+
+        if (dirFile.isFile()) {
+            return dirFile.delete();
+        } else {
+
+            for (File file : dirFile.listFiles()) {
+                deleteFile(file);
+            }
+        }
+
+        return dirFile.delete();
     }
 }
