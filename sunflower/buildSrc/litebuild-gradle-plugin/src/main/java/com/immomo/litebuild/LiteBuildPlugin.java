@@ -66,9 +66,11 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
             timer.end("_________");
         });
-        // implementation project(":pipline")
-        project.getDependencies().add("implementation",
-                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.62-SNAPSHOT"));
+
+        if (!project.getGroup().equals("sunflower")) {
+            project.getDependencies().add("implementation",
+                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.62-SNAPSHOT"));
+        }
     }
 
     public void combineTask(Project project) {

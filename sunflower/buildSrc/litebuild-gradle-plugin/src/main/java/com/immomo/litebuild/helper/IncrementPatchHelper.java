@@ -23,8 +23,8 @@ public class IncrementPatchHelper {
     public void patchToApp() {
         String cmds = new String();
         cmds += "source ~/.bash_profile";
-        cmds += '\n' + "adb shell am force-stop " + Settings.getEnv().getProperty("debug_package");
-        cmds += '\n' + "adb shell am start -n " + Settings.getEnv().getProperty("debug_package") + "/" + Settings.getEnv().getProperty("launcher_activity");
+        cmds += '\n' + "adb shell am force-stop " + Settings.getPropertiesEnv().getProperty("debug_package");
+        cmds += '\n' + "adb shell am start -n " + Settings.getPropertiesEnv().getProperty("debug_package") + "/" + Settings.getPropertiesEnv().getProperty("launcher_activity");
         Utils.runShell(cmds);
     }
 

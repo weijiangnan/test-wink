@@ -6,7 +6,6 @@ import com.immomo.litebuild.util.Utils;
 import org.apache.http.util.TextUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 public class CompileHelper {
     public void compileCode() {
@@ -41,7 +40,7 @@ public class CompileHelper {
             sb.append(path);
         }
 
-        String shellCommand = "javac" + Settings.getEnv().getProperty(project.getProject().getName() + "_javac_args")
+        String shellCommand = "javac" + Settings.getPropertiesEnv().getProperty(project.getProject().getName() + "_javac_args")
                 + sb.toString();
 //        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
         System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
@@ -95,8 +94,8 @@ public class CompileHelper {
         System.out.println("[LiteBuild] kotlincHome : " + kotlincHome);
         System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
         try {
-            String mainKotlincArgs = Settings.getEnv().getProperty(project.getProject().getName() + "_kotlinc_args");
-            String javaHomePath = Settings.getEnv().getProperty("java_home");
+            String mainKotlincArgs = Settings.getPropertiesEnv().getProperty(project.getProject().getName() + "_kotlinc_args");
+            String javaHomePath = Settings.getPropertiesEnv().getProperty("java_home");
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             String shellCommand = kotlincHome + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
 //            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
@@ -117,7 +116,7 @@ public class CompileHelper {
 
         String cmds = new String();
         cmds += "source ~/.bash_profile";
-        cmds += '\n' + Settings.getEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
+        cmds += '\n' + Settings.getPropertiesEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
                 + Settings.Data.TMP_PATH + "/patch0.dex " +  Settings.Data.TMP_PATH + "/tmp_class/";
         cmds += '\n' + "adb shell mkdir " + destPath;
         cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex " + destPath;
