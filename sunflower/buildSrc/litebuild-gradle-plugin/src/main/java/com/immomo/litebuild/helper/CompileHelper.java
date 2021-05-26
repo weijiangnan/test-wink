@@ -72,7 +72,10 @@ public class CompileHelper {
         }
         String kotlincHome = System.getenv("KOTLINC_HOME");
         if (TextUtils.isEmpty(kotlincHome)) {
-            kotlincHome = "/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+            kotlincHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+        }
+
+        if (TextUtils.isEmpty(kotlincHome)) {
             if (!new File(kotlincHome).exists()) {
                 System.out.println();
                 System.out.println("================== 请配置 KOTLINC_HOME ==================");

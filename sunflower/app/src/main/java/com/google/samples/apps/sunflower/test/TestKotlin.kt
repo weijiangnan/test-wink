@@ -4,7 +4,7 @@ class TestKotlin {
 
     fun getTitle(): String {
         println("===============")
-        var aaa = "1111"
+        var aaa = "11133322"
 //        aaa += getString1();
         return aaa
     }
