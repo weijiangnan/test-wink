@@ -43,6 +43,7 @@ android {
             }
         }
     }
+
     //解决强行修改图片后缀问题 jpg改成png会有问题
     aaptOptions {
         cruncherEnabled = false
@@ -64,6 +65,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            applicationIdSuffix '.dev'
         }
     }
     compileOptions {
@@ -88,9 +93,7 @@ android {
 }
 
 dependencies {
-//    implementation "com.immomo.litebuild:build-lib:0.0.5-SNAPSHOT"
     implementation project(':LiteBuildLib')
-//    implementation "com.immomo.android.module:diandian:1.0.9-module-0323-2100"
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
     kapt "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"

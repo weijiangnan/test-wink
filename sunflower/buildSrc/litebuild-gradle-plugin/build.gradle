@@ -31,7 +31,6 @@ repositories {
 }
 
 dependencies {
-//    api 'com.immomo.litebuild:build-lib:0.0.5-SNAPSHOT'
     implementation "com.android.tools.build:gradle:4.0.2"
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
@@ -63,7 +62,7 @@ afterEvaluate { project ->
             mavenDeployer {
                 pom.groupId = 'com.immomo.litebuild'
                 pom.artifactId = 'plugin'
-                pom.version = '0.0.62-SNAPSHOT'
+                pom.version = '0.0.602-SNAPSHOT'
                 repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
