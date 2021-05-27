@@ -63,6 +63,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         addAssembleLastTask(project);
 
+
+
         project.getExtensions().create("litebuildOptions",
                 LitebuildOptions.class);
 
@@ -102,6 +104,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         Task cleanUp = project.getTasks().getByName("litebuildCleanup");
         Task clean = project.getTasks().getByName("clean");
+
+        Task assembleDebug = project.getTasks().getByName("assembleDebug");
+        assembleDebug.doLast(task -> new CleanupHelper().cleanup());
 
 //        cleanUp.dependsOn(clean);
         clean.dependsOn(cleanUp);
