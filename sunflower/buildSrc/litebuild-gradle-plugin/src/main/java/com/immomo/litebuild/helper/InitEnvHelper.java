@@ -253,44 +253,52 @@ public class InitEnvHelper {
         Settings.getData().projectTreeRoot = new Settings.Data.ProjectInfo();
         Settings.getData().projectTreeRoot.setProject(project);
 
-        long startTimeOuter = System.currentTimeMillis();
-        project.getRootProject().getSubprojects().forEach(subProject -> {
-            if (subProject != null) { // && subProject.getChildProjects().size() == 0) {
-                if (subProject.getName().equals("litebuild-gradle-plugin")) {
-                    return;
-                }
-                // build.gradle liteBuildModuleExclude 配置
-                LitebuildOptions litebuildOptions = project.getExtensions().getByType(LitebuildOptions.class);
-//                if (litebuildOptions.moduleBlacklist != null) {
-//                    System.out.println("===================================");
-//                    System.out.println("moduleConfigs: " + Arrays.toString(litebuildOptions.moduleBlacklist));
-//                    System.out.println("===================================");
-//                    System.out.println("subProject name==" + subProject.getName());
-//                    if (!Arrays.asList(litebuildOptions.moduleBlacklist).contains(subProject.getName())) {
-//                        addSubProject(subProject);
-//                    }
-//                } else {
-                    addSubProject(subProject);
-//                }
-            }
-        });
-        for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-            System.out.println("Settings.getData().projectBuildItem : " + projectInfo.getProject().getName());
-        }
-        System.out.println("ywbbbbbbbbbb " + "project ~~~ " + project.getName() + ": 耗时：" + (System.currentTimeMillis() - startTimeOuter) + " ms");
+        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
+        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
 
-//        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
-//
-//        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
+        ignoreProject();
     }
 
-    private void addSubProject(Project subProject) {
-        long startTime = System.currentTimeMillis();
-        Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
-        childNode.setProject(subProject);
-        Settings.getData().projectTreeRoot.getChildren().add(childNode);
-        Settings.getData().projectBuildSortList.add(childNode);
-        System.out.println("ywbbbbbbbbbb " + "subProject " + subProject.getName() + ": 耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+    private void ignoreProject() {
+        LitebuildOptions litebuildOptions =
+                project.getExtensions().getByType(LitebuildOptions.class);
+        if (litebuildOptions == null) {
+            return;
+        }
+
+        if (litebuildOptions.moduleWhitelist != null
+                && litebuildOptions.moduleWhitelist.length > 0) {
+            // 优先白名单过滤
+            HashSet<String> set = new HashSet<>();
+            for (String module : litebuildOptions.moduleWhitelist) {
+                set.add(module);
+            }
+
+            for (int i = Settings.getData().projectBuildSortList.size() - 1;
+                 i >= 0; i--) {
+                Settings.Data.ProjectInfo info = Settings.getData().projectBuildSortList.get(i);
+                if (!set.contains(info.getProject().getName())) {
+                    Settings.getData().projectBuildSortList.remove(i);
+                    info.projectIgnore = true;
+                }
+            }
+        } else if (litebuildOptions.moduleBlacklist != null
+                && litebuildOptions.moduleBlacklist.length > 0) {
+            // 然后黑名单过滤
+            HashSet<String> set = new HashSet<>();
+            for (String module : litebuildOptions.moduleBlacklist) {
+                set.add(module);
+            }
+
+            for (int i = Settings.getData().projectBuildSortList.size() - 1;
+                 i >= 0; i--) {
+                Settings.Data.ProjectInfo info = Settings.getData().projectBuildSortList.get(i);
+                if (set.contains(info.getProject().getName())) {
+                    Settings.getData().projectBuildSortList.remove(i);
+                    info.projectIgnore = true;
+                }
+            }
+        }
     }
 
     private void sortBuildList(Settings.Data.ProjectInfo node, List<Settings.Data.ProjectInfo> out) {
@@ -316,10 +324,15 @@ public class InitEnvHelper {
         xxxCompile.getDependencies().forEach(new Consumer<Dependency>() {
             @Override
             public void accept(Dependency dependency) {
+
                 if (dependency instanceof DefaultProjectDependency) {
                     DefaultProjectDependency dp = (DefaultProjectDependency) dependency;
-
                     // 孩子节点
+                    String name = dp.getDependencyProject().getName();
+                    if (name.equals("litebuild-gradle-plugin") || name.equals("LiteBuildLib")) {
+                        return;
+                    }
+
                     Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
                     childNode.setProject(dp.getDependencyProject());
                     node.getChildren().add(childNode);

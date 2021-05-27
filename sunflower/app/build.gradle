@@ -140,9 +140,6 @@ def getUnsplashAccess() {
 }
 
 litebuildOptions {
-
+//    moduleWhitelist = [ "app" ]
+//    moduleBlacklist = [ "app" ]
 }
-//liteBuildModuleExclude {
-//    modules = ["LiteBuildLib"]
-////    modules = ["LiteBuildLib"]
-//}
