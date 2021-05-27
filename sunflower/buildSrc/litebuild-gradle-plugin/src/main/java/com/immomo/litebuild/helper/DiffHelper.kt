@@ -356,7 +356,7 @@ class DiffHelper(var project: Project) {
         }
     }
 
-    private fun getSnapshot(it: File) = Utils.getFileMD5s(it, 64)
+    private fun getSnapshot(it: File) = it.lastModified().toString()//Utils.getFileMD5s(it, 64)
 
 
 }
