@@ -114,27 +114,19 @@ public class InitEnvHelper {
         properties.setProperty("compile_sdk_dir", FileUtils.join(properties.getProperty("sdk_dir"), "platforms", properties.getProperty("compile_sdk_version")));
 
         String packageName = androidExt.getDefaultConfig().getApplicationId();
-        String packageNameStuff = androidExt.getDefaultConfig().getApplicationId();
-//        Settings.getData().PACKAGE_NAME = packageName;
+        String packageNameSuffix = androidExt.getDefaultConfig().getApplicationIdSuffix();
 
-        Settings.getData().PACKAGE_NAME = (String) androidExt.getBuildTypes().getByName("debug").getManifestPlaceholders().getOrDefault("packagename", packageName);
-
-        System.out.println("获取包名 包名 包名 " + packageName + "， 后缀：" + packageNameStuff);
+        System.out.println("获取包名 包名 包名 " + packageName + "， 后缀：" + packageNameSuffix);
         while (androidExt.getApplicationVariants().iterator().hasNext()) {
             ApplicationVariant variant = androidExt.getApplicationVariants().iterator().next();
             if (variant.getName().equals("debug")) {
-                packageNameStuff = variant.getApplicationId();
+                Settings.getData().PACKAGE_NAME = variant.getApplicationId();
                 break;
             }
         }
-//        String applicationIdSuffix = ((BaseAppModuleExtension) androidExt).publicExtensionImpl.buildTypes.getByName("debug").getApplicationIdSuffix();
-//        if (!TextUtils.isEmpty(applicationIdSuffix)) {
-//            packageName += applicationIdSuffix;
-//        }
-        properties.setProperty("debug_package", packageNameStuff);
 
+        properties.setProperty("debug_package", Settings.getData().PACKAGE_NAME);
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
-//        System.out.println("manifestPath : " + manifestPath);
 
         String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageName);
 //        System.out.println("launcherActivity : " + launcherActivity);
