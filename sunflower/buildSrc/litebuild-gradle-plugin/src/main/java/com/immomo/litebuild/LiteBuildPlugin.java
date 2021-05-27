@@ -58,7 +58,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 lbfolder.mkdir();
             }
             if (file.exists()) {
-                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在");
+                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  "+file.getAbsolutePath());
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
             } else {
                 Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");

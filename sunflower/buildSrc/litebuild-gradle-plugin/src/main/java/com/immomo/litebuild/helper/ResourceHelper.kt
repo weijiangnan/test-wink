@@ -46,16 +46,17 @@ class ResourceHelper {
         val lastPath = Settings.project.rootDir
         val litebuildFolderPath = Settings.Data.TMP_PATH
         val apkPath = "$litebuildFolderPath/resources-debug.apk"
-        val pushSdcardPath = "/sdcard/Android/data/${Settings.Data.PACKAGE_NAME}/patch_file"
+        val pushSdcardPath = "/sdcard/Android/data/${Settings.Data.PACKAGE_NAME}/patch_file/apk"
 
+        val app = Settings.getData().projectTreeRoot.project.name
         val localScript = """
             source ~/.bash_profile
             echo "开始资源解压，重新压缩！"
-            echo $lastPath/app/build/intermediates/processed_res/debug/out
+            echo $lastPath/$app/build/intermediates/processed_res/debug/out
             rm -rf $lastPath/.idea/litebuild/tempResFolder
             mkdir $lastPath/.idea/litebuild/tempResFolder
-            unzip -o -q $lastPath/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d .idea/litebuild/tempResFolder
-            cp -R $lastPath/app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
+            unzip -o -q $lastPath/$app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d $lastPath/.idea/litebuild/tempResFolder
+            cp -R $lastPath/$app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
             cd $lastPath/.idea/litebuild/tempResFolder
             zip -r -o -q $apkPath *
             cd ..
