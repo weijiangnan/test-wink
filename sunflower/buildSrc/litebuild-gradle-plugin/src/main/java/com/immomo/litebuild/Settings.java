@@ -27,7 +27,7 @@ import com.immomo.litebuild.helper.InitEnvHelper;
 public class Settings {
     static InitEnvHelper sEnvHelper = new InitEnvHelper();
     public static Project project;
-    public static Properties getEnv() {
+    public static Properties getPropertiesEnv() {
         return sEnvHelper.getPropertiesEnv();
     }
 

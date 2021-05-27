@@ -19,6 +19,7 @@ package com.immomo.litebuild;
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.BaseVariantOutput;
+import com.immomo.litebuild.helper.CleanupHelper;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
@@ -65,12 +66,15 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
             timer.end("_________");
         });
-        // implementation project(":pipline")
-        project.getDependencies().add("implementation",
-                project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.62-SNAPSHOT"));
+
+        if (!project.getGroup().equals("sunflower")) {
+            project.getDependencies().add("implementation",
+                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.62-SNAPSHOT"));
+        }
     }
 
     public void combineTask(Project project) {
+        System.out.println("执行了我们插件");
         Task taskInit = project.getTasks().getByName("litebuildInit");
         Task taskDiff = project.getTasks().getByName("litebuildDiff");
         Task taskCompile = project.getTasks().getByName("litebuildCompile");
@@ -80,6 +84,13 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task taskGradleProcessDebugResources = project.getTasks().getByName("processDebugResources");
         Task taskLitebuild = project.getTasks().getByName("litebuild");
         Task taskPackageResources = project.getTasks().getByName("litebuildPackageResources");
+
+        Task cleanUp = project.getTasks().getByName("litebuildCleanup");
+        Task clean = project.getTasks().getByName("clean");
+
+//        cleanUp.dependsOn(clean);
+        clean.dependsOn(cleanUp);
+        cleanUp.dependsOn(taskInit);
 
         taskDiff.dependsOn(taskInit);
         taskCompile.dependsOn(taskDiff);
@@ -163,10 +174,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
-                    Log.TimerLog timer = Log.timerStart("litebuildCleanup", "patchToApp...");
-                    // patch
-                    new IncrementPatchHelper().patchToApp();
-                    timer.end("patchToApp...");
+                    Log.TimerLog timer = Log.timerStart("litebuildCleanup", "cleanUp");
+                    new CleanupHelper().cleanup();
+                    timer.end("cleanUp");
                 }
             });
         }).get().setGroup(Settings.getData().NAME);

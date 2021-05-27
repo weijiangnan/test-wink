@@ -16,8 +16,55 @@
 
 package com.immomo.litebuild.helper;
 
+import com.immomo.litebuild.Settings;
+import com.immomo.litebuild.util.Utils;
+
+import java.io.File;
+import java.io.IOException;
+
 public class CleanupHelper {
     public void cleanup() {
+        delete("patch0.dex");
+        delete("resources-debug.apk");
+        delete("diff");
+        delete("tmp_class");
+        delete("env.properties");
+        delete("stableIds.txt");
 
+        // 删除手机上的patch文件
+        deletePatchFileOnPhone();
+    }
+
+    public void deletePatchFileOnPhone() {
+        String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
+        String cmds = "";
+        cmds += "source ~/.bash_profile";
+        cmds += '\n' + "adb shell rm -rf " + destPath;
+        cmds += '\n' + "adb shell mkdir " + destPath;
+        Utils.runShell(cmds);
+    }
+
+    public void delete(String path) {
+        System.out.println("删除文件:" + Settings.Data.TMP_PATH + "/" + path);
+        File f = new File(Settings.Data.TMP_PATH + "/" + path);
+        deleteFile(f);
+    }
+
+    public boolean deleteFile(File dirFile) {
+        // 如果dir对应的文件不存在，则退出
+        if (!dirFile.exists()) {
+            return false;
+        }
+
+        if (dirFile.isFile()) {
+            return dirFile.delete();
+        } else {
+
+            for (File file : dirFile.listFiles()) {
+                deleteFile(file);
+            }
+        }
+
+        return dirFile.delete();
     }
 }
