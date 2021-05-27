@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import com.immomo.litebuild.helper.InitEnvHelper;
+import com.immomo.litebuild.util.Log;
 
 public class Settings {
     static InitEnvHelper sEnvHelper = new InitEnvHelper();
@@ -32,6 +33,8 @@ public class Settings {
     }
 
     public static void init(Project p) {
+        Log.TimerLog timer = Log.timerStart("litebuildInit");
+
         project = p;
         // 创建文件夹
         Data.TMP_PATH = project.getRootDir().getPath() + "/.idea/litebuild";
@@ -41,6 +44,8 @@ public class Settings {
         }
 
         sEnvHelper.initEnv(p);
+
+        timer.end();
     }
 
     static Data sData = new Data();
@@ -60,6 +65,9 @@ public class Settings {
         public boolean hasResourceChanged = false;
         public boolean hasClassChanged = false;
         public boolean needProcessDebugResources = false;
+        public String newVersion = "";
+        public String version = "";
+
         public static class ProjectInfo {
             private Project project;
             private String dir;
