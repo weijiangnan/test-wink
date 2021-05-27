@@ -30,7 +30,7 @@ class ResourceHelper {
         }
 
         Settings.getData().needProcessDebugResources = true
-        Utils.executeScript("./gradlew processDebugResources --offline")
+//        Utils.executeScript("./gradlew processDebugResources --offline")
     }
 
     fun packageResources() {
