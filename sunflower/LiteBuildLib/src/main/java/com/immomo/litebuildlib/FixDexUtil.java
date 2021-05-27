@@ -168,4 +168,25 @@ public class FixDexUtil {
         System.arraycopy(arrayRhs, 0, result, i, j);
         return result;
     }
+
+    public static Object getBuildConfigValue(String packageName, String fieldName) {
+        try {
+            Class<?> clazz = Class.forName(packageName + ".BuildConfig");
+            Field field = clazz.getField(fieldName);
+            return field.get(null);
+        } catch (ClassNotFoundException e) {
+            int idx = packageName.lastIndexOf(".");
+            if (idx > 0) {
+                return getBuildConfigValue(packageName.substring(0, idx), fieldName);
+            }
+
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

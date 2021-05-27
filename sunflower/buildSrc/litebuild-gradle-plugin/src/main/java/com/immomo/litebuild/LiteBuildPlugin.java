@@ -73,7 +73,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
         addAssembleLastTask(project);
 
 
-
         project.getExtensions().create("litebuildOptions",
                 LitebuildOptions.class);
 
