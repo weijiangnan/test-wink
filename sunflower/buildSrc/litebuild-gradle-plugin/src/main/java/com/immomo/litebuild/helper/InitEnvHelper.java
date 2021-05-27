@@ -115,7 +115,10 @@ public class InitEnvHelper {
 
         String packageName = androidExt.getDefaultConfig().getApplicationId();
         String packageNameStuff = androidExt.getDefaultConfig().getApplicationId();
-        Settings.getData().PACKAGE_NAME = packageName;
+//        Settings.getData().PACKAGE_NAME = packageName;
+
+        Settings.getData().PACKAGE_NAME = (String) androidExt.getBuildTypes().getByName("debug").getManifestPlaceholders().getOrDefault("packagename", packageName);
+
         System.out.println("获取包名 包名 包名 " + packageName + "， 后缀：" + packageNameStuff);
         while (androidExt.getApplicationVariants().iterator().hasNext()) {
             ApplicationVariant variant = androidExt.getApplicationVariants().iterator().next();
