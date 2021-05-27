@@ -141,8 +141,6 @@ def getUnsplashAccess() {
 
 litebuildOptions {
     kotlinSyntheticsEnable = false
+//    moduleWhitelist = [ "app" ]
+//    moduleBlacklist = [ "app" ]
 }
-//liteBuildModuleExclude {
-//    modules = ["LiteBuildLib"]
-////    modules = ["LiteBuildLib"]
-//}
