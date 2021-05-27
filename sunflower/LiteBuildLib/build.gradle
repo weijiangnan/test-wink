@@ -50,7 +50,7 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
-
+// ./gradlew LiteBuildLib:uploadArchives
 afterEvaluate { project ->
     uploadArchives {
         repositories {

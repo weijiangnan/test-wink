@@ -46,7 +46,24 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void apply(Project project) {
         Log.TimerLog timer = Log.timerStart("apply init", "_________");
 
+        Log.v("aaptOptions", "开始aapt配置");
+        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+        appExtension.aaptOptions(aaptOptions -> {
+            Log.v("aaptOptions", "开始aapt配置 execute!");
+            String stableIdPath = ".idea/litebuild/stableIds.txt";
+            File file = new File(stableIdPath);
+            if (file.exists()) {
+                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在");
+                aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
+            } else {
+                Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
+                aaptOptions.additionalParameters("--emit-ids", file.getAbsolutePath());
+            }
+        });
+
         addAssembleLastTask(project);
+
+
 
         project.getExtensions().create("litebuildOptions",
                 LitebuildOptions.class);
@@ -69,7 +86,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         if (!project.getGroup().equals("sunflower")) {
             project.getDependencies().add("implementation",
-                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.602-SNAPSHOT"));
+                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.62-SNAPSHOT"));
         }
     }
 
@@ -87,6 +104,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         Task cleanUp = project.getTasks().getByName("litebuildCleanup");
         Task clean = project.getTasks().getByName("clean");
+
+        Task assembleDebug = project.getTasks().getByName("assembleDebug");
+        assembleDebug.doLast(task -> new CleanupHelper().cleanup());
 
 //        cleanUp.dependsOn(clean);
         clean.dependsOn(cleanUp);
@@ -185,24 +205,24 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void createDiffTask(Project project) {
         project.getTasks().register("litebuildDiff", task -> {
 
-            task.doLast(it2-> {
+            task.doLast(it2 -> {
                 long diffStartTime = System.currentTimeMillis();
 
                 for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
                     //
                     long startTime = System.currentTimeMillis();
                     new DiffHelper(projectInfo.getProject()).diff(projectInfo);
-                System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+                    System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
 //
-            for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
-                if (projectInfo.hasResourceChanged) {
-                    System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
-                    System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                    Settings.getData().hasResourceChanged = true;
-                    break;
+                for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+                    if (projectInfo.hasResourceChanged) {
+                        System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
+                        System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                        Settings.getData().hasResourceChanged = true;
+                        break;
+                    }
                 }
-            }
 
                 System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
