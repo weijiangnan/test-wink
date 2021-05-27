@@ -50,8 +50,13 @@ public class LiteBuildPlugin implements Plugin<Project> {
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
         appExtension.aaptOptions(aaptOptions -> {
             Log.v("aaptOptions", "开始aapt配置 execute!");
-            String stableIdPath = ".idea/litebuild/stableIds.txt";
+            String stableIdPath = project.getRootDir() + "/.idea/litebuild/stableIds.txt";
+            String litebuildFolder = project.getRootDir() + "/.idea/litebuild";
             File file = new File(stableIdPath);
+            File lbfolder = new File(litebuildFolder);
+            if (!lbfolder.exists()) {
+                lbfolder.mkdir();
+            }
             if (file.exists()) {
                 Log.v("aaptOptions", "开始aapt配置 execute! 文件存在");
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
@@ -106,7 +111,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task clean = project.getTasks().getByName("clean");
 
         Task assembleDebug = project.getTasks().getByName("assembleDebug");
-        assembleDebug.doLast(task -> new CleanupHelper().cleanup());
+        assembleDebug.doLast(task -> new CleanupHelper().cleanOnAssemble());
 
 //        cleanUp.dependsOn(clean);
         clean.dependsOn(cleanUp);

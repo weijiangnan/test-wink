@@ -35,6 +35,18 @@ public class CleanupHelper {
         deletePatchFileOnPhone();
     }
 
+    public void cleanOnAssemble() {
+        delete("patch0.dex");
+        delete("resources-debug.apk");
+        delete("diff");
+        delete("tmp_class");
+        delete("env.properties");
+
+        // 删除手机上的patch文件
+        deletePatchFileOnPhone();
+    }
+
+
     public void deletePatchFileOnPhone() {
         String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
         String cmds = "";
