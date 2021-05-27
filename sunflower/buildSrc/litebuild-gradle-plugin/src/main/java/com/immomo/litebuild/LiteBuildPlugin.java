@@ -48,6 +48,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         Log.v("aaptOptions", "开始aapt配置");
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+
+
+
+//        appExtension.getDefaultConfig().buildConfigField("String", "LITEBUILD_VERSION", "20000912");
         appExtension.aaptOptions(aaptOptions -> {
             Log.v("aaptOptions", "开始aapt配置 execute!");
             String stableIdPath = project.getRootDir() + "/.idea/litebuild/stableIds.txt";
@@ -91,7 +95,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         if (!project.getGroup().equals("sunflower")) {
             project.getDependencies().add("implementation",
-                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.62-SNAPSHOT"));
+                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.603-SNAPSHOT"));
         }
     }
 
@@ -111,7 +115,15 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task clean = project.getTasks().getByName("clean");
 
         Task assembleDebug = project.getTasks().getByName("assembleDebug");
-        assembleDebug.doLast(task -> new CleanupHelper().cleanOnAssemble());
+        assembleDebug.doLast(task -> afterFullBuild(project));
+
+        project.getTasks().getByName("generateDebugBuildConfig")
+                .doFirst(task -> {
+                    Settings.getData().newVersion = System.currentTimeMillis() + "";
+                    ((AppExtension) project.getExtensions().getByName("android"))
+                            .getDefaultConfig().buildConfigField("String",
+                            "LITEBUILD_VERSION", "\"" + Settings.getData().newVersion + "\"");
+                });
 
 //        cleanUp.dependsOn(clean);
         clean.dependsOn(cleanUp);
@@ -132,10 +144,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void createInitTask(Project project) {
         project.getTasks().register("litebuildInit", task -> {
             task.doLast(it -> {
-                Log.TimerLog timer = Log.timerStart("litebuildInit");
                 // init
                 Settings.init(project);
-                timer.end();
             });
 
         }).get().setGroup(Settings.getData().NAME);
@@ -233,6 +243,13 @@ public class LiteBuildPlugin implements Plugin<Project> {
             });
 
         }).get().setGroup(Settings.getData().NAME);
+    }
+
+    private void afterFullBuild(Project project) {
+        // 清理
+        new CleanupHelper().cleanOnAssemble();
+        // 初始化
+        Settings.init(project);
     }
 
     private void addAssembleLastTask(Project project) {
