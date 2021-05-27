@@ -52,13 +52,13 @@ android {
 //        } else {
 //            ignoreAssetsPattern "!lua_64"
 //        }
-        def stableIdPath = ".idea/litebuild/stableIds.txt"
-        File publicTxtFile = project.rootProject.file(stableIdPath)
-        if (publicTxtFile.exists()) {
-            additionalParameters "--stable-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
-        } else {
-            additionalParameters "--emit-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
-        }
+//        def stableIdPath = ".idea/litebuild/stableIds.txt"
+//        File publicTxtFile = project.rootProject.file(stableIdPath)
+//        if (publicTxtFile.exists()) {
+//            additionalParameters "--stable-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
+//        } else {
+//            additionalParameters "--emit-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
+//        }
     }
     buildTypes {
         release {

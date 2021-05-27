@@ -147,19 +147,8 @@ public class CompileHelper {
         cmds += '\n' + "adb shell mkdir " + destPath;
         cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex " + destPath;
 
-//        cmds += '\n' + "adb shell am force-stop " + APP_PACKAGE;
-//        cmds += '\n' + "adb shell am start -n " + APP_PACKAGE + "/" + LAUNCH_ACTIVITY;
-
         System.out.println("安装 CMD 命令：" + cmds);
 
         Utils.runShell(cmds);
-//        try {
-//            Utils.executeScript(cmds);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-        System.out.println("adb push " + Settings.Data.TMP_PATH + "/patch0.dex /sdcard/");
     }
 }
