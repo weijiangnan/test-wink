@@ -140,12 +140,13 @@ public class CompileHelper {
         }
         String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
 
+        String patchName = Settings.getData().version + "_patch.dex";
         String cmds = new String();
         cmds += "source ~/.bash_profile";
         cmds += '\n' + Settings.getPropertiesEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
-                + Settings.Data.TMP_PATH + "/patch0.dex " +  Settings.Data.TMP_PATH + "/tmp_class/";
+                + Settings.Data.TMP_PATH + "/" + patchName + " " +  Settings.Data.TMP_PATH + "/tmp_class/";
         cmds += '\n' + "adb shell mkdir " + destPath;
-        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/patch0.dex " + destPath;
+        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/" + patchName + " " + destPath;
 
         System.out.println("安装 CMD 命令：" + cmds);
 

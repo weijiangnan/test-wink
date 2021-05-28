@@ -18,6 +18,6 @@ package com.google.samples.apps.sunflower.test;
 
 public class TestJava {
     public String getTitle() {
-        return "标题222222";
+        return "XXCC";
     }
 }

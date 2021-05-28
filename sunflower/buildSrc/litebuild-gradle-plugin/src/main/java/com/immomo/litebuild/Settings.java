@@ -53,6 +53,11 @@ public class Settings {
         return sData;
     }
 
+    public static Data initData() {
+        sData = new Data();
+        return sData;
+    }
+
     public static class Data {
         public static String APP_PROJECT_DIR = "";
         public static String TMP_PATH = "../.idea/litebuild";
