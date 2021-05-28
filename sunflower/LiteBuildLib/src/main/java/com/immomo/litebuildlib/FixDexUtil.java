@@ -169,6 +169,15 @@ public class FixDexUtil {
         return result;
     }
 
+    static String sPatchVersion = null;
+    public static String getPatchVersion(Context context) {
+        if (sPatchVersion != null && !sPatchVersion.isEmpty()) {
+            return sPatchVersion;
+        }
+
+        return (String) getBuildConfigValue(context.getPackageName(), "LITEBUILD_VERSION");
+    }
+
     public static Object getBuildConfigValue(String packageName, String fieldName) {
         try {
             Class<?> clazz = Class.forName(packageName + ".BuildConfig");
