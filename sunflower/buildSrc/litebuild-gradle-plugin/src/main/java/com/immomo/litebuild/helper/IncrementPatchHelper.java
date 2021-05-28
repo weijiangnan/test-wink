@@ -16,11 +16,18 @@
 
 package com.immomo.litebuild.helper;
 
+import com.immomo.litebuild.Constant;
 import com.immomo.litebuild.Settings;
+import com.immomo.litebuild.util.Log;
 import com.immomo.litebuild.util.Utils;
 
 public class IncrementPatchHelper {
     public void patchToApp() {
+        if (!Settings.getData().hasClassChanged && !Settings.getData().hasResourceChanged) {
+            Log.v(Constant.TAG, "No change, do nothing!!");
+            return;
+        }
+
         String cmds = new String();
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell am force-stop " + Settings.getPropertiesEnv().getProperty("debug_package");
