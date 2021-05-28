@@ -45,9 +45,11 @@ class ResourceHelper {
 
         val lastPath = Settings.project.rootDir
         val litebuildFolderPath = Settings.Data.TMP_PATH
-        val apkPath = "$litebuildFolderPath/resources-debug.apk"
+        val patchName = Settings.getData().version + "_resources-debug.apk"
+        val apkPath = "$litebuildFolderPath/$patchName"
         val pushSdcardPath = "/sdcard/Android/data/${Settings.Data.PACKAGE_NAME}/patch_file/apk"
 
+        println("资源打包路径：$apkPath")
         val app = Settings.getData().projectTreeRoot.project.name
         val localScript = """
             source ~/.bash_profile
@@ -63,7 +65,7 @@ class ResourceHelper {
             rm -rf tempResFolder
             adb shell rm -rf $pushSdcardPath
             adb shell mkdir $pushSdcardPath
-            adb push resources-debug.apk $pushSdcardPath/
+            adb push $patchName $pushSdcardPath/
         """.trimIndent()
 
         println("准备执行第8版资源脚本")
