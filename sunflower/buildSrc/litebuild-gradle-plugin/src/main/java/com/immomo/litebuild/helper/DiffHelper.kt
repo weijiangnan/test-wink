@@ -101,6 +101,20 @@ class DiffHelper(var project: Project) {
 //        initSnapshotByGit()
     }
 
+    fun initSnapshotForCode() {
+        Log.v(TAG, "[${project.path}]:initSnapshot ...")
+
+        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
+        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+    }
+
+    fun initSnapshotForRes() {
+        Log.v(TAG, "[${project.path}]:initSnapshot ...")
+
+        File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
+        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+    }
+
     fun diff(projectInfo: Settings.Data.ProjectInfo) {
         Log.v(TAG, "[${project.path}]:获取差异...")
 
@@ -259,6 +273,7 @@ class DiffHelper(var project: Project) {
             compareMap(mapOrigin, mapNew)
                     .also { if (it.isEmpty()) Log.v(TAG, "[${project.path}]:差异数据为空") }
                     .forEach {
+                        System.out.println(it)
                         block(it)
                     }
 
