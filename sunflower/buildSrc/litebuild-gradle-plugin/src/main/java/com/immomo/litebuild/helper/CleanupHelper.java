@@ -20,12 +20,15 @@ import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 
 public class CleanupHelper {
     public void cleanup() {
-        delete("patch0.dex");
-        delete("resources-debug.apk");
+//        delete(Settings.getData().version + "_patch.dex");
+//        delete(Settings.getData().version + "_resources-debug.apk");
+        deleteAllApk();
+        deleteAllDex();
         delete("diff");
         delete("tmp_class");
         delete("env.properties");
@@ -36,8 +39,11 @@ public class CleanupHelper {
     }
 
     public void cleanOnAssemble() {
-        delete("patch0.dex");
-        delete("resources-debug.apk");
+//        delete(Settings.getData().version + "_patch.dex");
+//        delete(Settings.getData().version + "_resources-debug.apk");
+        deleteAllApk();
+        deleteAllDex();
+
         delete("diff");
         delete("tmp_class");
         delete("env.properties");
@@ -54,6 +60,32 @@ public class CleanupHelper {
         cmds += '\n' + "adb shell rm -rf " + destPath;
         cmds += '\n' + "adb shell mkdir " + destPath;
         Utils.runShell(cmds);
+    }
+
+    public void deleteAllApk() {
+        System.out.println("删除文件:" + Settings.Data.TMP_PATH);
+        File f = new File(Settings.Data.TMP_PATH);
+        if (f.exists() && f.isDirectory()) {
+            File[] apks = f.listFiles(pathname -> pathname.getName().endsWith("apk"));
+            if (apks != null) {
+                for (File a : apks) {
+                    a.deleteOnExit();
+                }
+            }
+        }
+    }
+
+    public void deleteAllDex() {
+        System.out.println("删除文件:" + Settings.Data.TMP_PATH);
+        File f = new File(Settings.Data.TMP_PATH);
+        if (f.exists() && f.isDirectory()) {
+            File[] files = f.listFiles(pathname -> pathname.getName().endsWith("dex"));
+            if (files != null) {
+                for (File a : files) {
+                    a.deleteOnExit();
+                }
+            }
+        }
     }
 
     public void delete(String path) {
