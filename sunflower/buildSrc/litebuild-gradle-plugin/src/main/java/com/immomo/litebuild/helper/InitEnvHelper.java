@@ -35,7 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -273,9 +273,7 @@ public class InitEnvHelper {
                 && litebuildOptions.moduleWhitelist.length > 0) {
             // 优先白名单过滤
             HashSet<String> set = new HashSet<>();
-            for (String module : litebuildOptions.moduleWhitelist) {
-                set.add(module);
-            }
+            Collections.addAll(set, litebuildOptions.moduleWhitelist);
 
             for (int i = Settings.getData().projectBuildSortList.size() - 1;
                  i >= 0; i--) {
@@ -289,9 +287,7 @@ public class InitEnvHelper {
                 && litebuildOptions.moduleBlacklist.length > 0) {
             // 然后黑名单过滤
             HashSet<String> set = new HashSet<>();
-            for (String module : litebuildOptions.moduleBlacklist) {
-                set.add(module);
-            }
+            Collections.addAll(set, litebuildOptions.moduleBlacklist);
 
             for (int i = Settings.getData().projectBuildSortList.size() - 1;
                  i >= 0; i--) {
@@ -313,7 +309,7 @@ public class InitEnvHelper {
     }
 
     private void handleAndroidProject(Project project, Settings.Data.ProjectInfo node, String productFlavor, String buildType) {
-        String[] compileNames = new String[] {"compile", "implementation", "api", "debugCompile"};
+        String[] compileNames = new String[]{"compile", "implementation", "api", "debugCompile"};
         for (String name : compileNames) {
             Configuration compile = project.getConfigurations().findByName(name);
             if (compile != null) {
@@ -323,7 +319,7 @@ public class InitEnvHelper {
     }
 
     private void collectLocalDependency(Settings.Data.ProjectInfo node,
-                                               Configuration xxxCompile, String productFlavor, String buildType) {
+                                        Configuration xxxCompile, String productFlavor, String buildType) {
         xxxCompile.getDependencies().forEach(new Consumer<Dependency>() {
             @Override
             public void accept(Dependency dependency) {
@@ -340,7 +336,7 @@ public class InitEnvHelper {
                     childNode.setProject(dp.getDependencyProject());
                     node.getChildren().add(childNode);
 
-                    handleAndroidProject(childNode.getProject(), childNode,  productFlavor, buildType);
+                    handleAndroidProject(childNode.getProject(), childNode, productFlavor, buildType);
                 }
             }
         });

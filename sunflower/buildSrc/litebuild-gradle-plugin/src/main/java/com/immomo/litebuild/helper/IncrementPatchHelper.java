@@ -30,7 +30,7 @@ public class IncrementPatchHelper {
 
         Log.v(Constant.TAG, "No ------ !!" + Settings.getData().hasClassChanged + Settings.getData().hasResourceChanged);
 
-        String cmds = new String();
+        String cmds = "";
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell am force-stop " + Settings.getPropertiesEnv().getProperty("debug_package");
         cmds += '\n' + "adb shell am start -n " + Settings.getPropertiesEnv().getProperty("debug_package") + "/" + Settings.getPropertiesEnv().getProperty("launcher_activity");

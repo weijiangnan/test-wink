@@ -22,7 +22,6 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.google.gson.Gson
 import com.immomo.litebuild.Settings
 import com.immomo.litebuild.util.Log
-import com.immomo.litebuild.util.Utils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.*

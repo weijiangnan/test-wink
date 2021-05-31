@@ -14,10 +14,6 @@ class ResourceHelper {
 
         st = System.currentTimeMillis()
         compileResources()
-        val pkgtime = System.currentTimeMillis()
-//        println("资源编译耗时：" + (System.currentTimeMillis() - st))
-//        packageResources()
-//        println("资源打包耗时：" + (System.currentTimeMillis() - pkgtime))
     }
 
     private fun compileResources() {
@@ -28,9 +24,7 @@ class ResourceHelper {
             println("=================================")
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
-
         Settings.getData().needProcessDebugResources = true
-//        Utils.executeScript("./gradlew processDebugResources --offline")
     }
 
     fun packageResources() {
@@ -68,7 +62,6 @@ class ResourceHelper {
             adb push $patchName $pushSdcardPath/
         """.trimIndent()
 
-        println("准备执行第8版资源脚本")
         Utils.executeScript(localScript)
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))

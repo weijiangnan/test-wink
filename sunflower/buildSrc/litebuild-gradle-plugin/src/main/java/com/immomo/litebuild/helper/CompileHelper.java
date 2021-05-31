@@ -4,6 +4,7 @@ package com.immomo.litebuild.helper;
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
+
 import org.apache.http.util.TextUtils;
 
 import java.io.File;
@@ -144,7 +145,7 @@ public class CompileHelper {
         String cmds = new String();
         cmds += "source ~/.bash_profile";
         cmds += '\n' + Settings.getPropertiesEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
-                + Settings.Data.TMP_PATH + "/" + patchName + " " +  Settings.Data.TMP_PATH + "/tmp_class/";
+                + Settings.Data.TMP_PATH + "/" + patchName + " " + Settings.Data.TMP_PATH + "/tmp_class/";
         cmds += '\n' + "adb shell mkdir " + destPath;
         cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/" + patchName + " " + destPath;
 

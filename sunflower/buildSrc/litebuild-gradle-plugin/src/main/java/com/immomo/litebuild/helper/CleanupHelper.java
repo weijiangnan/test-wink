@@ -20,8 +20,6 @@ import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
 
 public class CleanupHelper {
     public void cleanup() {

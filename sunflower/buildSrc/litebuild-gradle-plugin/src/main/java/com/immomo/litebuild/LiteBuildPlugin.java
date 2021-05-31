@@ -17,8 +17,6 @@
 package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
-import com.android.build.gradle.api.ApplicationVariant;
-import com.android.build.gradle.api.BaseVariantOutput;
 import com.immomo.litebuild.helper.CleanupHelper;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
@@ -30,13 +28,8 @@ import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.execution.TaskExecutionGraph;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Iterator;
-import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
@@ -48,7 +41,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         Log.TimerLog timer = Log.timerStart("apply init", "_________");
 
-        Log.v("aaptOptions", "开始aapt配置");
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
 
 //        appExtension.getDefaultConfig().buildConfigField("String", "LITEBUILD_VERSION", "20000912");
@@ -62,7 +54,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 lbfolder.mkdir();
             }
             if (file.exists()) {
-                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  "+file.getAbsolutePath());
+                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
             } else {
                 Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
@@ -121,7 +113,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
                             "LITEBUILD_VERSION", "\"" + Settings.getData().newVersion + "\"");
                 });
 
-//        cleanUp.dependsOn(clean);
         clean.dependsOn(cleanUp);
         cleanUp.dependsOn(taskInit);
 
@@ -265,68 +256,4 @@ public class LiteBuildPlugin implements Plugin<Project> {
             }
         }
     }
-
-//    private void addAssembleLastTask(Project project) {
-//        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-//            @Override
-//            public void accept(Project it) {
-//
-//
-//                it.getGradle().getTaskGraph().whenReady(new Action<TaskExecutionGraph>() {
-//                    @Override
-//                    public void execute(TaskExecutionGraph taskExecutionGraph) {
-//                        taskExecutionGraph.getAllTasks().forEach(new Consumer<Task>() {
-//                            @Override
-//                            public void accept(Task task) {
-//                                if (task.getName().toLowerCase().contains("assemble") || task.getName().toLowerCase().contains("install")) {
-//                                    task.doLast(new Action<Task>() {
-//                                        @Override
-//                                        public void execute(Task task) {
-//                                            new DiffHelper(it).initSnapshot();
-//
-//                                            //copy apk to litebuild dir
-//                                            boolean hasAppPlugin = it.getPlugins().hasPlugin("com.android.application");
-//                                            if (hasAppPlugin) {
-//                                                System.out.println("该module未包含com.android.application插件");
-//                                                AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-//                                                Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-//                                                while (itApp.hasNext()) {
-//                                                    ApplicationVariant variant = itApp.next();
-//                                                    if (variant.getName().equals("debug")) {
-//                                                        variant.getOutputs().all(new Action<BaseVariantOutput>() {
-//                                                            @Override
-//                                                            public void execute(BaseVariantOutput baseVariantOutput) {
-//                                                                File srcFile = baseVariantOutput.getOutputFile();
-//                                                                String moduleName = it.getPath().replace(":", "");
-//                                                                String diffDir = project.getRootDir() + "/.idea/litebuild/diff/" + moduleName;
-//                                                                File destFile = new File(diffDir, "snapshot.apk");
-//                                                                if (destFile.exists()) {
-//                                                                    destFile.delete();
-//                                                                }
-//                                                                try {
-//                                                                    Files.copy(srcFile.toPath(), destFile.toPath());
-//                                                                } catch (IOException e) {
-//                                                                    e.printStackTrace();
-//                                                                }
-//                                                                System.out.println("momomomomomomomomomomomomomo Output path=" + srcFile);
-//                                                            }
-//                                                        });
-//
-//                                                        //
-//                                                        String outputApkPath = variant.getPackageApplicationProvider().get().getOutputDirectory().get().toString();
-//                                                        System.out.println("momomomomomomomomomomomomomo outputApkPath=" + outputApkPath);
-//                                                    }
-//                                                }
-//                                            }
-//
-//                                        }
-//                                    });
-//                                }
-//                            }
-//                        });
-//                    }
-//                });
-//            }
-//        });
-//    }
 }
