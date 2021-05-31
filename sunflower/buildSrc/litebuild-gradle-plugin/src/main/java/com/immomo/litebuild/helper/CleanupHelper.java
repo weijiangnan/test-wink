@@ -25,8 +25,6 @@ import java.io.IOException;
 
 public class CleanupHelper {
     public void cleanup() {
-//        delete(Settings.getData().version + "_patch.dex");
-//        delete(Settings.getData().version + "_resources-debug.apk");
         deleteAllApk();
         deleteAllDex();
         delete("diff");
@@ -39,8 +37,6 @@ public class CleanupHelper {
     }
 
     public void cleanOnAssemble() {
-//        delete(Settings.getData().version + "_patch.dex");
-//        delete(Settings.getData().version + "_resources-debug.apk");
         deleteAllApk();
         deleteAllDex();
 
@@ -63,26 +59,26 @@ public class CleanupHelper {
     }
 
     public void deleteAllApk() {
-        System.out.println("删除文件:" + Settings.Data.TMP_PATH);
+        System.out.println("删除文件deleteAllApk :" + Settings.Data.TMP_PATH);
         File f = new File(Settings.Data.TMP_PATH);
         if (f.exists() && f.isDirectory()) {
             File[] apks = f.listFiles(pathname -> pathname.getName().endsWith("apk"));
             if (apks != null) {
                 for (File a : apks) {
-                    a.deleteOnExit();
+                    a.delete();
                 }
             }
         }
     }
 
     public void deleteAllDex() {
-        System.out.println("删除文件:" + Settings.Data.TMP_PATH);
+        System.out.println("删除文件deleteAllDex :" + Settings.Data.TMP_PATH);
         File f = new File(Settings.Data.TMP_PATH);
         if (f.exists() && f.isDirectory()) {
             File[] files = f.listFiles(pathname -> pathname.getName().endsWith("dex"));
             if (files != null) {
                 for (File a : files) {
-                    a.deleteOnExit();
+                    a.delete();
                 }
             }
         }
