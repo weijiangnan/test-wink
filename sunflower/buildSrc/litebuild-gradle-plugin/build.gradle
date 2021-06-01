@@ -2,7 +2,7 @@ apply plugin: 'java-gradle-plugin'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 
-apply from: rootProject.file('../publish_to_maven_central.gradle')
+//apply from: rootProject.file('../publish_to_maven_central.gradle')
 buildscript {
     ext {
         gradleVersion = '4.0.2'
@@ -64,13 +64,13 @@ afterEvaluate { project ->
             mavenDeployer {
                 pom.groupId = 'com.immomo.litebuild'
                 pom.artifactId = 'plugin'
-                pom.version = '0.0.603-SNAPSHOT'
+                pom.version = '0.1.3'
                 repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
-                snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
+//                snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
+//                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+//                }
             }
         }
     }
