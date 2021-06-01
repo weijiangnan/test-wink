@@ -1,6 +1,8 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
+
+apply from: rootProject.file('../publish_to_maven_central.gradle')
 buildscript {
     ext {
         gradleVersion = '4.0.2'

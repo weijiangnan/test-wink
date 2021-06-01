@@ -28,12 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-    /**
-     * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
-     *
-     * @param shStr 需要执行的shell
-     * @return
-     */
+
     public static List<String> runShell(String shStr) {
 //        System.out.println("准备运行shell : " + shStr);
         List<String> strList = new ArrayList<String>();
@@ -118,7 +113,7 @@ public class Utils {
      *
      * @param file  文件
      * @param radix 位 16 32 64
-     * @return
+     * @return MD5
      */
     public static String getFileMD5s(File file, int radix) {
         if (!file.isFile()) {
