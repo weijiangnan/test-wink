@@ -22,7 +22,7 @@ public class AndroidManifestUtils {
             Node category = categoryList.item(i);
             NamedNodeMap attrs = category.getAttributes();
             for (int j = 0; j < attrs.getLength(); j++) {
-                if (attrs.item(j).getNodeName() == "android:name") {
+                if (attrs.item(j).getNodeName().equals("android:name")) {
                     if (attrs.item(j).getNodeValue().equals("android.intent.category.LAUNCHER")) {
                         activity = category.getParentNode().getParentNode();
                         break;
@@ -33,7 +33,7 @@ public class AndroidManifestUtils {
         if (activity != null) {
             NamedNodeMap attrs = activity.getAttributes();
             for (int j = 0; j < attrs.getLength(); j++) {
-                if (attrs.item(j).getNodeName() == "android:name") {
+                if (attrs.item(j).getNodeName().equals("android:name")) {
                     sTem = attrs.item(j).getNodeValue();
                 }
             }

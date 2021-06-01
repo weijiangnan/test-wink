@@ -32,6 +32,7 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -241,6 +242,7 @@ public class InitEnvHelper {
             for (String module : litebuildOptions.moduleWhitelist) {
                 if (moduleName.equals(module)) {
                     return false;
+
                 }
             }
 

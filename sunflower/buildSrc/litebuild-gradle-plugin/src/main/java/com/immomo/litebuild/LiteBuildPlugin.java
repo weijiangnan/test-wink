@@ -40,7 +40,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void apply(Project project) {
         Log.TimerLog timer = Log.timerStart("apply init", "_________");
 
-        Log.v("aaptOptions", "开始aapt配置");
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
 
 //        appExtension.getDefaultConfig().buildConfigField("String", "LITEBUILD_VERSION", "20000912");
@@ -54,7 +53,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 lbfolder.mkdir();
             }
             if (file.exists()) {
-                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  "+file.getAbsolutePath());
+                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
             } else {
                 Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
@@ -113,7 +112,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
                             "LITEBUILD_VERSION", "\"" + Settings.data.newVersion + "\"");
                 });
 
-//        cleanUp.dependsOn(clean);
         clean.dependsOn(cleanUp);
         cleanUp.dependsOn(taskInit);
 

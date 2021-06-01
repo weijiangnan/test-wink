@@ -4,6 +4,7 @@ package com.immomo.litebuild.helper;
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
+
 import org.apache.http.util.TextUtils;
 
 import java.io.File;

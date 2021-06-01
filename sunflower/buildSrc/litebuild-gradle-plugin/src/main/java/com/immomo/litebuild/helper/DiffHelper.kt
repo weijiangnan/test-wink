@@ -62,7 +62,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     init {
         Log.v(TAG, "[${project.fixedInfo.name}]:init")
 
-        val moduleName = project.fixedInfo.name!!.replace(":", "")
+        val moduleName = project.fixedInfo.name
         diffDir = "${Settings.env!!.rootDir}/.idea/litebuild/diff/${moduleName}"
 
         scanPathCode = "${project.fixedInfo.dir}/src/main/java"
@@ -214,7 +214,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
     private fun diffByMd5(projectInfo: Settings.ProjectTmpInfo) {
         diffInner(scanPathCode, csvPathCode) {
-            //            Log.v(TAG, "[${project.fixedInfo.name}]:    差异数据:$it")
+            Log.v(TAG, "[${project.fixedInfo.name}]:    差异数据:$it")
             when {
                 it.endsWith(".java") -> {
                     if (!projectInfo.changedJavaFiles.contains(it)) {

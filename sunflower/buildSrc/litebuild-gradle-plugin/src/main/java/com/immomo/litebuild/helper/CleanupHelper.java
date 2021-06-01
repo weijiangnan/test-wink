@@ -20,12 +20,11 @@ import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
 import java.io.File;
-import java.io.IOException;
 
 public class CleanupHelper {
     public void cleanup() {
-        delete("patch0.dex");
-        delete("resources-debug.apk");
+        deleteAllApk();
+        deleteAllDex();
         delete("diff");
         delete("tmp_class");
         delete("env.properties");
@@ -36,8 +35,9 @@ public class CleanupHelper {
     }
 
     public void cleanOnAssemble() {
-        delete("patch0.dex");
-        delete("resources-debug.apk");
+        deleteAllApk();
+        deleteAllDex();
+
         delete("diff");
         delete("tmp_class");
         delete("env.properties");
@@ -54,6 +54,32 @@ public class CleanupHelper {
         cmds += '\n' + "adb shell rm -rf " + destPath;
         cmds += '\n' + "adb shell mkdir " + destPath;
         Utils.runShell(cmds);
+    }
+
+    public void deleteAllApk() {
+        System.out.println("删除文件deleteAllApk :" + Settings.Data.TMP_PATH);
+        File f = new File(Settings.Data.TMP_PATH);
+        if (f.exists() && f.isDirectory()) {
+            File[] apks = f.listFiles(pathname -> pathname.getName().endsWith("apk"));
+            if (apks != null) {
+                for (File a : apks) {
+                    a.delete();
+                }
+            }
+        }
+    }
+
+    public void deleteAllDex() {
+        System.out.println("删除文件deleteAllDex :" + Settings.Data.TMP_PATH);
+        File f = new File(Settings.Data.TMP_PATH);
+        if (f.exists() && f.isDirectory()) {
+            File[] files = f.listFiles(pathname -> pathname.getName().endsWith("dex"));
+            if (files != null) {
+                for (File a : files) {
+                    a.delete();
+                }
+            }
+        }
     }
 
     public void delete(String path) {

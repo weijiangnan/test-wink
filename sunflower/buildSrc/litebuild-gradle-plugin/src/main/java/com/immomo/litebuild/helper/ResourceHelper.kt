@@ -14,10 +14,6 @@ class ResourceHelper {
 
         st = System.currentTimeMillis()
         compileResources()
-        val pkgtime = System.currentTimeMillis()
-//        println("资源编译耗时：" + (System.currentTimeMillis() - st))
-//        packageResources()
-//        println("资源打包耗时：" + (System.currentTimeMillis() - pkgtime))
     }
 
     private fun compileResources() {
@@ -30,7 +26,6 @@ class ResourceHelper {
         }
 
         Settings.data.needProcessDebugResources = true
-//        Utils.executeScript("./gradlew processDebugResources --offline")
     }
 
     fun packageResources() {
@@ -45,9 +40,11 @@ class ResourceHelper {
 
         val lastPath = Settings.env.rootDir
         val litebuildFolderPath = Settings.env.tmpPath
-        val apkPath = "$litebuildFolderPath/resources-debug.apk"
+        val patchName = Settings.env.version + "_resources-debug.apk"
+        val apkPath = "$litebuildFolderPath/$patchName"
         val pushSdcardPath = "/sdcard/Android/data/${Settings.env.debugPackageName}/patch_file/apk"
 
+        println("资源打包路径：$apkPath")
         val app = Settings.env.projectTreeRoot!!.name
         val localScript = """
             source ~/.bash_profile
@@ -63,10 +60,9 @@ class ResourceHelper {
             rm -rf tempResFolder
             adb shell rm -rf $pushSdcardPath
             adb shell mkdir $pushSdcardPath
-            adb push resources-debug.apk $pushSdcardPath/
+            adb push $patchName $pushSdcardPath/
         """.trimIndent()
 
-        println("准备执行第8版资源脚本")
         Utils.executeScript(localScript)
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))
