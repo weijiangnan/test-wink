@@ -11,23 +11,23 @@ import java.util.Locale;
 
 public class CompileHelper {
     public void compileCode() {
-        File file = new File(Settings.Data.TMP_PATH + "/tmp_class");
+        File file = new File(Settings.env.tmpPath + "/tmp_class");
         if (!file.exists()) {
             file.mkdirs();
         }
 
-        for (Settings.Data.ProjectInfo project : Settings.getData().projectBuildSortList) {
+        for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
             compileKotlin(project);
         }
 
-        for (Settings.Data.ProjectInfo project : Settings.getData().projectBuildSortList) {
+        for (Settings.ProjectTmpInfo project : Settings.data.projectBuildSortList) {
             compileJava(project);
         }
 
         createDexPatch();
     }
 
-    private int compileJava(Settings.Data.ProjectInfo project) {
+    private int compileJava(Settings.ProjectTmpInfo project) {
         System.out.println("compileJava ================================");
         System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
         System.out.println("compileJava ================================");
@@ -42,21 +42,21 @@ public class CompileHelper {
             sb.append(path);
         }
 
-        String shellCommand = "javac" + Settings.getPropertiesEnv().getProperty(project.getProject().getName() + "_javac_args")
+        String shellCommand = "javac" + project.fixedInfo.javacArgs
                 + sb.toString();
 //        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
-        System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
+        System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
         Utils.runShell(
 //                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
                 shellCommand
         );
 
-        Settings.getData().hasClassChanged = true;
+        Settings.data.hasClassChanged = true;
 
         return project.changedJavaFiles.size();
     }
 
-    private void compileKotlin(Settings.Data.ProjectInfo project) {
+    private void compileKotlin(Settings.ProjectTmpInfo project) {
 
         System.out.println("compileKotlin ================================");
         System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
@@ -100,11 +100,11 @@ public class CompileHelper {
             kotlincHome = kotlincHome.replace(" ", "\\ ");
         }
         System.out.println("[LiteBuild] kotlincHome : " + kotlincHome);
-        System.out.println("[LiteBuild] projectName : " + project.getProject().getName());
+        System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
         try {
-            String mainKotlincArgs = Settings.getPropertiesEnv().getProperty(project.getProject().getName() + "_kotlinc_args");
+            String mainKotlincArgs = project.fixedInfo.kotlincArgs;
             String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
-            String javaHomePath = Settings.getPropertiesEnv().getProperty("java_home");
+            String javaHomePath = Settings.env.javaHome;
             javaHomePath = javaHomePath.replace(" ", "\\ ");
             String shellCommand = "sh " + kotlincHome + kotlinxArgs + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
 //            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
@@ -113,17 +113,17 @@ public class CompileHelper {
             e.printStackTrace();
         }
 
-        Settings.getData().hasClassChanged = true;
+        Settings.data.hasClassChanged = true;
     }
 
-    private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.Data.ProjectInfo projectInfo) {
-        LitebuildOptions options = projectInfo.getProject().getExtensions().getByType(LitebuildOptions.class);
+    private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.ProjectTmpInfo projectInfo) {
+        LitebuildOptions options = Settings.env.options;
         String args = "";
         if (options.kotlinSyntheticsEnable) {
             String pluginHome = kotlinHome + "/kotlinc/lib/android-extensions-compiler.jar";
-            String packageName = Settings.getPropertiesEnv().getProperty("debug_package");
+            String packageName = Settings.env.debugPackageName;
             String flavor = "main";
-            String resPath = projectInfo.getProject().getProjectDir() + "/src/" + flavor + "/res";
+            String resPath = projectInfo.fixedInfo.dir + "/src/" + flavor + "/res";
 
             args = String.format(Locale.US, " -Xplugin=%s " +
                     "-P plugin:org.jetbrains.kotlin.android:package=%s " +
@@ -134,19 +134,19 @@ public class CompileHelper {
     }
 
     private void createDexPatch() {
-        if (!Settings.getData().hasClassChanged) {
+        if (!Settings.data.hasClassChanged) {
             // 没有数据变更
             return;
         }
-        String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
+        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
 
-        String patchName = Settings.getData().version + "_patch.dex";
+        String patchName = Settings.env.version + "_patch.dex";
         String cmds = new String();
         cmds += "source ~/.bash_profile";
-        cmds += '\n' + Settings.getPropertiesEnv().getProperty("build_tools_dir") + "/dx --dex --no-strict --output "
-                + Settings.Data.TMP_PATH + "/" + patchName + " " +  Settings.Data.TMP_PATH + "/tmp_class/";
+        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
+                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
         cmds += '\n' + "adb shell mkdir " + destPath;
-        cmds += '\n' + "adb push " + Settings.Data.TMP_PATH + "/" + patchName + " " + destPath;
+        cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;
 
         System.out.println("安装 CMD 命令：" + cmds);
 

@@ -48,7 +48,7 @@ public class CleanupHelper {
 
 
     public void deletePatchFileOnPhone() {
-        String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
+        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
         String cmds = "";
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell rm -rf " + destPath;
@@ -57,8 +57,8 @@ public class CleanupHelper {
     }
 
     public void delete(String path) {
-        System.out.println("删除文件:" + Settings.Data.TMP_PATH + "/" + path);
-        File f = new File(Settings.Data.TMP_PATH + "/" + path);
+        System.out.println("删除文件:" + Settings.env.tmpPath + "/" + path);
+        File f = new File(Settings.env.tmpPath + "/" + path);
         deleteFile(f);
     }
 

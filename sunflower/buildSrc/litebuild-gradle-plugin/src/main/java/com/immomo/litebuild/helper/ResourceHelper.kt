@@ -9,8 +9,8 @@ class ResourceHelper {
     var st : Long = 0
 
     fun checkResource() {
-        println("ResourceHelper process, changed=${Settings.getData().hasResourceChanged}")
-        if (!Settings.getData().hasResourceChanged) return
+        println("ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
+        if (!Settings.data.hasResourceChanged) return
 
         st = System.currentTimeMillis()
         compileResources()
@@ -21,7 +21,7 @@ class ResourceHelper {
     }
 
     private fun compileResources() {
-        val stableId = File(Settings.Data.TMP_PATH + "/stableIds.txt")
+        val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
             println("stableIds存在")
         } else {
@@ -29,13 +29,13 @@ class ResourceHelper {
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
 
-        Settings.getData().needProcessDebugResources = true
+        Settings.data.needProcessDebugResources = true
 //        Utils.executeScript("./gradlew processDebugResources --offline")
     }
 
     fun packageResources() {
-        val ap_ = File("${Settings.project.rootDir.path}/app/build/intermediates/processed_res/debug/out/resources-debug.ap_")
-        println("packageResources-packageResources rootPath=====${Settings.project.rootDir.path}")
+        val ap_ = File("${Settings.env.rootDir}/app/build/intermediates/processed_res/debug/out/resources-debug.ap_")
+        println("packageResources-packageResources rootPath=====${Settings.env.rootDir}")
 
         if (ap_.exists()) {
             println("ap_文件存在")
@@ -43,12 +43,12 @@ class ResourceHelper {
             throw FileNotFoundException("ap_文件 不 存在")
         }
 
-        val lastPath = Settings.project.rootDir
-        val litebuildFolderPath = Settings.Data.TMP_PATH
+        val lastPath = Settings.env.rootDir
+        val litebuildFolderPath = Settings.env.tmpPath
         val apkPath = "$litebuildFolderPath/resources-debug.apk"
-        val pushSdcardPath = "/sdcard/Android/data/${Settings.Data.PACKAGE_NAME}/patch_file/apk"
+        val pushSdcardPath = "/sdcard/Android/data/${Settings.env.debugPackageName}/patch_file/apk"
 
-        val app = Settings.getData().projectTreeRoot.project.name
+        val app = Settings.env.projectTreeRoot!!.name
         val localScript = """
             source ~/.bash_profile
             echo "开始资源解压，重新压缩！"

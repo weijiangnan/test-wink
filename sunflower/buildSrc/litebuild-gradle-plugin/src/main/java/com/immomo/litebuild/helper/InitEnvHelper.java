@@ -17,7 +17,9 @@
 package com.immomo.litebuild.helper;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.ApplicationVariant;
+import com.android.build.gradle.api.LibraryVariant;
 import com.android.utils.FileUtils;
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
@@ -29,48 +31,15 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.JavaCompile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public class InitEnvHelper {
-
-    static Properties sProperties = null;
     Project project;
-
-    public Properties getPropertiesEnv() {
-        if (null != sProperties) {
-            return sProperties;
-        }
-
-        sProperties = new Properties();
-        try {
-            File file = new File(Settings.Data.TMP_PATH + "/env.properties");
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            FileInputStream iFile = new FileInputStream(file);
-            sProperties.load(iFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return sProperties;
-    }
-
     // from retrolambda
     public String getJavaHome() {
         String javaHomeProp = System.getProperty("java.home");
@@ -93,226 +62,216 @@ public class InitEnvHelper {
         }
     }
 
-    public void initEnv(Project project) {
-        this.project = project;
-        Properties properties = getPropertiesEnv();
+    public void initEnv(Project project, boolean reload) {
+        if (reload) {
+            reloadEnv(project);
+        } else {
+            Settings.restoreEnv(project.getRootDir()
+                    + "/.idea/" + Settings.NAME + "/env");
+        }
 
-        System.out.println("-------------------------");
+        // Data每次初始化
+        Settings.initData();
+    }
+
+    protected void reloadEnv(Project project) {
+        this.project = project;
 
         AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
 
-        properties.setProperty("java_home", getJavaHome());
-        properties.setProperty("root_dir", project.getPath());
+        Settings.Env env = Settings.env;
+        env.javaHome = getJavaHome();
+        env.sdkDir = androidExt.getSdkDirectory().getPath();
+        env.buildToolsVersion = androidExt.getBuildToolsVersion();
+        env.buildToolsDir = FileUtils.join(androidExt.getSdkDirectory().getPath(),
+                "build-tools", env.buildToolsVersion);
+        env.compileSdkVersion = androidExt.getCompileSdkVersion();
+        env.compileSdkDir = FileUtils.join(env.sdkDir, "platforms", env.compileSdkVersion);
 
-        if (!Settings.getData().newVersion.isEmpty()) {
-            properties.setProperty("version", Settings.getData().newVersion);
-            Settings.getData().newVersion = "";
+        env.rootDir = project.getRootDir().getAbsolutePath();
+
+        if (!Settings.data.newVersion.isEmpty()) {
+            env.version = Settings.data.newVersion;
+            Settings.data.newVersion = "";
         }
 
-        Settings.getData().version = properties.getProperty("version");
+        env.appProjectDir = project.getProjectDir().getAbsolutePath();
+        env.tmpPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
 
-        Settings.getData().APP_PROJECT_DIR = project.getProjectDir().getAbsolutePath();
-        Settings.getData().TMP_PATH = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/litebuild";
-
-        properties.setProperty("java_home", getJavaHome());
-        properties.setProperty("sdk_dir", androidExt.getSdkDirectory().getPath());
-        properties.setProperty("build_tools_version", androidExt.getBuildToolsVersion());
-        properties.setProperty("build_tools_dir", FileUtils.join(androidExt.getSdkDirectory().getPath(), "build-tools", properties.getProperty("build_tools_version")));
-        properties.setProperty("compile_sdk_version", androidExt.getCompileSdkVersion());
-        properties.setProperty("compile_sdk_dir", FileUtils.join(properties.getProperty("sdk_dir"), "platforms", properties.getProperty("compile_sdk_version")));
-
-        String packageName = androidExt.getDefaultConfig().getApplicationId();
-        String packageNameSuffix = androidExt.getDefaultConfig().getApplicationIdSuffix();
-
-        System.out.println("获取包名 包名 包名 " + packageName + "， 后缀：" + packageNameSuffix);
+        env.packageName = androidExt.getDefaultConfig().getApplicationId();
         while (androidExt.getApplicationVariants().iterator().hasNext()) {
             ApplicationVariant variant = androidExt.getApplicationVariants().iterator().next();
             if (variant.getName().equals("debug")) {
-                Settings.getData().PACKAGE_NAME = variant.getApplicationId();
+                env.debugPackageName = variant.getApplicationId();
                 break;
             }
         }
 
-        properties.setProperty("debug_package", Settings.getData().PACKAGE_NAME);
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
+        env.launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, env.packageName);
 
-        String launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, packageName);
-//        System.out.println("launcherActivity : " + launcherActivity);
-        properties.setProperty("launcher_activity", launcherActivity);
+        env.options = project.getExtensions().getByType(LitebuildOptions.class);
 
-        Settings.getData().projectBuildSortList = new ArrayList<>();
-
-        long findModuleTreeStartTime = System.currentTimeMillis();
         findModuleTree(project, "");
-        System.out.println("ywb 11111111111111 findModuleTree 耗时：" + (System.currentTimeMillis() - findModuleTreeStartTime) + " ms");
-        long findModuleEndTime = System.currentTimeMillis();
 
-        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
-            initProjectData(info.getProject(), androidExt, properties);
-        }
-        long initProjectDataEndTime = System.currentTimeMillis();
-        System.out.println("ywb 11111111111111 initProjectData 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
-
-        try {
-            FileOutputStream oFile = new FileOutputStream(Settings.Data.TMP_PATH + "/env.properties", false);
-            properties.store(oFile, "Auto create by litebuild.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("ywb 11111111111111 findModuleTree 耗时：" + (System.currentTimeMillis() - initProjectDataEndTime) + " ms");
+        Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
     }
 
-    private void initProjectData(Project project, AppExtension androidExt, Properties properties) {
+    private void initProjectData(Settings.ProjectFixedInfo fixedInfo, Project project) {
         long findModuleEndTime = System.currentTimeMillis();
+        fixedInfo.name = project.getName();
+        fixedInfo.isProjectIgnore = isIgnoreProject(fixedInfo.name);
+        if (fixedInfo.isProjectIgnore) {
+            return;
+        }
 
-        Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-
-        properties.setProperty(project.getName() + "_project_name", project.getName());
-        properties.setProperty(project.getName() + "_project_dir", project.getPath());
-        properties.setProperty(project.getName() + "_build_dir", project.getBuildDir().getPath());
-        properties.setProperty(project.getName() + "_manifest_path", androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath());
+        fixedInfo.dir = project.getProjectDir().getAbsolutePath();
+        fixedInfo.buildDir = project.getBuildDir().getPath();
 
         ArrayList<String> args = new ArrayList<>();
         ArrayList<String> kotlinArgs = new ArrayList<>();
 
         System.out.println("ywb 2222222 initProjectData 1111 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
 
-        while (itApp.hasNext()) {
-            long findModuleEndTime2 = System.currentTimeMillis();
-            ApplicationVariant variant = itApp.next();
-            if (!variant.getName().equals("debug")) {
-                continue;
+        Object extension = project.getExtensions().getByName("android");
+        JavaCompile javaCompile = null;
+        if (extension instanceof AppExtension) {
+            Iterator<ApplicationVariant> itApp = ((AppExtension) extension).getApplicationVariants().iterator();
+            while (itApp.hasNext()) {
+                ApplicationVariant variant = itApp.next();
+                if (variant.getName().equals("debug")) {
+                    javaCompile = variant.getJavaCompileProvider().get();
+                    break;
+                }
             }
+        } else if (extension instanceof LibraryExtension) {
+            Iterator<LibraryVariant> it = ((LibraryExtension) extension).getLibraryVariants().iterator();
+            while (it.hasNext()) {
+                LibraryVariant variant = it.next();
+                if (variant.getName().equals("debug")) {
+                    javaCompile = variant.getJavaCompileProvider().get();
+                    break;
+                }
+            }
+        }
 
-            JavaCompile javaCompile = variant.getJavaCompileProvider().get();
+        if (javaCompile == null) {
+            return;
+        }
 
-            args.add("-source");
-            args.add(javaCompile.getTargetCompatibility());
 
-            args.add("-target");
-            args.add(javaCompile.getTargetCompatibility());
+        args.add("-source");
+        args.add(javaCompile.getTargetCompatibility());
 
-            args.add("-encoding");
-            args.add(javaCompile.getOptions().getEncoding());
+        args.add("-target");
+        args.add(javaCompile.getTargetCompatibility());
 
-            args.add("-bootclasspath");
-            args.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath());
+        args.add("-encoding");
+        args.add(javaCompile.getOptions().getEncoding());
 
-            args.add("-g");
+        args.add("-bootclasspath");
+        args.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath());
+
+        args.add("-g");
 
 //            args.add("-sourcepath");
 //            args.add("");
 
-            args.add("-processorpath");
-            args.add(javaCompile.getOptions().getAnnotationProcessorPath().getAsPath());
+        args.add("-processorpath");
+        args.add(javaCompile.getOptions().getAnnotationProcessorPath().getAsPath());
 
-            args.add("-classpath");
-            args.add(javaCompile.getClasspath().getAsPath() + ":"
-                    + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
+        args.add("-classpath");
+        args.add(javaCompile.getClasspath().getAsPath() + ":"
+                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
 
-            args.add("-d");
-            args.add(Settings.Data.TMP_PATH + "/tmp_class");
+        args.add("-d");
+        args.add(Settings.env.tmpPath+ "/tmp_class");
 
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < args.size(); i++) {
-                sb.append(" ");
-                sb.append(args.get(i));
-            }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < args.size(); i++) {
+            sb.append(" ");
+            sb.append(args.get(i));
+        }
 
-            properties.setProperty(project.getName() + "_javac_args", sb.toString());
+        fixedInfo.javacArgs = sb.toString();
 
-            // 路径可能包含空格，动态控制
+        // 路径可能包含空格，动态控制
 //            kotlinArgs.add("-jdk-home");
 //            kotlinArgs.add(getJavaHome());
 
-            kotlinArgs.add("-classpath");
+        kotlinArgs.add("-classpath");
 //            System.out.println("=============");
 //            System.out.println("BootstrapClasspath =========== : " + javaCompile.getOptions().getBootstrapClasspath().getAsPath());
 //            System.out.println("=============");
 
-            System.out.println("projectDir : " + project.getProjectDir().toString());
-            kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
-                    + javaCompile.getClasspath().getAsPath()
-                    + ":" + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
+        System.out.println("projectDir : " + project.getProjectDir().toString());
+        kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
+                + javaCompile.getClasspath().getAsPath()
+                + ":" + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
 
-            kotlinArgs.add("-jvm-target");
-            kotlinArgs.add(javaCompile.getTargetCompatibility());
+        kotlinArgs.add("-jvm-target");
+        kotlinArgs.add(javaCompile.getTargetCompatibility());
 
-            kotlinArgs.add("-d");
-            kotlinArgs.add(Settings.Data.TMP_PATH + "/tmp_class");
+        kotlinArgs.add("-d");
+        kotlinArgs.add(Settings.env.tmpPath + "/tmp_class");
 
-            StringBuilder sbKotlin = new StringBuilder();
-            for (int i = 0; i < kotlinArgs.size(); i++) {
-                sbKotlin.append(" ");
-                sbKotlin.append(kotlinArgs.get(i));
-            }
-            properties.setProperty(project.getName() + "_kotlinc_args", sbKotlin.toString());
-            System.out.println("ywb 2222222 initProjectData 22222 耗时：" + (System.currentTimeMillis() - findModuleEndTime2) + " ms");
-
+        StringBuilder sbKotlin = new StringBuilder();
+        for (int i = 0; i < kotlinArgs.size(); i++) {
+            sbKotlin.append(" ");
+            sbKotlin.append(kotlinArgs.get(i));
         }
+
+        fixedInfo.kotlincArgs = sbKotlin.toString();
     }
 
     private void findModuleTree(Project project, String productFlavor) {
-        Settings.getData().projectTreeRoot = new Settings.Data.ProjectInfo();
-        Settings.getData().projectTreeRoot.setProject(project);
-
-        handleAndroidProject(project, Settings.getData().projectTreeRoot, productFlavor, "debug");
-        sortBuildList(Settings.getData().projectTreeRoot, Settings.getData().projectBuildSortList);
-
-        ignoreProject();
+        Settings.env.projectTreeRoot = new Settings.ProjectFixedInfo();
+        handleAndroidProject(project, Settings.env.projectTreeRoot, productFlavor, "debug");
+        sortBuildList(Settings.env.projectTreeRoot, Settings.env.projectBuildSortList);
     }
 
-    private void ignoreProject() {
-        LitebuildOptions litebuildOptions =
-                project.getExtensions().getByType(LitebuildOptions.class);
+    private boolean isIgnoreProject(String moduleName) {
+        LitebuildOptions litebuildOptions = Settings.env.options;
         if (litebuildOptions == null) {
-            return;
+            return false;
         }
 
         if (litebuildOptions.moduleWhitelist != null
                 && litebuildOptions.moduleWhitelist.length > 0) {
-            // 优先白名单过滤
-            HashSet<String> set = new HashSet<>();
             for (String module : litebuildOptions.moduleWhitelist) {
-                set.add(module);
-            }
-
-            for (int i = Settings.getData().projectBuildSortList.size() - 1;
-                 i >= 0; i--) {
-                Settings.Data.ProjectInfo info = Settings.getData().projectBuildSortList.get(i);
-                if (!set.contains(info.getProject().getName())) {
-                    Settings.getData().projectBuildSortList.remove(i);
-                    info.projectIgnore = true;
+                if (moduleName.equals(module)) {
+                    return false;
                 }
             }
+
+            return true;
         } else if (litebuildOptions.moduleBlacklist != null
-                && litebuildOptions.moduleBlacklist.length > 0) {
-            // 然后黑名单过滤
-            HashSet<String> set = new HashSet<>();
+            && litebuildOptions.moduleBlacklist.length > 0) {
             for (String module : litebuildOptions.moduleBlacklist) {
-                set.add(module);
-            }
-
-            for (int i = Settings.getData().projectBuildSortList.size() - 1;
-                 i >= 0; i--) {
-                Settings.Data.ProjectInfo info = Settings.getData().projectBuildSortList.get(i);
-                if (set.contains(info.getProject().getName())) {
-                    Settings.getData().projectBuildSortList.remove(i);
-                    info.projectIgnore = true;
+                if (moduleName.equals(module)) {
+                    return true;
                 }
             }
+
+            return false;
         }
+
+        return false;
     }
 
-    private void sortBuildList(Settings.Data.ProjectInfo node, List<Settings.Data.ProjectInfo> out) {
-        for (Settings.Data.ProjectInfo child : node.getChildren()) {
+    private void sortBuildList(Settings.ProjectFixedInfo node, List<Settings.ProjectFixedInfo> out) {
+        for (Settings.ProjectFixedInfo child : node.children) {
             sortBuildList(child, out);
         }
 
-        out.add(node);
+        if (!node.isProjectIgnore) {
+            out.add(node);
+        }
     }
 
-    private void handleAndroidProject(Project project, Settings.Data.ProjectInfo node, String productFlavor, String buildType) {
+    private void handleAndroidProject(Project project, Settings.ProjectFixedInfo node, String productFlavor, String buildType) {
+        initProjectData(node, project);
+
         String[] compileNames = new String[] {"compile", "implementation", "api", "debugCompile"};
         for (String name : compileNames) {
             Configuration compile = project.getConfigurations().findByName(name);
@@ -322,7 +281,7 @@ public class InitEnvHelper {
         }
     }
 
-    private void collectLocalDependency(Settings.Data.ProjectInfo node,
+    private void collectLocalDependency(Settings.ProjectFixedInfo node,
                                                Configuration xxxCompile, String productFlavor, String buildType) {
         xxxCompile.getDependencies().forEach(new Consumer<Dependency>() {
             @Override
@@ -336,11 +295,10 @@ public class InitEnvHelper {
                         return;
                     }
 
-                    Settings.Data.ProjectInfo childNode = new Settings.Data.ProjectInfo();
-                    childNode.setProject(dp.getDependencyProject());
-                    node.getChildren().add(childNode);
+                    Settings.ProjectFixedInfo childNode = new Settings.ProjectFixedInfo();
+                    node.children.add(childNode);
 
-                    handleAndroidProject(childNode.getProject(), childNode,  productFlavor, buildType);
+                    handleAndroidProject(dp.getDependencyProject(), childNode,  productFlavor, buildType);
                 }
             }
         });

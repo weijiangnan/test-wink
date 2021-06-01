@@ -17,12 +17,11 @@
 package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
-import com.android.build.gradle.api.ApplicationVariant;
-import com.android.build.gradle.api.BaseVariantOutput;
 import com.immomo.litebuild.helper.CleanupHelper;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
+import com.immomo.litebuild.helper.InitEnvHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
 import com.immomo.litebuild.util.Log;
 
@@ -30,13 +29,8 @@ import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.api.execution.TaskExecutionGraph;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Iterator;
-import java.util.function.Consumer;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
@@ -44,8 +38,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        Settings.initData();
-
         Log.TimerLog timer = Log.timerStart("apply init", "_________");
 
         Log.v("aaptOptions", "开始aapt配置");
@@ -91,7 +83,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         if (!project.getGroup().equals("sunflower")) {
             project.getDependencies().add("implementation",
-                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.0.603-SNAPSHOT"));
+                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.1.2"));
         }
     }
 
@@ -115,10 +107,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         project.getTasks().getByName("generateDebugBuildConfig")
                 .doFirst(task -> {
-                    Settings.getData().newVersion = System.currentTimeMillis() + "";
+                    Settings.data.newVersion = System.currentTimeMillis() + "";
                     ((AppExtension) project.getExtensions().getByName("android"))
                             .getDefaultConfig().buildConfigField("String",
-                            "LITEBUILD_VERSION", "\"" + Settings.getData().newVersion + "\"");
+                            "LITEBUILD_VERSION", "\"" + Settings.data.newVersion + "\"");
                 });
 
 //        cleanUp.dependsOn(clean);
@@ -141,10 +133,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
         project.getTasks().register("litebuildInit", task -> {
             task.doLast(it -> {
                 // init
-                Settings.init(project);
+                new InitEnvHelper().initEnv(project, false);
             });
 
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createCompileTask(Project project) {
@@ -154,15 +146,15 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 new CompileHelper().compileCode();
                 timer.end();
             });
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createResourcesTask(Project project) {
         project.getTasks().register("litebuildProcessResources", task -> {
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
 
         project.getTasks().getByName("litebuildProcessResources").setOnlyIf(it2 -> {
-            return Settings.getData().hasResourceChanged;
+            return Settings.data.hasResourceChanged;
         });
 
         project.getTasks().register("litebuildResources", task -> {
@@ -172,18 +164,18 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 new ResourceHelper().checkResource();
                 timer.end();
             });
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
 
         project.getTasks().register("litebuildPackageResources", task -> {
             task.doLast(it -> {
                 Log.TimerLog timer = Log.timerStart("litebuildPackageResources");
-                if (Settings.getData().hasResourceChanged) {
+                if (Settings.data.hasResourceChanged) {
                     new ResourceHelper().packageResources();
                 }
 
                 timer.end();
             });
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createLiteBuildTask(Project project) {
@@ -199,7 +191,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                     timer.end("patchToApp...");
                 }
             });
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
@@ -212,7 +204,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                     timer.end("cleanUp");
                 }
             });
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createDiffTask(Project project) {
@@ -221,18 +213,18 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(it2 -> {
                 long diffStartTime = System.currentTimeMillis();
 
-                for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+                for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
                     //
                     long startTime = System.currentTimeMillis();
-                    new DiffHelper(projectInfo.getProject()).diff(projectInfo);
-                    System.out.println("=================>>>>>> " + projectInfo.getProject().getName() + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+                    new DiffHelper(projectInfo).diff(projectInfo);
+                    System.out.println("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
 //
-                for (Settings.Data.ProjectInfo projectInfo : Settings.getData().projectBuildSortList) {
+                for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
                     if (projectInfo.hasResourceChanged) {
-                        System.out.println("遍历是否有资源修改, name=" + projectInfo.getDir());
+                        System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
                         System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                        Settings.getData().hasResourceChanged = true;
+                        Settings.data.hasResourceChanged = true;
                         break;
                     }
                 }
@@ -240,93 +232,29 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
 
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     private void afterFullBuild(Project project) {
         // 清理
         new CleanupHelper().cleanOnAssemble();
         // 初始化
-        Settings.init(project);
+        new InitEnvHelper().initEnv(project, true);
         // 产生快照
-        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
-            new DiffHelper(info.getProject()).initSnapshot();
+        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
+            new DiffHelper(info).initSnapshot();
         }
     }
 
     private void updateSnapShot() {
-        for (Settings.Data.ProjectInfo info : Settings.getData().projectBuildSortList) {
+        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
             if (info.changedJavaFiles.size() > 0 || info.changedKotlinFiles.size() > 0) {
-                new DiffHelper(info.getProject()).initSnapshotForCode();
+                new DiffHelper(info).initSnapshotForCode();
             }
 
             if (info.hasResourceChanged) {
-                new DiffHelper(info.getProject()).initSnapshotForRes();
+                new DiffHelper(info).initSnapshotForRes();
             }
         }
     }
-
-//    private void addAssembleLastTask(Project project) {
-//        project.getRootProject().getAllprojects().forEach(new Consumer<Project>() {
-//            @Override
-//            public void accept(Project it) {
-//
-//
-//                it.getGradle().getTaskGraph().whenReady(new Action<TaskExecutionGraph>() {
-//                    @Override
-//                    public void execute(TaskExecutionGraph taskExecutionGraph) {
-//                        taskExecutionGraph.getAllTasks().forEach(new Consumer<Task>() {
-//                            @Override
-//                            public void accept(Task task) {
-//                                if (task.getName().toLowerCase().contains("assemble") || task.getName().toLowerCase().contains("install")) {
-//                                    task.doLast(new Action<Task>() {
-//                                        @Override
-//                                        public void execute(Task task) {
-//                                            new DiffHelper(it).initSnapshot();
-//
-//                                            //copy apk to litebuild dir
-//                                            boolean hasAppPlugin = it.getPlugins().hasPlugin("com.android.application");
-//                                            if (hasAppPlugin) {
-//                                                System.out.println("该module未包含com.android.application插件");
-//                                                AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
-//                                                Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
-//                                                while (itApp.hasNext()) {
-//                                                    ApplicationVariant variant = itApp.next();
-//                                                    if (variant.getName().equals("debug")) {
-//                                                        variant.getOutputs().all(new Action<BaseVariantOutput>() {
-//                                                            @Override
-//                                                            public void execute(BaseVariantOutput baseVariantOutput) {
-//                                                                File srcFile = baseVariantOutput.getOutputFile();
-//                                                                String moduleName = it.getPath().replace(":", "");
-//                                                                String diffDir = project.getRootDir() + "/.idea/litebuild/diff/" + moduleName;
-//                                                                File destFile = new File(diffDir, "snapshot.apk");
-//                                                                if (destFile.exists()) {
-//                                                                    destFile.delete();
-//                                                                }
-//                                                                try {
-//                                                                    Files.copy(srcFile.toPath(), destFile.toPath());
-//                                                                } catch (IOException e) {
-//                                                                    e.printStackTrace();
-//                                                                }
-//                                                                System.out.println("momomomomomomomomomomomomomo Output path=" + srcFile);
-//                                                            }
-//                                                        });
-//
-//                                                        //
-//                                                        String outputApkPath = variant.getPackageApplicationProvider().get().getOutputDirectory().get().toString();
-//                                                        System.out.println("momomomomomomomomomomomomomo outputApkPath=" + outputApkPath);
-//                                                    }
-//                                                }
-//                                            }
-//
-//                                        }
-//                                    });
-//                                }
-//                            }
-//                        });
-//                    }
-//                });
-//            }
-//        });
-//    }
 }
