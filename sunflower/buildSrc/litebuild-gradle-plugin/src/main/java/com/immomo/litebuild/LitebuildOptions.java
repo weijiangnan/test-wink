@@ -1,6 +1,8 @@
 package com.immomo.litebuild;
 
-public class LitebuildOptions {
+import java.io.Serializable;
+
+public class LitebuildOptions implements Serializable {
     public String[] moduleWhitelist;
     public String[] moduleBlacklist;
     public boolean kotlinSyntheticsEnable;

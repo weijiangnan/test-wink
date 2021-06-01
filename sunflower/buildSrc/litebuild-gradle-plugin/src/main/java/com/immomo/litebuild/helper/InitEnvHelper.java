@@ -21,9 +21,11 @@ import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.utils.FileUtils;
+import com.immomo.litebuild.Constant;
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.AndroidManifestUtils;
+import com.immomo.litebuild.util.Log;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -73,6 +75,8 @@ public class InitEnvHelper {
 
         // Data每次初始化
         Settings.initData();
+
+        Log.v(Constant.TAG, Settings.env.toString());
     }
 
     protected void reloadEnv(Project project) {
