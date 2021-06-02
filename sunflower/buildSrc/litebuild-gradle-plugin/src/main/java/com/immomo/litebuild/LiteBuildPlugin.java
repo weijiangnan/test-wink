@@ -117,8 +117,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
         clean.dependsOn(cleanUp);
         cleanUp.dependsOn(taskInit);
 
-        if (Utils.isStableFileExist(project)) {
-            isFirstCompile = false;
+        boolean isStableFileExist = Utils.isStableFileExist(project);
+        isFirstCompile = !isStableFileExist;
+
+        if (isStableFileExist) {
             Log.v("【LiteBuildPlugin】", "=========== 开始增量编译 ===========");
             taskDiff.dependsOn(taskInit);
             taskCompile.dependsOn(taskDiff);
@@ -130,7 +132,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
             taskProcessResources.mustRunAfter(taskResources);
             taskProcessResources.dependsOn(taskGradleProcessDebugResources);
         } else {
-            isFirstCompile = true;
             Log.v("【LiteBuildPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
             Task installDebug = project.getTasks().getByName("installDebug");
             taskLitebuild.dependsOn(installDebug);
