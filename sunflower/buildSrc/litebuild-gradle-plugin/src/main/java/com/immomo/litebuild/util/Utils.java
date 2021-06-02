@@ -16,6 +16,10 @@
 
 package com.immomo.litebuild.util;
 
+import com.immomo.litebuild.Settings;
+
+import org.gradle.api.Project;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -137,4 +141,12 @@ public class Utils {
         BigInteger bigInt = new BigInteger(1, digest.digest());
         return bigInt.toString(radix);
     }
+
+    public static boolean isStableFileExist(Project project) {
+        String path = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME + "/stableIds.txt";
+        System.out.println("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
+        File f = new File(path);
+        return f.exists();
+    }
+
 }

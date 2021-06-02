@@ -24,6 +24,7 @@ import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.InitEnvHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
 import com.immomo.litebuild.util.Log;
+import com.immomo.litebuild.util.Utils;
 
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
@@ -35,6 +36,7 @@ import java.io.File;
 public class LiteBuildPlugin implements Plugin<Project> {
 
     public static final String GROUP = "momo";
+    public boolean isFirstCompile = false;
 
     @Override
     public void apply(Project project) {
@@ -115,16 +117,24 @@ public class LiteBuildPlugin implements Plugin<Project> {
         clean.dependsOn(cleanUp);
         cleanUp.dependsOn(taskInit);
 
-        taskDiff.dependsOn(taskInit);
-        taskCompile.dependsOn(taskDiff);
-        taskLitebuild.dependsOn(taskCompile);
-        taskLitebuild.dependsOn(taskResources);
-        taskLitebuild.dependsOn(taskPackageResources);
-
-        taskPackageResources.dependsOn(taskResources);
-        taskPackageResources.dependsOn(taskProcessResources);
-        taskProcessResources.mustRunAfter(taskResources);
-        taskProcessResources.dependsOn(taskGradleProcessDebugResources);
+        if (Utils.isStableFileExist(project)) {
+            isFirstCompile = false;
+            Log.v("【LiteBuildPlugin】", "=========== 开始增量编译 ===========");
+            taskDiff.dependsOn(taskInit);
+            taskCompile.dependsOn(taskDiff);
+            taskLitebuild.dependsOn(taskCompile);
+            taskLitebuild.dependsOn(taskResources);
+            taskLitebuild.dependsOn(taskPackageResources);
+            taskPackageResources.dependsOn(taskResources);
+            taskPackageResources.dependsOn(taskProcessResources);
+            taskProcessResources.mustRunAfter(taskResources);
+            taskProcessResources.dependsOn(taskGradleProcessDebugResources);
+        } else {
+            isFirstCompile = true;
+            Log.v("【LiteBuildPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
+            Task installDebug = project.getTasks().getByName("installDebug");
+            taskLitebuild.dependsOn(installDebug);
+        }
     }
 
     public void createInitTask(Project project) {
@@ -181,6 +191,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
+                    if (isFirstCompile) {
+                        return;
+                    }
                     Log.TimerLog timer = Log.timerStart("litebuild", "patchToApp...");
                     // patch
                     if (new IncrementPatchHelper().patchToApp()) {
