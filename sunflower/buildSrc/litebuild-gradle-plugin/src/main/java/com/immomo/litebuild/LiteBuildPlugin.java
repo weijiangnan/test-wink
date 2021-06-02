@@ -167,7 +167,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 HiltTransform.INSTANCE.transform();
                 timer.end();
             });
-        }).get().setGroup(Settings.getData().NAME);
+        }).get().setGroup(Settings.NAME);
 //        BaseExtension androidExtension = project.getExtensions().findByType(BaseExtension.class);
 //        androidExtension.registerTransform(new AndroidEntryPointTransform());
     }

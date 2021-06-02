@@ -5,7 +5,7 @@ import java.io.File
 
 object HiltTransform{
 
-    private val srcPath = File(Settings.Data.TMP_PATH + "/tmp_class")
+    private val srcPath = File(Settings.env.tmpPath + "/tmp_class")
 
     private val transformer by lazy {
         val transformPath = File("/Users/weixin/Documents/litebuild/sunflower/app/build/intermediates/transforms/AndroidEntryPointTransform/debug/")
