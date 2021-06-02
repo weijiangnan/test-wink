@@ -72,7 +72,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             createInitTask(it);
             createDiffTask(it);
             createCompileTask(it);
-            createTransformTask(it);
+            //createTransformTask(it);
             createResourcesTask(it);
             createLiteBuildTask(it);
             createCleanupTask(it);
