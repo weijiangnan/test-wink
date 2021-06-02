@@ -34,7 +34,6 @@ import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -69,6 +68,7 @@ public class InitEnvHelper {
         if (reload) {
             reloadEnv(project);
         } else {
+            reloadEnv(project);
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
         }
@@ -76,7 +76,7 @@ public class InitEnvHelper {
         // Data每次初始化
         Settings.initData();
 
-        Log.v(Constant.TAG, Settings.env.toString());
+//        Log.v(Constant.TAG, Settings.env.toString());
     }
 
     protected void reloadEnv(Project project) {

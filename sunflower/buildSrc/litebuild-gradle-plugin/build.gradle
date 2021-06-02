@@ -64,7 +64,7 @@ afterEvaluate { project ->
             mavenDeployer {
                 pom.groupId = 'com.immomo.litebuild'
                 pom.artifactId = 'plugin'
-                pom.version = '0.1.4'
+                pom.version = '0.1.14'
                 repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }

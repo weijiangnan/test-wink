@@ -1,5 +1,7 @@
 package com.immomo.litebuild.util;
 
+import com.immomo.litebuild.Constant;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +24,7 @@ public class LocalCacheUtil {
             }
         } catch (Exception e) {
             delete(file);
+            Log.v(Constant.TAG, e.getMessage());
         } finally {
             try {
                 if (ois != null) {
