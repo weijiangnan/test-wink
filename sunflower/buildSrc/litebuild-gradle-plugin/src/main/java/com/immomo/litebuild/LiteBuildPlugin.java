@@ -24,6 +24,7 @@ import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
+import com.immomo.litebuild.hilt.HiltTransform;
 import com.immomo.litebuild.util.Log;
 
 import org.gradle.api.Action;
@@ -56,6 +57,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             createInitTask(it);
             createDiffTask(it);
             createCompileTask(it);
+            createTransformTask(it);
             createResourcesTask(it);
             createLiteBuildTask(it);
             createCleanupTask(it);
@@ -124,6 +126,18 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 timer.end();
             });
         }).get().setGroup(Settings.getData().NAME);
+    }
+
+    public void createTransformTask(Project project) {
+        project.getTasks().register("litebuildTransform", task -> {
+            task.doLast(it -> {
+                Log.TimerLog timer = Log.timerStart("litebuildCompile");
+                HiltTransform.INSTANCE.transform();
+                timer.end();
+            });
+        }).get().setGroup(Settings.getData().NAME);
+//        BaseExtension androidExtension = project.getExtensions().findByType(BaseExtension.class);
+//        androidExtension.registerTransform(new AndroidEntryPointTransform());
     }
 
     public void createResourcesTask(Project project) {
