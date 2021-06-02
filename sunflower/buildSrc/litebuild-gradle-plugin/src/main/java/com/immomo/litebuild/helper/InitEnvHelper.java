@@ -68,7 +68,7 @@ public class InitEnvHelper {
         if (reload) {
             reloadEnv(project);
         } else {
-            reloadEnv(project);
+//            reloadEnv(project);
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
         }
@@ -115,7 +115,11 @@ public class InitEnvHelper {
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
         env.launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, env.packageName);
 
-        env.options = project.getExtensions().getByType(LitebuildOptions.class);
+        LitebuildOptions options = project.getExtensions().getByType(LitebuildOptions.class);
+        env.options = new LitebuildOptions();
+        env.options.moduleBlacklist = options.moduleBlacklist;
+        env.options.moduleWhitelist = options.moduleWhitelist;
+        env.options.kotlinSyntheticsEnable = options.kotlinSyntheticsEnable;
 
         findModuleTree(project, "");
 
@@ -252,7 +256,7 @@ public class InitEnvHelper {
 
             return true;
         } else if (litebuildOptions.moduleBlacklist != null
-            && litebuildOptions.moduleBlacklist.length > 0) {
+                && litebuildOptions.moduleBlacklist.length > 0) {
             for (String module : litebuildOptions.moduleBlacklist) {
                 if (moduleName.equals(module)) {
                     return true;
@@ -288,7 +292,7 @@ public class InitEnvHelper {
     }
 
     private void collectLocalDependency(Settings.ProjectFixedInfo node,
-                                               Configuration xxxCompile, String productFlavor, String buildType) {
+                                        Configuration xxxCompile, String productFlavor, String buildType) {
         xxxCompile.getDependencies().forEach(new Consumer<Dependency>() {
             @Override
             public void accept(Dependency dependency) {
