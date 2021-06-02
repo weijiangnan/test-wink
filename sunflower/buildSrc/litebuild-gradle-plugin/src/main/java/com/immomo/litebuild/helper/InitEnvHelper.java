@@ -21,11 +21,9 @@ import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.utils.FileUtils;
-import com.immomo.litebuild.Constant;
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.AndroidManifestUtils;
-import com.immomo.litebuild.util.Log;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -66,7 +64,7 @@ public class InitEnvHelper {
 
     public void initEnv(Project project, boolean reload) {
         if (reload) {
-            reloadEnv(project);
+            createEnv(project);
         } else {
 //            reloadEnv(project);
             Settings.restoreEnv(project.getRootDir()
@@ -79,7 +77,7 @@ public class InitEnvHelper {
 //        Log.v(Constant.TAG, Settings.env.toString());
     }
 
-    protected void reloadEnv(Project project) {
+    protected void createEnv(Project project) {
         this.project = project;
 
         AppExtension androidExt = (AppExtension) project.getExtensions().getByName("android");
@@ -168,7 +166,6 @@ public class InitEnvHelper {
             return;
         }
 
-
         args.add("-source");
         args.add(javaCompile.getTargetCompatibility());
 
@@ -186,8 +183,11 @@ public class InitEnvHelper {
 //            args.add("-sourcepath");
 //            args.add("");
 
-        args.add("-processorpath");
-        args.add(javaCompile.getOptions().getAnnotationProcessorPath().getAsPath());
+        String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
+        if (!processorpath.trim().isEmpty()) {
+            args.add("-processorpath");
+            args.add(processorpath);
+        }
 
         args.add("-classpath");
         args.add(javaCompile.getClasspath().getAsPath() + ":"
@@ -219,7 +219,7 @@ public class InitEnvHelper {
                 + ":" + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
 
         kotlinArgs.add("-jvm-target");
-        kotlinArgs.add(javaCompile.getTargetCompatibility());
+        kotlinArgs.add(getSupportVersion(javaCompile.getTargetCompatibility()));
 
         kotlinArgs.add("-d");
         kotlinArgs.add(Settings.env.tmpPath + "/tmp_class");
@@ -231,6 +231,14 @@ public class InitEnvHelper {
         }
 
         fixedInfo.kotlincArgs = sbKotlin.toString();
+    }
+
+    private String getSupportVersion(String jvmVersion) {
+        if ("1.7".equals(jvmVersion)) {
+            return "1.8";
+        }
+
+        return jvmVersion;
     }
 
     private void findModuleTree(Project project, String productFlavor) {

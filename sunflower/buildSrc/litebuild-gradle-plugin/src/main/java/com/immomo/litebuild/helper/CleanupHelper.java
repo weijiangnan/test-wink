@@ -27,7 +27,7 @@ public class CleanupHelper {
         deleteAllDex();
         delete("diff");
         delete("tmp_class");
-        delete("env.properties");
+        delete("env");
         delete("stableIds.txt");
 
         // 删除手机上的patch文件
@@ -40,7 +40,7 @@ public class CleanupHelper {
 
         delete("diff");
         delete("tmp_class");
-        delete("env.properties");
+        delete("env");
 
         // 删除手机上的patch文件
         deletePatchFileOnPhone();
