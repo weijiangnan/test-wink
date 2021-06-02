@@ -9,19 +9,15 @@ class ResourceHelper {
     var st : Long = 0
 
     fun checkResource() {
-        println("ResourceHelper process, changed=${Settings.getData().hasResourceChanged}")
-        if (!Settings.getData().hasResourceChanged) return
+        println("ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
+        if (!Settings.data.hasResourceChanged) return
 
         st = System.currentTimeMillis()
         compileResources()
-        val pkgtime = System.currentTimeMillis()
-//        println("资源编译耗时：" + (System.currentTimeMillis() - st))
-//        packageResources()
-//        println("资源打包耗时：" + (System.currentTimeMillis() - pkgtime))
     }
 
     private fun compileResources() {
-        val stableId = File(Settings.Data.TMP_PATH + "/stableIds.txt")
+        val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
             println("stableIds存在")
         } else {
@@ -29,13 +25,12 @@ class ResourceHelper {
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
 
-        Settings.getData().needProcessDebugResources = true
-        Utils.executeScript("./gradlew processDebugResources --offline")
+        Settings.data.needProcessDebugResources = true
     }
 
     fun packageResources() {
-        val ap_ = File("${Settings.project.rootDir.path}/app/build/intermediates/processed_res/debug/out/resources-debug.ap_")
-        println("packageResources-packageResources rootPath=====${Settings.project.rootDir.path}")
+        val ap_ = File("${Settings.env.rootDir}/app/build/intermediates/processed_res/debug/out/resources-debug.ap_")
+        println("packageResources-packageResources rootPath=====${Settings.env.rootDir}")
 
         if (ap_.exists()) {
             println("ap_文件存在")
@@ -43,29 +38,31 @@ class ResourceHelper {
             throw FileNotFoundException("ap_文件 不 存在")
         }
 
-        val lastPath = Settings.project.rootDir
-        val litebuildFolderPath = Settings.Data.TMP_PATH
-        val apkPath = "$litebuildFolderPath/resources-debug.apk"
-        val pushSdcardPath = "/sdcard/Android/data/${Settings.Data.PACKAGE_NAME}/patch_file"
+        val lastPath = Settings.env.rootDir
+        val litebuildFolderPath = Settings.env.tmpPath
+        val patchName = Settings.env.version + "_resources-debug.apk"
+        val apkPath = "$litebuildFolderPath/$patchName"
+        val pushSdcardPath = "/sdcard/Android/data/${Settings.env.debugPackageName}/patch_file/apk"
 
+        println("资源打包路径：$apkPath")
+        val app = Settings.env.projectTreeRoot!!.name
         val localScript = """
             source ~/.bash_profile
             echo "开始资源解压，重新压缩！"
-            echo $lastPath/app/build/intermediates/processed_res/debug/out
+            echo $lastPath/$app/build/intermediates/processed_res/debug/out
             rm -rf $lastPath/.idea/litebuild/tempResFolder
             mkdir $lastPath/.idea/litebuild/tempResFolder
-            unzip -o -q $lastPath/app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d .idea/litebuild/tempResFolder
-            cp -R $lastPath/app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
+            unzip -o -q $lastPath/$app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d $lastPath/.idea/litebuild/tempResFolder
+            cp -R $lastPath/$app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
             cd $lastPath/.idea/litebuild/tempResFolder
             zip -r -o -q $apkPath *
             cd ..
             rm -rf tempResFolder
             adb shell rm -rf $pushSdcardPath
             adb shell mkdir $pushSdcardPath
-            adb push resources-debug.apk $pushSdcardPath/
+            adb push $patchName $pushSdcardPath/
         """.trimIndent()
 
-        println("准备执行第8版资源脚本")
         Utils.executeScript(localScript)
 
         println("资源编译耗时：" + (System.currentTimeMillis() - st))

@@ -106,7 +106,9 @@ public final class HotFixEngineWrapper {
     }
 
     public final void loadPatch( Context context) {
-        dexPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + context.getPackageName() + "/patch_file/patch0.dex";
+        String patchName = FixDexUtil.getPatchVersion(context) + "_patch.dex";
+        dexPath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/Android/data/" + context.getPackageName() + "/patch_file/" + patchName;
         Log.e("weijiangnan", dexPath);
         if ((new File(dexPath)).exists()) {
             StringBuilder var10000 = new StringBuilder();

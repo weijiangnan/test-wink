@@ -16,9 +16,13 @@
 
 package com.immomo.litebuild.util;
 
+import com.immomo.litebuild.Settings;
+
+import org.gradle.api.Project;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -28,12 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-    /**
-     * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
-     *
-     * @param shStr 需要执行的shell
-     * @return
-     */
+
     public static List<String> runShell(String shStr) {
 //        System.out.println("准备运行shell : " + shStr);
         List<String> strList = new ArrayList<String>();
@@ -118,7 +117,7 @@ public class Utils {
      *
      * @param file  文件
      * @param radix 位 16 32 64
-     * @return
+     * @return MD5
      */
     public static String getFileMD5s(File file, int radix) {
         if (!file.isFile()) {
@@ -142,4 +141,12 @@ public class Utils {
         BigInteger bigInt = new BigInteger(1, digest.digest());
         return bigInt.toString(radix);
     }
+
+    public static boolean isStableFileExist(Project project) {
+        String path = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME + "/stableIds.txt";
+        System.out.println("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
+        File f = new File(path);
+        return f.exists();
+    }
+
 }

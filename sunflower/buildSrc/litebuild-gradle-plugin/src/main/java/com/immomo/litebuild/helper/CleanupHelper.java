@@ -20,23 +20,35 @@ import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
 import java.io.File;
-import java.io.IOException;
 
 public class CleanupHelper {
     public void cleanup() {
-        delete("patch0.dex");
-        delete("resources-debug.apk");
+        deleteAllApk();
+        deleteAllDex();
         delete("diff");
         delete("tmp_class");
-        delete("env.properties");
+        delete("env");
         delete("stableIds.txt");
 
         // 删除手机上的patch文件
         deletePatchFileOnPhone();
     }
 
+    public void cleanOnAssemble() {
+        deleteAllApk();
+        deleteAllDex();
+
+        delete("diff");
+        delete("tmp_class");
+        delete("env");
+
+        // 删除手机上的patch文件
+        deletePatchFileOnPhone();
+    }
+
+
     public void deletePatchFileOnPhone() {
-        String destPath = "/sdcard/Android/data/" + Settings.Data.PACKAGE_NAME + "/patch_file/";
+        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
         String cmds = "";
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell rm -rf " + destPath;
@@ -44,9 +56,35 @@ public class CleanupHelper {
         Utils.runShell(cmds);
     }
 
+    public void deleteAllApk() {
+        System.out.println("删除文件deleteAllApk :" + Settings.env.tmpPath);
+        File f = new File(Settings.env.tmpPath);
+        if (f.exists() && f.isDirectory()) {
+            File[] apks = f.listFiles(pathname -> pathname.getName().endsWith("apk"));
+            if (apks != null) {
+                for (File a : apks) {
+                    a.delete();
+                }
+            }
+        }
+    }
+
+    public void deleteAllDex() {
+        System.out.println("删除文件deleteAllDex :" + Settings.env.tmpPath);
+        File f = new File(Settings.env.tmpPath);
+        if (f.exists() && f.isDirectory()) {
+            File[] files = f.listFiles(pathname -> pathname.getName().endsWith("dex"));
+            if (files != null) {
+                for (File a : files) {
+                    a.delete();
+                }
+            }
+        }
+    }
+
     public void delete(String path) {
-        System.out.println("删除文件:" + Settings.Data.TMP_PATH + "/" + path);
-        File f = new File(Settings.Data.TMP_PATH + "/" + path);
+        System.out.println("删除文件:" + Settings.env.tmpPath + "/" + path);
+        File f = new File(Settings.env.tmpPath + "/" + path);
         deleteFile(f);
     }
 

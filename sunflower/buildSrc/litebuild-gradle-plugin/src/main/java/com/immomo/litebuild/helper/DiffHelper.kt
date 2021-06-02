@@ -22,7 +22,6 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.google.gson.Gson
 import com.immomo.litebuild.Settings
 import com.immomo.litebuild.util.Log
-import com.immomo.litebuild.util.Utils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.*
@@ -40,7 +39,7 @@ import java.util.*
 
 const val KEY_COMMIT_ID = "key_commit_id"
 
-class DiffHelper(var project: Project) {
+class DiffHelper(var project: Settings.ProjectTmpInfo) {
     companion object {
         const val TAG = "litebuild.diff"
     }
@@ -61,13 +60,13 @@ class DiffHelper(var project: Project) {
     private val properties = Properties()
 
     init {
-        Log.v(TAG, "[${project.path}]:init")
+        Log.v(TAG, "[${project.fixedInfo.name}]:init")
 
-        val moduleName = project.path.replace(":", "")
-        diffDir = "${project.rootDir}/.idea/litebuild/diff/${moduleName}"
+        val moduleName = project.fixedInfo.name
+        diffDir = "${Settings.env!!.rootDir}/.idea/litebuild/diff/${moduleName}"
 
-        scanPathCode = "${project.projectDir}/src/main/java"
-        scanPathRes = "${project.projectDir}/src/main/res"
+        scanPathCode = "${project.fixedInfo.dir}/src/main/java"
+        scanPathRes = "${project.fixedInfo.dir}/src/main/res"
 
         csvPathCode = "${diffDir}/md5_code.csv"
         csvPathRes = "${diffDir}/md5_res.csv"
@@ -87,7 +86,7 @@ class DiffHelper(var project: Project) {
 
         //git
         repo = FileRepositoryBuilder()
-                .findGitDir(project.projectDir)
+                .findGitDir(File(Settings.env.rootDir))
                 .build()
 
         git = Git(repo)
@@ -95,14 +94,28 @@ class DiffHelper(var project: Project) {
 
 
     fun initSnapshot() {
-        Log.v(TAG, "[${project.path}]:initSnapshot ...")
+        Log.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         initSnapshotByMd5()
 //        initSnapshotByGit()
     }
 
-    fun diff(projectInfo: Settings.Data.ProjectInfo) {
-        Log.v(TAG, "[${project.path}]:获取差异...")
+    fun initSnapshotForCode() {
+        Log.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+
+        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
+        genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
+    }
+
+    fun initSnapshotForRes() {
+        Log.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+
+        File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
+        genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
+    }
+
+    fun diff(projectInfo: Settings.ProjectTmpInfo) {
+        Log.v(TAG, "[${project.fixedInfo.name}]:获取差异...")
 
         diffByMd5(projectInfo)
 //        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
@@ -163,7 +176,7 @@ class DiffHelper(var project: Project) {
             when (it.changeType) {
                 DiffEntry.ChangeType.ADD, DiffEntry.ChangeType.MODIFY, DiffEntry.ChangeType.COPY, DiffEntry.ChangeType.RENAME -> {
                     Log.v(str = "${it.changeType} newPath=${it.newPath}")
-                    if (rootParentPath.plus(it.newPath).startsWith(project.projectDir.absolutePath)) {
+                    if (rootParentPath.plus(it.newPath).startsWith(project.fixedInfo.dir)) {
                         if (it.newPath.endsWith(".java")) {
                             setJava.add(rootParentPath.plus(it.newPath))
                         }
@@ -177,7 +190,7 @@ class DiffHelper(var project: Project) {
                 }
 
                 DiffEntry.ChangeType.DELETE, DiffEntry.ChangeType.RENAME -> {
-                    if (rootParentPath.plus(it.oldPath).startsWith(project.projectDir.absolutePath)) {
+                    if (rootParentPath.plus(it.oldPath).startsWith(project.fixedInfo.dir)) {
                         Log.v(str = "${it.changeType} oldPath=${it.oldPath}")
                         if (it.oldPath.endsWith(".java")) {
                             setJava.add(rootParentPath.plus(it.oldPath))
@@ -199,9 +212,9 @@ class DiffHelper(var project: Project) {
         return rst
     }
 
-    private fun diffByMd5(projectInfo: Settings.Data.ProjectInfo) {
+    private fun diffByMd5(projectInfo: Settings.ProjectTmpInfo) {
         diffInner(scanPathCode, csvPathCode) {
-            //            Log.v(TAG, "[${project.path}]:    差异数据:$it")
+            Log.v(TAG, "[${project.fixedInfo.name}]:    差异数据:$it")
             when {
                 it.endsWith(".java") -> {
                     if (!projectInfo.changedJavaFiles.contains(it)) {
@@ -217,7 +230,7 @@ class DiffHelper(var project: Project) {
         }
 
         diffInner(scanPathRes, csvPathRes) {
-            Log.v(TAG, "[${project.path}]:有资源被修改了！！！！！！差异数据:$it")
+            Log.v(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$it")
             Log.v(TAG, "被修改的资源是：$scanPathRes")
             projectInfo.hasResourceChanged = true
         }
@@ -246,7 +259,7 @@ class DiffHelper(var project: Project) {
         //Log.v(TAG, mapOrigin)
 
         if (mapOrigin.isEmpty()) {
-            Log.v(TAG, "[${project.path}]:原始数据为空")
+            Log.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
             return
         } else {
             val mapNew = hashMapOf<String, String>()
@@ -255,10 +268,11 @@ class DiffHelper(var project: Project) {
             //Log.v(TAG, "新数据:")
             //Log.v(TAG, mapNew)
 
-            Log.v(TAG, "[${project.path}]:计算差异数据...")
+            Log.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
             compareMap(mapOrigin, mapNew)
-                    .also { if (it.isEmpty()) Log.v(TAG, "[${project.path}]:差异数据为空") }
+                    .also { if (it.isEmpty()) Log.v(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
                     .forEach {
+                        System.out.println(it)
                         block(it)
                     }
 
@@ -266,7 +280,7 @@ class DiffHelper(var project: Project) {
     }
 
     private fun compareMap(map1: Map<String, String>, map2: Map<String, String>): Set<String> {
-        Log.v(TAG, "[${project.path}]:compareMap...")
+        Log.v(TAG, "[${project.fixedInfo.name}]:compareMap...")
 
         val rst = hashSetOf<String>()
         var m1 = map1
@@ -294,7 +308,7 @@ class DiffHelper(var project: Project) {
 
 
     private fun genSnapshotAndSaveToCache(path: String, map: HashMap<String, String>) {
-//        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
+//        Log.v(TAG, "[${project.fixedInfo.name}]:遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
                 .filter {
@@ -307,11 +321,11 @@ class DiffHelper(var project: Project) {
                     map[it.absolutePath] = getSnapshot(it)
                 }
 
-        Log.v(TAG, "[${project.path}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+        Log.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
 
     private fun genSnapshotAndSaveToDisk(path: String, csvPath: String) {
-//        Log.v(TAG, "[${project.path}]:遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
+//        Log.v(TAG, "[${project.fixedInfo.name}]:遍历目录[$path]下的java,kt文件,生成md5并保存到csv文件[$csvPath]")
 
         val csvFile = File(csvPath)
         if (!csvFile.exists()) {
@@ -334,15 +348,15 @@ class DiffHelper(var project: Project) {
                     }
                 }
 
-        Log.v(TAG, "[${project.path}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+        Log.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
 
     }
 
     private fun loadSnapshotToCacheFromDisk(path: String): Map<String, String> {
-//        Log.v(TAG, "[${project.path}]:从[${path}]加载md5信息...")
+//        Log.v(TAG, "[${project.fixedInfo.name}]:从[${path}]加载md5信息...")
 
         return if (!File(path).exists()) {
-            Log.v(TAG, "[${project.path}]:文件[${path}]不存在")
+            Log.v(TAG, "[${project.fixedInfo.name}]:文件[${path}]不存在")
             hashMapOf()
         } else {
             val map = hashMapOf<String, String>()
@@ -356,7 +370,7 @@ class DiffHelper(var project: Project) {
         }
     }
 
-    private fun getSnapshot(it: File) = Utils.getFileMD5s(it, 64)
+    private fun getSnapshot(it: File) = it.lastModified().toString()//Utils.getFileMD5s(it, 64)
 
 
 }

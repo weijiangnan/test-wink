@@ -22,14 +22,14 @@ object Log {
     }
 
     @JvmStatic
-    fun timerStart(name: String, other: String = "") : TimerLog {
+    fun timerStart(name: String, other: String = ""): TimerLog {
         var log = TimerLog(name, other)
         v(Constant.TAG, " ${log.name} start. $other >>>>>>>>")
         return log
     }
 
     @JvmStatic
-    fun timerStart(name: String) : TimerLog {
+    fun timerStart(name: String): TimerLog {
         return timerStart(name, "")
     }
 
@@ -37,7 +37,10 @@ object Log {
         var starTime = System.currentTimeMillis()
 
         fun end(other: String = "") {
-            v(Constant.TAG, "$name end, duration: ${System.currentTimeMillis() - starTime}. $other <<<<<<<<")
+            v(
+                Constant.TAG,
+                "$name end, duration: ${System.currentTimeMillis() - starTime}. $other <<<<<<<<"
+            )
         }
 
         fun end() {

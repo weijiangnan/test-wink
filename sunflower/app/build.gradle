@@ -43,6 +43,7 @@ android {
             }
         }
     }
+
     //解决强行修改图片后缀问题 jpg改成png会有问题
     aaptOptions {
         cruncherEnabled = false
@@ -52,13 +53,13 @@ android {
 //        } else {
 //            ignoreAssetsPattern "!lua_64"
 //        }
-        def stableIdPath = ".idea/litebuild/stableIds.txt"
-        File publicTxtFile = project.rootProject.file(stableIdPath)
-        if (publicTxtFile.exists()) {
-            additionalParameters "--stable-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
-        } else {
-            additionalParameters "--emit-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
-        }
+//        def stableIdPath = ".idea/litebuild/stableIds.txt"
+//        File publicTxtFile = project.rootProject.file(stableIdPath)
+//        if (publicTxtFile.exists()) {
+//            additionalParameters "--stable-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
+//        } else {
+//            additionalParameters "--emit-ids", "${project.rootProject.file(stableIdPath).absolutePath}"
+//        }
     }
     buildTypes {
         release {
@@ -88,9 +89,7 @@ android {
 }
 
 dependencies {
-//    implementation "com.immomo.litebuild:build-lib:0.0.5-SNAPSHOT"
     implementation project(':LiteBuildLib')
-//    implementation "com.immomo.android.module:diandian:1.0.9-module-0323-2100"
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
     kapt "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"

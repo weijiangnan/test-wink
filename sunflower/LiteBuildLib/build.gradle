@@ -50,14 +50,14 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
-
+// ./gradlew LiteBuildLib:uploadArchives
 afterEvaluate { project ->
     uploadArchives {
         repositories {
             mavenDeployer {
                 pom.groupId = 'com.immomo.litebuild'
                 pom.artifactId = 'build-lib'
-                pom.version = '0.0.62-SNAPSHOT'
+                pom.version = '0.1.4'
                 repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                     authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                 }
