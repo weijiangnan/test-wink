@@ -3,7 +3,7 @@ plugins {
 //    id 'kotlin-android'
     id 'maven'
 }
-
+//apply from: rootProject.file('LiteBuildLib/publish_to_maven_central.gradle')
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"

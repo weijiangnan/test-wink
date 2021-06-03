@@ -38,11 +38,6 @@ public class LocalCacheUtil {
         return null;
     }
 
-    /**
-     * 保存文件
-     *
-     * @param value
-     */
     public static  <T> void save2File(T value, String filePath) {
         ObjectOutputStream oo = null;
         try {
