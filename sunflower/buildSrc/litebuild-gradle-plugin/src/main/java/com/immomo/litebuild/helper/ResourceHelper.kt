@@ -70,7 +70,6 @@ class ResourceHelper {
         val localScript = """
             source ~/.bash_profile
             echo "开始资源解压，重新压缩！"
-            echo $lastPath/$app/build/intermediates/processed_res/debug/out
             rm -rf $lastPath/.idea/litebuild/tempResFolder
             mkdir $lastPath/.idea/litebuild/tempResFolder
             unzip -o -q ${ap_path} -d $lastPath/.idea/litebuild/tempResFolder
