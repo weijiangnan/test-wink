@@ -4,7 +4,7 @@ apply plugin: 'signing'
 version = '0.1.5' 	    // sdk版本号   需要更改
 group = 'com.immomo.litebuild'           // groupID， 必须com.immomo开头    需要更改
 //artifactId = 'build-lib'
-
+def ARTIFACT_ID = 'build-lib'
 def siteUrl = "https://git.wemomo.com/live/litebuild"      // 项目的主页  需要更改
 def gitUrl = "https://git.wemomo.com/live/litebuild"       // Git仓库的url   需要更改
 
@@ -22,6 +22,7 @@ uploadArchives {
                 packaging 'aar'
                 description 'project description'
                 url siteUrl
+                artifactId ARTIFACT_ID
 
                 scm {
                     connection gitUrl
