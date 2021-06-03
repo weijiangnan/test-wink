@@ -51,27 +51,32 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 // ./gradlew LiteBuildLib:uploadArchives
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                pom.groupId = 'com.immomo.litebuild'
-                pom.artifactId = 'build-lib'
-                pom.version = '0.1.4'
-                repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
-                snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+def isUploadMavenCenter = true
+if (isUploadMavenCenter) {
+    apply from: rootProject.file('LiteBuildLib/publish_to_maven_central.gradle')
+} else {
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    pom.groupId = 'com.immomo.litebuild'
+                    pom.artifactId = 'build-lib'
+                    pom.version = '0.1.4'
+                    repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
+                    snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
                 }
             }
         }
-    }
-    task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.sourceFiles
-    }
-    artifacts {
-        archives androidSourcesJar
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.sourceFiles
+        }
+        artifacts {
+            archives androidSourcesJar
+        }
     }
 }

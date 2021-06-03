@@ -28,11 +28,32 @@ class ResourceHelper {
         Settings.data.needProcessDebugResources = true
     }
 
-    fun packageResources() {
-        val ap_ = File("${Settings.env.rootDir}/app/build/intermediates/processed_res/debug/out/resources-debug.ap_")
-        println("packageResources-packageResources rootPath=====${Settings.env.rootDir}")
+    var ap_path = ""
+    fun findAp_(file: File) {
+        if (file.isFile) {
+            println("findAp_是文件 file=${file.name}")
+            if (file.name.endsWith(".ap_")) {
+                println("是ap_ file=${file.name}")
+                ap_path = file.absolutePath
+            }
+        }
+        if (file.isDirectory) {
+            for (f : File in file.listFiles()) {
+                println("递归找ap_ f=${f.name}")
+                findAp_(f)
+            }
+        }
+    }
 
-        if (ap_.exists()) {
+    fun packageResources() {
+        val ap_ParentDir = File("${Settings.env.appProjectDir}/build/intermediates/processed_res")
+        findAp_(ap_ParentDir)
+
+        println("packageResources-packageResources rootPath=====${ap_ParentDir.absolutePath}")
+        println("找到的 findap==${ap_path}")
+
+
+        if (!ap_path.isBlank()) {
             println("ap_文件存在")
         } else {
             throw FileNotFoundException("ap_文件 不 存在")
@@ -49,10 +70,9 @@ class ResourceHelper {
         val localScript = """
             source ~/.bash_profile
             echo "开始资源解压，重新压缩！"
-            echo $lastPath/$app/build/intermediates/processed_res/debug/out
             rm -rf $lastPath/.idea/litebuild/tempResFolder
             mkdir $lastPath/.idea/litebuild/tempResFolder
-            unzip -o -q $lastPath/$app/build/intermediates/processed_res/debug/out/resources-debug.ap_ -d $lastPath/.idea/litebuild/tempResFolder
+            unzip -o -q ${ap_path} -d $lastPath/.idea/litebuild/tempResFolder
             cp -R $lastPath/$app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
             cd $lastPath/.idea/litebuild/tempResFolder
             zip -r -o -q $apkPath *

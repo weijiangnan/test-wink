@@ -2,7 +2,6 @@ apply plugin: 'java-gradle-plugin'
 apply plugin: 'kotlin'
 apply plugin: 'maven'
 
-//apply from: rootProject.file('../publish_to_maven_central.gradle')
 buildscript {
     ext {
         gradleVersion = '3.5.0'
@@ -61,28 +60,34 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
+
 // 在项目根路径下执行 ./gradlew -p buildSrc :litebuild-gradle-plugin:uploadArchives
-afterEvaluate { project ->
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                pom.groupId = 'com.immomo.litebuild'
-                pom.artifactId = 'plugin'
-                pom.version = '0.1.21'
-                repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
-                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
-                }
+def isUploadMavenCenter = true
+if (isUploadMavenCenter) {
+    apply from: rootProject.file('publish_to_maven_central.gradle')
+} else {
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    pom.groupId = 'com.immomo.litebuild'
+                    pom.artifactId = 'plugin'
+                    pom.version = '0.1.30'
+                    repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
 //                snapshotRepository(url: MOMOAGORA_SNAPSHOT_REPOSITORY_URL) {
 //                    authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
 //                }
+                }
             }
         }
     }
-}
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-artifacts {
-    archives sourceJar
+    task sourceJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    artifacts {
+        archives sourceJar
+    }
 }
