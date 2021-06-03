@@ -5,7 +5,7 @@ apply plugin: 'maven'
 //apply from: rootProject.file('../publish_to_maven_central.gradle')
 buildscript {
     ext {
-        gradleVersion = '4.0.2'
+        gradleVersion = '3.5.0'
         kotlinVersion = '1.4.30'
     }
     repositories {
@@ -33,10 +33,14 @@ repositories {
 }
 
 dependencies {
-    implementation "com.android.tools.build:gradle:4.0.2"
+    implementation "com.android.tools.build:gradle:$gradleVersion"
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
     implementation "com.google.code.gson:gson:2.8.2"
+
+    implementation 'org.javassist:javassist:3.26.0-GA'
+    implementation 'org.ow2.asm:asm:9.0'
+    implementation "com.squareup:javapoet:1.13.0"
 
 }
 

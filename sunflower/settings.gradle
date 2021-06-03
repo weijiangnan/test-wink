@@ -18,5 +18,6 @@ gradle.ext.dev = true
 include ':LiteBuildLib'
 include ':mylibrary'
 //include ':litebuild-gradle-plugin'
-include ':app'
+//include ':app'
 //include ':sunflower:buildSrc:litebuild-gradle-plugin'
+include ':wink'
