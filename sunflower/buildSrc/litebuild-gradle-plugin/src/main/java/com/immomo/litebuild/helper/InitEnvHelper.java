@@ -243,7 +243,10 @@ public class InitEnvHelper {
 
     private void findModuleTree(Project project, String productFlavor) {
         Settings.env.projectTreeRoot = new Settings.ProjectFixedInfo();
-        handleAndroidProject(project, Settings.env.projectTreeRoot, productFlavor, "debug");
+
+        HashSet<String> hasAddProject = new HashSet<>();
+        handleAndroidProject(project, Settings.env.projectTreeRoot, hasAddProject, productFlavor, "debug");
+
         sortBuildList(Settings.env.projectTreeRoot, Settings.env.projectBuildSortList);
     }
 
@@ -287,20 +290,22 @@ public class InitEnvHelper {
         }
     }
 
-    private void handleAndroidProject(Project project, Settings.ProjectFixedInfo node, String productFlavor, String buildType) {
+    private void handleAndroidProject(Project project, Settings.ProjectFixedInfo node,
+                                      HashSet<String> hasAddProject, String productFlavor, String buildType) {
         initProjectData(node, project);
 
         String[] compileNames = new String[] {"compile", "implementation", "api", "debugCompile"};
         for (String name : compileNames) {
             Configuration compile = project.getConfigurations().findByName(name);
             if (compile != null) {
-                collectLocalDependency(node, compile, productFlavor, buildType);
+                collectLocalDependency(node, compile, hasAddProject, productFlavor, buildType);
             }
         }
     }
 
     private void collectLocalDependency(Settings.ProjectFixedInfo node,
-                                        Configuration xxxCompile, String productFlavor, String buildType) {
+                                        Configuration xxxCompile,
+                                        HashSet<String> hasAddProject, String productFlavor, String buildType) {
         xxxCompile.getDependencies().forEach(new Consumer<Dependency>() {
             @Override
             public void accept(Dependency dependency) {
@@ -309,14 +314,17 @@ public class InitEnvHelper {
                     DefaultProjectDependency dp = (DefaultProjectDependency) dependency;
                     // 孩子节点
                     String name = dp.getDependencyProject().getName();
-                    if (name.equals("litebuild-gradle-plugin") || name.equals("LiteBuildLib")) {
+                    if (name.equals("litebuild-gradle-plugin")
+                            || name.equals("LiteBuildLib")
+                            || hasAddProject.contains(name)) {
                         return;
                     }
 
                     Settings.ProjectFixedInfo childNode = new Settings.ProjectFixedInfo();
                     node.children.add(childNode);
+                    hasAddProject.add(name);
 
-                    handleAndroidProject(dp.getDependencyProject(), childNode,  productFlavor, buildType);
+                    handleAndroidProject(dp.getDependencyProject(), childNode,  hasAddProject, productFlavor, buildType);
                 }
             }
         });

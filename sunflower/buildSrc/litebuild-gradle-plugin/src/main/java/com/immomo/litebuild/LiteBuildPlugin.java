@@ -106,7 +106,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task assembleDebug = project.getTasks().getByName("assembleDebug");
         assembleDebug.doLast(task -> afterFullBuild(project));
 
-        project.getTasks().getByName("generateDebugBuildConfig")
+        project.getTasks().getByName("preDebugBuild")
                 .doFirst(task -> {
                     Settings.data.newVersion = System.currentTimeMillis() + "";
                     ((AppExtension) project.getExtensions().getByName("android"))
