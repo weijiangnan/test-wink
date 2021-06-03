@@ -119,7 +119,7 @@ public class InitEnvHelper {
         env.options.moduleWhitelist = options.moduleWhitelist;
         env.options.kotlinSyntheticsEnable = options.kotlinSyntheticsEnable;
 
-        findModuleTree(project, "");
+        findModuleTree2(project, "");
 
         Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
     }
@@ -140,9 +140,11 @@ public class InitEnvHelper {
 
         System.out.println("ywb 2222222 initProjectData 1111 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
 
-        Object extension = project.getExtensions().getByName("android");
+        Object extension = project.getExtensions().findByName("android");
         JavaCompile javaCompile = null;
-        if (extension instanceof AppExtension) {
+        if (extension == null) {
+            return;
+        } else if (extension instanceof AppExtension) {
             Iterator<ApplicationVariant> itApp = ((AppExtension) extension).getApplicationVariants().iterator();
             while (itApp.hasNext()) {
                 ApplicationVariant variant = itApp.next();
@@ -245,9 +247,40 @@ public class InitEnvHelper {
         Settings.env.projectTreeRoot = new Settings.ProjectFixedInfo();
 
         HashSet<String> hasAddProject = new HashSet<>();
+        hasAddProject.add(project.getName());
+
         handleAndroidProject(project, Settings.env.projectTreeRoot, hasAddProject, productFlavor, "debug");
 
         sortBuildList(Settings.env.projectTreeRoot, Settings.env.projectBuildSortList);
+    }
+
+    public void findModuleTree2(Project project, String productFlavor) {
+        Settings.env.projectTreeRoot = new Settings.ProjectFixedInfo();
+        initProjectData(Settings.env.projectTreeRoot, project);
+
+        HashSet<String> hasAddProject = new HashSet<>();
+        hasAddProject.add(project.getName());
+
+        for (Project item : project.getRootProject().getSubprojects()) {
+            String name = item.getName();
+            if (name.equals("litebuild-gradle-plugin")
+                    || name.equals("LiteBuildLib")
+                    || hasAddProject.contains(name)) {
+                continue;
+            }
+
+            Settings.ProjectFixedInfo childNode = new Settings.ProjectFixedInfo();
+            initProjectData(childNode, item);
+            Settings.env.projectTreeRoot.children.add(childNode);
+            hasAddProject.add(item.getName());
+        }
+
+        sortBuildList(Settings.env.projectTreeRoot, Settings.env.projectBuildSortList);
+    }
+
+
+    private boolean isValidProject() {
+        return false;
     }
 
     private boolean isIgnoreProject(String moduleName) {
