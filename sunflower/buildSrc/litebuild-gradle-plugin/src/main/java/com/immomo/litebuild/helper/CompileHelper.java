@@ -142,10 +142,12 @@ public class CompileHelper {
         String patchName = Settings.env.version + "_patch.jar";
         String cmds = new String();
 
-        cmds += "source ~/.bash_profile";
+        Utils.runShell("source ~/.bash_profile" +
+                '\n' + "adb shell mkdir " + destPath);
 
         String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
         String dest = Settings.env.tmpPath + "/tmp_class.zip";
+        cmds += "source ~/.bash_profile";
         cmds += '\n' + "rm -rf " + dest;
         cmds += '\n' + "cd " + Settings.env.tmpPath + "/tmp_class";
         cmds += '\n' + "zip -r -o -q " + dest +  " *";
