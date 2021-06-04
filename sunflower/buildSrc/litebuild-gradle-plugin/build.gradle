@@ -62,7 +62,7 @@ def getRepositoryPassword() {
 }
 
 // 在项目根路径下执行 ./gradlew -p buildSrc :litebuild-gradle-plugin:uploadArchives
-def isUploadMavenCenter = true
+def isUploadMavenCenter = false
 if (isUploadMavenCenter) {
     apply from: rootProject.file('publish_to_maven_central.gradle')
 } else {
@@ -90,4 +90,19 @@ if (isUploadMavenCenter) {
     artifacts {
         archives sourceJar
     }
+}
+
+// 配置生成 jar 包
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.immomo.litebuild.JavaEntrance',
+//                    'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
+                    'Class-Path': '/Users/momo/Desktop/jar_test/kotlin-stdlib-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-stdlib-common-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-csv-jvm-0.15.2.jar /Users/momo/Desktop/jar_test/org.eclipse.jgit-5.11.0.202103091610-r.jar /Users/momo/Desktop/jar_test/slf4j-api-1.7.30.jar /Users/momo/Desktop/jar_test/kotlin-logging-1.7.9.jar'
+    }
+
+    // This line of code recursively collects and copies all of a project's files
+    // and adds them to the JAR itself. One can extend this task, to skip certain
+    // files or particular types at will
+//    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+//    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }

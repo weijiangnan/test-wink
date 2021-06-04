@@ -5,8 +5,6 @@ import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
 import com.immomo.litebuild.util.Utils;
 
-import org.apache.http.util.TextUtils;
-
 import java.io.File;
 import java.util.Locale;
 
@@ -74,16 +72,16 @@ public class CompileHelper {
         }
 
         String kotlinHome = System.getenv("KOTLIN_HOME");
-        if (TextUtils.isEmpty(kotlinHome)) {
+        if (kotlinHome == null || kotlinHome.equals("")) {
             kotlinHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin";
         }
 
         String kotlincHome = System.getenv("KOTLINC_HOME");
-        if (TextUtils.isEmpty(kotlincHome)) {
+        if (kotlinHome == null || kotlinHome.equals("")) {
             kotlincHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
         }
 
-        if (TextUtils.isEmpty(kotlincHome)) {
+        if (kotlinHome == null || kotlinHome.equals("")) {
             if (!new File(kotlincHome).exists()) {
                 System.out.println();
                 System.out.println("================== 请配置 KOTLINC_HOME ==================");
@@ -130,7 +128,7 @@ public class CompileHelper {
                     "-P plugin:org.jetbrains.kotlin.android:package=%s " +
                     "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
         }
-//        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
+        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
         return args;
     }
 
