@@ -45,12 +45,23 @@ object Settings {
     var data = Data()
 
     @JvmStatic
-    fun initData(): Data {
+    fun restoreData(filePath: String?): Data? {
+        var newData = LocalCacheUtil.getCache<Data>(filePath)
+        newData?.let {
+            data = newData
+        }
+        return data
+    }
+
+
+    @JvmStatic
+    fun initData(path: String): Data {
         data = Data()
         env!!.projectBuildSortList.forEach {
             data.projectBuildSortList.add(ProjectTmpInfo(it))
         }
 
+        LocalCacheUtil.save2File(data, path)
         return data
     }
 
@@ -76,7 +87,7 @@ object Settings {
                     @JvmField var hasResourceChanged: Boolean = false,
                     @JvmField var hasClassChanged: Boolean = false,
                     @JvmField var needProcessDebugResources: Boolean = false,
-                    @JvmField var newVersion: String = "") {
+                    @JvmField var newVersion: String = "") : Serializable {
     }
 
     data class ProjectFixedInfo(@JvmField var children: MutableList<ProjectFixedInfo> = ArrayList(),
@@ -92,5 +103,5 @@ object Settings {
     class ProjectTmpInfo(@JvmField var fixedInfo: ProjectFixedInfo,
                          @JvmField var changedJavaFiles: MutableList<String> = ArrayList(),
                          @JvmField var changedKotlinFiles: MutableList<String> = ArrayList(),
-                         @JvmField var hasResourceChanged: Boolean = false)
+                         @JvmField var hasResourceChanged: Boolean = false) : Serializable
 }

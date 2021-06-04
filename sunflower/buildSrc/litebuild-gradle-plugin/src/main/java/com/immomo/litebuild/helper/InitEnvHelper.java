@@ -72,7 +72,10 @@ public class InitEnvHelper {
         }
 
         // Data每次初始化
-        Settings.initData();
+        String path = project.getRootDir() + "/.idea/" + Settings.NAME + "/data";
+        System.out.println("data file path : " + path);
+
+        Settings.initData(path);
 
 //        Log.v(Constant.TAG, Settings.env.toString());
     }
