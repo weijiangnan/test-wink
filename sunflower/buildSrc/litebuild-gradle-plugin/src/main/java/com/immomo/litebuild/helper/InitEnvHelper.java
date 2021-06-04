@@ -275,9 +275,9 @@ public class InitEnvHelper {
             hasAddProject.add(item.getName());
         }
 
+        Settings.env.projectBuildSortList.clear();
         sortBuildList(Settings.env.projectTreeRoot, Settings.env.projectBuildSortList);
     }
-
 
     private boolean isValidProject() {
         return false;
