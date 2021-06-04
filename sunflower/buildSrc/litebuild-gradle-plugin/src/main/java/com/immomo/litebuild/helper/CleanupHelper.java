@@ -29,6 +29,7 @@ public class CleanupHelper {
         delete("tmp_class");
         delete("env");
         delete("stableIds.txt");
+        delete("tmp_class.zip");
 
         // 删除手机上的patch文件
         deletePatchFileOnPhone();
@@ -41,6 +42,7 @@ public class CleanupHelper {
         delete("diff");
         delete("tmp_class");
         delete("env");
+        delete("tmp_class.zip");
 
         // 删除手机上的patch文件
         deletePatchFileOnPhone();
@@ -73,7 +75,7 @@ public class CleanupHelper {
         System.out.println("删除文件deleteAllDex :" + Settings.env.tmpPath);
         File f = new File(Settings.env.tmpPath);
         if (f.exists() && f.isDirectory()) {
-            File[] files = f.listFiles(pathname -> pathname.getName().endsWith("dex"));
+            File[] files = f.listFiles(pathname -> (pathname.getName().endsWith("dex") || pathname.getName().endsWith("jar")));
             if (files != null) {
                 for (File a : files) {
                     a.delete();

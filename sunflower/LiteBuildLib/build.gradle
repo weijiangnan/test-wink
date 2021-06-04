@@ -51,7 +51,7 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 // ./gradlew LiteBuildLib:uploadArchives
-def isUploadMavenCenter = true
+def isUploadMavenCenter = false
 if (isUploadMavenCenter) {
     apply from: rootProject.file('LiteBuildLib/publish_to_maven_central.gradle')
 } else {
@@ -61,7 +61,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.litebuild'
                     pom.artifactId = 'build-lib'
-                    pom.version = '0.1.4'
+                    pom.version = '0.1.35'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }

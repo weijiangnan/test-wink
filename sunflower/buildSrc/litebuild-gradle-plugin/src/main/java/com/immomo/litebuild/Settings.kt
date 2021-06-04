@@ -86,6 +86,7 @@ object Settings {
                                 @JvmField var buildDir: String? = null,
                                 @JvmField var manifestPath: String? = null,
                                 @JvmField var javacArgs: String? = null,
+                                @JvmField var classPath: String? = null,
                                 @JvmField var kotlincArgs: String? = null) : Serializable
 
     class ProjectTmpInfo(@JvmField var fixedInfo: ProjectFixedInfo,

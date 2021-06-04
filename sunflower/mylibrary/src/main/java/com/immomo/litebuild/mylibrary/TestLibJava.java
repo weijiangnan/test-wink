@@ -1,7 +1,7 @@
 package com.immomo.litebuild.mylibrary;
 
-class TestLibJava {
+public class TestLibJava {
     public static String getVersion() {
-        return "";
+        return "2222200";
     }
 }
