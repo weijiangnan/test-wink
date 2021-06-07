@@ -370,7 +370,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         }
     }
 
-    private fun getSnapshot(it: File) = it.lastModified().toString()//Utils.getFileMD5s(it, 64)
+    private fun getSnapshot(it: File) = ((it.lastModified() / 1000).toString())//Utils.getFileMD5s(it, 64)
 
 
 }
