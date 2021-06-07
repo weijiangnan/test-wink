@@ -139,11 +139,26 @@ public class CompileHelper {
         }
         String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
 
-        String patchName = Settings.env.version + "_patch.dex";
+        String patchName = Settings.env.version + "_patch.jar";
         String cmds = new String();
+
+        Utils.runShell("source ~/.bash_profile" +
+                '\n' + "adb shell mkdir " + destPath);
+
+        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
+        String dest = Settings.env.tmpPath + "/tmp_class.zip";
         cmds += "source ~/.bash_profile";
-        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
-                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
+        cmds += '\n' + "rm -rf " + dest;
+        cmds += '\n' + "cd " + Settings.env.tmpPath + "/tmp_class";
+        cmds += '\n' + "zip -r -o -q " + dest +  " *";
+        cmds += '\n' + Settings.env.buildToolsDir + "/d8 --intermediate --output " + Settings.env.tmpPath + "/" + patchName
+                + classpath + " " + Settings.env.tmpPath + "/tmp_class.zip";
+
+//        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
+//                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
+
+//        /Users/weijiangnan/Desktop/opt/sdk/build-tools/30.0.3/d8 /Users/weijiangnan/Desktop/git2/litebuild/sunflower/.idea/litebuild/tmp_class/com/immomo/wink/*.class --intermediate --output /Users/weijiangnan/Desktop/git2/litebuild/sunflower/.idea/litebuild/1622793498989_patch.jar --lib /Users/weijiangnan/Desktop/opt/sdk/platforms/android-29/android.jar
+
         cmds += '\n' + "adb shell mkdir " + destPath;
         cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;
 

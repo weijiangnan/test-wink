@@ -128,10 +128,14 @@ public class InitEnvHelper {
     }
 
     private void initProjectData(Settings.ProjectFixedInfo fixedInfo, Project project) {
+        initProjectData(fixedInfo, project, false);
+    }
+
+    private void initProjectData(Settings.ProjectFixedInfo fixedInfo, Project project, boolean foreInit) {
         long findModuleEndTime = System.currentTimeMillis();
         fixedInfo.name = project.getName();
         fixedInfo.isProjectIgnore = isIgnoreProject(fixedInfo.name);
-        if (fixedInfo.isProjectIgnore) {
+        if (fixedInfo.isProjectIgnore && !foreInit) {
             return;
         }
 
@@ -195,8 +199,11 @@ public class InitEnvHelper {
         }
 
         args.add("-classpath");
-        args.add(javaCompile.getClasspath().getAsPath() + ":"
-                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
+
+        fixedInfo.classPath = javaCompile.getClasspath().getAsPath() + ":"
+                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes";
+
+        args.add(fixedInfo.classPath);
 
         args.add("-d");
         args.add(Settings.env.tmpPath+ "/tmp_class");
@@ -259,7 +266,7 @@ public class InitEnvHelper {
 
     public void findModuleTree2(Project project, String productFlavor) {
         Settings.env.projectTreeRoot = new Settings.ProjectFixedInfo();
-        initProjectData(Settings.env.projectTreeRoot, project);
+        initProjectData(Settings.env.projectTreeRoot, project, true);
 
         HashSet<String> hasAddProject = new HashSet<>();
         hasAddProject.add(project.getName());
@@ -273,7 +280,7 @@ public class InitEnvHelper {
             }
 
             Settings.ProjectFixedInfo childNode = new Settings.ProjectFixedInfo();
-            initProjectData(childNode, item);
+            initProjectData(childNode, item, false);
             Settings.env.projectTreeRoot.children.add(childNode);
             hasAddProject.add(item.getName());
         }
