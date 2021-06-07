@@ -95,14 +95,45 @@ if (isUploadMavenCenter) {
 // 配置生成 jar 包
 jar {
     manifest {
+//        String someString = ''
+//        configurations.runtime.each {someString = someString + " lib//"+it.name}
+        def map = ["kotlin-stdlib":0,
+                   "kotlin-stdlib-common":0,
+                   "kotlin-csv-jvm":0,
+                   "org.eclipse.jgit":0,
+                   "slf4j-api":0,
+                   "kotlin-logging":0,
+                   "com.immomo":0]
+
+        String someString = ''
+
+
+        configurations.compileClasspath.collect { file ->
+            println(file.toString())
+            map.each { entry ->
+                if (file.toString().contains(entry.key)) {
+                    someString = someString + " " + file.toString()
+                }
+            }
+        }
+        //  NoClassDefFoundError: mu/KotlinLogging
+        //	at com.github.doyaaaaaken.kotlincsv.client.CsvFileReader.<init>(CsvFileReader.kt:21)
+        //  无法获取 jar 包中的依赖
+        someString = someString + " " + System.getProperties().getProperty("user.home") + "/.gradle/caches/modules-2/files-2.1/io.github.microutils/kotlin-logging/1.7.9/910dfb87d91a48f52d3afb4b0b09cff9d2f23f6b/kotlin-logging-1.7.9.jar"
+        println(someString)
+
         attributes 'Main-Class': 'com.immomo.litebuild.JavaEntrance',
 //                    'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
-                    'Class-Path': '/Users/momo/Desktop/jar_test/kotlin-stdlib-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-stdlib-common-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-csv-jvm-0.15.2.jar /Users/momo/Desktop/jar_test/org.eclipse.jgit-5.11.0.202103091610-r.jar /Users/momo/Desktop/jar_test/slf4j-api-1.7.30.jar /Users/momo/Desktop/jar_test/kotlin-logging-1.7.9.jar'
+//                    'Class-Path': '/Users/momo/Desktop/jar_test/kotlin-stdlib-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-stdlib-common-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-csv-jvm-0.15.2.jar /Users/momo/Desktop/jar_test/org.eclipse.jgit-5.11.0.202103091610-r.jar /Users/momo/Desktop/jar_test/slf4j-api-1.7.30.jar /Users/momo/Desktop/jar_test/kotlin-logging-1.7.9.jar'
+                    'Class-Path' : someString
     }
 
     // This line of code recursively collects and copies all of a project's files
     // and adds them to the JAR itself. One can extend this task, to skip certain
     // files or particular types at will
-//    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-//    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+//    from { configurations.compile.collect {
+//        println("file : " + it.toString())
+//        it.isDirectory() ? it : zipTree(it)
+//    } }
+//        configurations.runtime.each {someString = someString + " lib//"+it.name}
 }
