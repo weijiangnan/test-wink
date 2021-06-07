@@ -67,17 +67,24 @@ public class InitEnvHelper {
             createEnv(project);
         } else {
 //            reloadEnv(project);
+            // /Users/momo/Documents/MomoProject/litebuild/sunflower
+            System.out.println("project.getRootDir() : " + project.getRootDir());
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
         }
 
         // Data每次初始化
-        String path = project.getRootDir() + "/.idea/" + Settings.NAME + "/data";
-        System.out.println("data file path : " + path);
-
-        Settings.initData(path);
+        Settings.initData();
 
 //        Log.v(Constant.TAG, Settings.env.toString());
+    }
+
+    public void initEnvByPath(String path) {
+        Settings.restoreEnv(path
+                + "/.idea/" + Settings.NAME + "/env");
+
+        // Data每次初始化
+        Settings.initData();
     }
 
     protected void createEnv(Project project) {

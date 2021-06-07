@@ -45,23 +45,11 @@ object Settings {
     var data = Data()
 
     @JvmStatic
-    fun restoreData(filePath: String?): Data? {
-        var newData = LocalCacheUtil.getCache<Data>(filePath)
-        newData?.let {
-            data = newData
-        }
-        return data
-    }
-
-
-    @JvmStatic
-    fun initData(path: String): Data {
+    fun initData(): Data {
         data = Data()
         env!!.projectBuildSortList.forEach {
             data.projectBuildSortList.add(ProjectTmpInfo(it))
         }
-
-        LocalCacheUtil.save2File(data, path)
         return data
     }
 
