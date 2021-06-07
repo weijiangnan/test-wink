@@ -109,7 +109,6 @@ jar {
 
 
         configurations.compileClasspath.collect { file ->
-            println(file.toString())
             map.each { entry ->
                 if (file.toString().contains(entry.key)) {
                     someString = someString + " " + file.toString()
