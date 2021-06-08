@@ -77,28 +77,8 @@ public class CompileHelper {
             kotlinHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin";
         }
 
-        String kotlinc = System.getenv("KOTLINC_HOME");
-        if (kotlinc == null || kotlinc.equals("")) {
-            kotlinc = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
-        }
+        String kotlinc = getKotlinc();
 
-        if (kotlinc == null || kotlinc.equals("")) {
-            if (!new File(kotlinc).exists()) {
-                System.out.println();
-                System.out.println("================== 请配置 KOTLINC_HOME ==================");
-                System.out.println("1. 打开：~/.bash_profile");
-                System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
-                System.out.println("3. 执行：source ~/.bash_profile");
-                System.out.println("========================================================");
-                System.out.println();
-            }
-
-            return;
-        }
-        // 如果路径包含空格，需要替换 " " 为 "\ "
-        if (!kotlinc.contains("\\")) {
-            kotlinc = kotlinc.replace(" ", "\\ ");
-        }
         System.out.println("[LiteBuild] kotlincHome : " + kotlinc);
         System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
         try {
@@ -115,6 +95,42 @@ public class CompileHelper {
 
         Settings.data.hasClassChanged = true;
     }
+
+    private String getKotlinc() {
+        String kotlinc = System.getenv("KOTLINC_HOME");
+        if (kotlinc == null || kotlinc.equals("")) {
+            kotlinc = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+        }
+
+        if (kotlinc == null || kotlinc.equals("") || !new File(kotlinc).exists()) {
+            kotlinc = "/Applications/AndroidStudio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+        }
+
+        if (kotlinc == null || kotlinc.equals("")) {
+            if (!new File(kotlinc).exists()) {
+                System.out.println();
+                System.out.println("================== 请配置 KOTLINC_HOME ==================");
+                System.out.println("1. 打开：~/.bash_profile");
+                System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
+                System.out.println("3. 执行：source ~/.bash_profile");
+                System.out.println("========================================================");
+                System.out.println();
+            }
+
+            return "";
+        }
+
+        // 如果路径包含空格，需要替换 " " 为 "\ "
+        if (!kotlinc.contains("\\")) {
+            kotlinc = kotlinc.replace(" ", "\\ ");
+        }
+
+        return kotlinc;
+    }
+
+
+
+
 
     private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.ProjectTmpInfo projectInfo) {
         LitebuildOptions options = Settings.env.options;
