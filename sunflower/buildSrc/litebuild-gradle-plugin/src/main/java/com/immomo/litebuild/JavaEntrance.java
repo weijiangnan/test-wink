@@ -5,6 +5,7 @@ import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.InitEnvHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
+import com.immomo.litebuild.util.Utils;
 
 import java.util.List;
 
@@ -42,15 +43,19 @@ public class JavaEntrance {
 
         // 编译资源
         if (Settings.data.needProcessDebugResources) {
-            new ResourceHelper().packageResources();
-        } else {
-            System.out.println("======>>> 没有资源变更");
+//            new ResourceHelper().packageResources();
+            System.out.println("======>>> 资源变更，执行 gradle task");
+            String scriptStr = "cd " + path + " && " + " ./gradlew litebuild";
+            try {
+                Utils.executeScript(scriptStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
         }
 
-        // project.changedKotlinFiles.size()
-        // project.changedJavaFiles.size()
+        System.out.println("======>>> 没有资源变更");
         new CompileHelper().compileCode();
-
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
         }
