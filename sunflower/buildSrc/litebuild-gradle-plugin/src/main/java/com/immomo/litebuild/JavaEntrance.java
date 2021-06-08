@@ -27,6 +27,7 @@ public class JavaEntrance {
 
         // /Users/momo/Documents/MomoProject/litebuild/sunflower
         new InitEnvHelper().initEnvByPath(path);
+//        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/litebuild/sunflower");
 
         List<Settings.ProjectTmpInfo> projectBuildSortList = Settings.data.projectBuildSortList;
         System.out.println("projectBuildSortList : " + projectBuildSortList.toString());
