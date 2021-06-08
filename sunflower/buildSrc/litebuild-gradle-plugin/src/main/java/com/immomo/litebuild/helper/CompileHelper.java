@@ -10,6 +10,18 @@ import java.io.File;
 import java.util.Locale;
 
 public class CompileHelper {
+
+    // Define color constants
+    public static final String TEXT_RESET = "\u001B[0m";
+    public static final String TEXT_BLACK = "\u001B[30m";
+    public static final String TEXT_RED = "\u001B[31m";
+    public static final String TEXT_GREEN = "\u001B[32m";
+    public static final String TEXT_YELLOW = "\u001B[33m";
+    public static final String TEXT_BLUE = "\u001B[34m";
+    public static final String TEXT_PURPLE = "\u001B[35m";
+    public static final String TEXT_CYAN = "\u001B[36m";
+    public static final String TEXT_WHITE = "\u001B[37m";
+
     public void compileCode() {
         File file = new File(Settings.env.tmpPath + "/tmp_class");
         if (!file.exists()) {
@@ -109,11 +121,11 @@ public class CompileHelper {
         if (kotlinc == null || kotlinc.equals("")) {
             if (!new File(kotlinc).exists()) {
                 System.out.println();
-                System.out.println("================== 请配置 KOTLINC_HOME ==================");
-                System.out.println("1. 打开：~/.bash_profile");
-                System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
-                System.out.println("3. 执行：source ~/.bash_profile");
-                System.out.println("========================================================");
+                printWithColor("================== 请配置 KOTLINC_HOME ==================");
+                printWithColor("1. 打开：~/.bash_profile");
+                printWithColor("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
+                printWithColor("3. 执行：source ~/.bash_profile");
+                printWithColor("========================================================");
                 System.out.println();
             }
 
@@ -128,9 +140,9 @@ public class CompileHelper {
         return kotlinc;
     }
 
-
-
-
+    public void printWithColor(String text) {
+        System.out.println(TEXT_RED + text + TEXT_RESET);
+    }
 
     private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.ProjectTmpInfo projectInfo) {
         LitebuildOptions options = Settings.env.options;
