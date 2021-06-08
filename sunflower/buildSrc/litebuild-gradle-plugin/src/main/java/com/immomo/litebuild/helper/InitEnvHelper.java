@@ -208,7 +208,8 @@ public class InitEnvHelper {
         args.add("-classpath");
 
         fixedInfo.classPath = javaCompile.getClasspath().getAsPath() + ":"
-                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes";
+                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes"
+                + ":" + Settings.env.tmpPath + "/tmp_class";
 
         args.add(fixedInfo.classPath);
 
@@ -234,8 +235,7 @@ public class InitEnvHelper {
 
         System.out.println("projectDir : " + project.getProjectDir().toString());
         kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
-                + javaCompile.getClasspath().getAsPath()
-                + ":" + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
+                + fixedInfo.classPath);
 
         kotlinArgs.add("-jvm-target");
         kotlinArgs.add(getSupportVersion(javaCompile.getTargetCompatibility()));
