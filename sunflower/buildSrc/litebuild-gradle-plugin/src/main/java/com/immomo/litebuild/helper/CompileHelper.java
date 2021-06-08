@@ -3,6 +3,7 @@ package com.immomo.litebuild.helper;
 
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
+import com.immomo.litebuild.util.Log;
 import com.immomo.litebuild.util.Utils;
 
 import java.io.File;
@@ -76,13 +77,37 @@ public class CompileHelper {
             kotlinHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin";
         }
 
-        String kotlincHome = System.getenv("KOTLINC_HOME");
-        if (kotlinHome == null || kotlinHome.equals("")) {
-            kotlincHome = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+        String kotlinc = getKotlinc();
+
+        System.out.println("[LiteBuild] kotlincHome : " + kotlinc);
+        System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
+        try {
+            String mainKotlincArgs = project.fixedInfo.kotlincArgs;
+            String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
+            String javaHomePath = Settings.env.javaHome;
+            javaHomePath = javaHomePath.replace(" ", "\\ ");
+            String shellCommand = "sh " + kotlinc + kotlinxArgs + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
+//            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
+            Utils.runShell(shellCommand);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        if (kotlinHome == null || kotlinHome.equals("")) {
-            if (!new File(kotlincHome).exists()) {
+        Settings.data.hasClassChanged = true;
+    }
+
+    private String getKotlinc() {
+        String kotlinc = System.getenv("KOTLINC_HOME");
+        if (kotlinc == null || kotlinc.equals("")) {
+            kotlinc = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+        }
+
+        if (kotlinc == null || kotlinc.equals("") || !new File(kotlinc).exists()) {
+            kotlinc = "/Applications/AndroidStudio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
+        }
+
+        if (kotlinc == null || kotlinc.equals("")) {
+            if (!new File(kotlinc).exists()) {
                 System.out.println();
                 System.out.println("================== 请配置 KOTLINC_HOME ==================");
                 System.out.println("1. 打开：~/.bash_profile");
@@ -92,28 +117,20 @@ public class CompileHelper {
                 System.out.println();
             }
 
-            return;
-        }
-        // 如果路径包含空格，需要替换 " " 为 "\ "
-        if (!kotlincHome.contains("\\")) {
-            kotlincHome = kotlincHome.replace(" ", "\\ ");
-        }
-        System.out.println("[LiteBuild] kotlincHome : " + kotlincHome);
-        System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
-        try {
-            String mainKotlincArgs = project.fixedInfo.kotlincArgs;
-            String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
-            String javaHomePath = Settings.env.javaHome;
-            javaHomePath = javaHomePath.replace(" ", "\\ ");
-            String shellCommand = "sh " + kotlincHome + kotlinxArgs + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
-//            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
-            Utils.runShell(shellCommand);
-        } catch (Exception e) {
-            e.printStackTrace();
+            return "";
         }
 
-        Settings.data.hasClassChanged = true;
+        // 如果路径包含空格，需要替换 " " 为 "\ "
+        if (!kotlinc.contains("\\")) {
+            kotlinc = kotlinc.replace(" ", "\\ ");
+        }
+
+        return kotlinc;
     }
+
+
+
+
 
     private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.ProjectTmpInfo projectInfo) {
         LitebuildOptions options = Settings.env.options;
@@ -142,17 +159,20 @@ public class CompileHelper {
         String patchName = Settings.env.version + "_patch.jar";
         String cmds = new String();
 
+        Log.TimerLog log = Log.timerStart("!!!!!!!!!!!!!!!");
+
         Utils.runShell("source ~/.bash_profile" +
                 '\n' + "adb shell mkdir " + destPath);
 
-        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
+//        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
+//        classpath = "";
         String dest = Settings.env.tmpPath + "/tmp_class.zip";
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "rm -rf " + dest;
         cmds += '\n' + "cd " + Settings.env.tmpPath + "/tmp_class";
         cmds += '\n' + "zip -r -o -q " + dest +  " *";
         cmds += '\n' + Settings.env.buildToolsDir + "/d8 --intermediate --output " + Settings.env.tmpPath + "/" + patchName
-                + classpath + " " + Settings.env.tmpPath + "/tmp_class.zip";
+                + " " + Settings.env.tmpPath + "/tmp_class.zip";
 
 //        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
 //                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
@@ -165,5 +185,7 @@ public class CompileHelper {
         System.out.println("安装 CMD 命令：" + cmds);
 
         Utils.runShell(cmds);
+
+        log.end();
     }
 }

@@ -67,17 +67,24 @@ public class InitEnvHelper {
             createEnv(project);
         } else {
 //            reloadEnv(project);
+            // /Users/momo/Documents/MomoProject/litebuild/sunflower
+            System.out.println("project.getRootDir() : " + project.getRootDir());
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
         }
 
         // Data每次初始化
-        String path = project.getRootDir() + "/.idea/" + Settings.NAME + "/data";
-        System.out.println("data file path : " + path);
-
-        Settings.initData(path);
+        Settings.initData();
 
 //        Log.v(Constant.TAG, Settings.env.toString());
+    }
+
+    public void initEnvByPath(String path) {
+        Settings.restoreEnv(path
+                + "/.idea/" + Settings.NAME + "/env");
+
+        // Data每次初始化
+        Settings.initData();
     }
 
     protected void createEnv(Project project) {
@@ -201,7 +208,8 @@ public class InitEnvHelper {
         args.add("-classpath");
 
         fixedInfo.classPath = javaCompile.getClasspath().getAsPath() + ":"
-                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes";
+                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes"
+                + ":" + Settings.env.tmpPath + "/tmp_class";
 
         args.add(fixedInfo.classPath);
 
@@ -227,8 +235,7 @@ public class InitEnvHelper {
 
         System.out.println("projectDir : " + project.getProjectDir().toString());
         kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
-                + javaCompile.getClasspath().getAsPath()
-                + ":" + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes");
+                + fixedInfo.classPath);
 
         kotlinArgs.add("-jvm-target");
         kotlinArgs.add(getSupportVersion(javaCompile.getTargetCompatibility()));

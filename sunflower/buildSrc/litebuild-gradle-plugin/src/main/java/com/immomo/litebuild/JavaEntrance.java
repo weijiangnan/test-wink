@@ -3,6 +3,7 @@ package com.immomo.litebuild;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
+import com.immomo.litebuild.helper.InitEnvHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
 
 import java.util.List;
@@ -11,21 +12,22 @@ public class JavaEntrance {
 
     public static void main(String[] args) {
 
-//        if (args == null || args.length == 0) {
-//            System.out.println("Java 命令需要指定参数：task & func");
-//            return;
-//        }
+        if (args == null || args.length == 0) {
+            System.out.println("Java 命令需要指定参数：path");
+            return;
+        }
 
         System.out.println("====== 开始执行 Java 任务 ======");
 
-//        String task = args[0];
+        String path = args[0];
 //        String func = args[1];
 
-//        System.out.println("====== Task : " + task);
+        System.out.println("====== path : " + path);
 //        System.out.println("====== Func : " + func);
 
-        Settings.data = Settings.restoreData("/Users/momo/Documents/MomoProject/litebuild/sunflower/.idea/litebuild/data");
-        Settings.env = Settings.restoreEnv("/Users/momo/Documents/MomoProject/litebuild/sunflower/.idea/litebuild/env");
+        // /Users/momo/Documents/MomoProject/litebuild/sunflower
+        new InitEnvHelper().initEnvByPath(path);
+//        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/litebuild/sunflower");
 
         List<Settings.ProjectTmpInfo> projectBuildSortList = Settings.data.projectBuildSortList;
         System.out.println("projectBuildSortList : " + projectBuildSortList.toString());
