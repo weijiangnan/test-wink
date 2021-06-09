@@ -18,7 +18,7 @@ public class LiteBuildResLoader {
 //                    + patchVersion + "_resources-debug.apk";
 //            File patchFile = new File(path);
             File patchFile = FixDexUtil.getResourcesPatchFile(application);
-            if (patchFile != null && patchFile.exists()) {
+            if (patchFile != null && patchFile.exists() && patchFile.canRead()) {
                 boolean loadResources = LiteBuildResourcePatcher.monkeyPatchExistingResources(application, patchFile.getAbsolutePath());
             }
         } catch (Throwable throwable) {

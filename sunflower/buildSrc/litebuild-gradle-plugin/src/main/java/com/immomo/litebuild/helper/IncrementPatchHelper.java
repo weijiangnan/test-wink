@@ -40,23 +40,25 @@ public class IncrementPatchHelper {
     }
 
     public void createPatchFile() {
-        Settings.data.patchPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
-        Utils.ShellResult result = Utils.runShells("source ~/.bash_profile",
-                "adb shell mkdir " + Settings.data.patchPath);
-//        boolean noPermission = false;
-//        for (String error: result.getErrorResult()) {
-//            if (error.contains("Permission denied")) {
-//                // 标志没文件权限
-//                noPermission = true;
-//                break;
-//            }
-//        }
+        String patch = "/sdcard/Android/data/" + Settings.env.debugPackageName;
+        Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb shell ls " + patch);
+        boolean noPermission = false;
+        for (String error: result.getErrorResult()) {
+            if (error.contains("Permission denied")) {
+                // 标志没文件权限
+                noPermission = true;
+                break;
+            }
+        }
 
-//        if (noPermission) {
-//            Settings.data.patchPath = "/sdcard/" + Settings.NAME + "/patch_file/";
-//            Utils.runShells("source ~/.bash_profile\n" +
-//                    "adb shell mkdir " + Settings.data.patchPath);
-//        }
+        if (noPermission) {
+            Settings.data.patchPath = "/sdcard/" + Settings.NAME + "/patch_file/";
+        } else {
+            Settings.data.patchPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
+        }
+
+        Utils.runShells("source ~/.bash_profile",
+                "adb shell mkdir " + Settings.data.patchPath);
     }
 
     public void patchDex() {
@@ -65,9 +67,8 @@ public class IncrementPatchHelper {
         }
 
         String patchName = Settings.env.version + "_patch.jar";
-        Utils.runShells("source ~/.bash_profile\n" + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath);
-//        Utils.runShells("source ~/.bash_profile",
-//                "adb push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath);
+        Utils.runShells("source ~/.bash_profile\n" + "adb push " + Settings.env.tmpPath + "/" + patchName
+                + " " + Settings.data.patchPath + Settings.env.version + "_patch.png");
     }
 
     public void patchResources() {
@@ -79,13 +80,8 @@ public class IncrementPatchHelper {
         Utils.runShells("source ~/.bash_profile\n" +
                 "adb shell rm -rf " + Settings.data.patchPath + "apk\n" +
                 "adb shell mkdir " + Settings.data.patchPath + "apk\n" +
-                "adb push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath + "apk/");
-
-//        Utils.runShells("source ~/.bash_profile",
-//                "adb shell rm -rf " + Settings.data.patchPath + "apk",
-//                "adb shell mkdir " + Settings.data.patchPath + "apk",
-//                "source ~/.bash_profile\nadb push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath + "apk/");
-
+                "adb push " + Settings.env.tmpPath + "/" + patchName + " " + Settings.data.patchPath + "apk/" +
+                Settings.env.version + "_resources-debug.png");
     }
 
     public void restartApp() {

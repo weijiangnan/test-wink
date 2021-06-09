@@ -61,7 +61,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.litebuild'
                     pom.artifactId = 'build-lib'
-                    pom.version = '0.1.40'
+                    pom.version = '0.1.52i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }

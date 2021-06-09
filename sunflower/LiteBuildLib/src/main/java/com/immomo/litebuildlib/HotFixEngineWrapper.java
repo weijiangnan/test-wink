@@ -107,7 +107,7 @@ public final class HotFixEngineWrapper {
 
     public final void loadPatch( Context context) {
         File dexFile = FixDexUtil.getDexPatchFile(context);
-        if (dexFile != null && dexFile.exists()) {
+        if (dexFile != null && dexFile.exists() && dexFile.canRead()) {
             StringBuilder var10000 = new StringBuilder();
             File var10001 = context.getFilesDir();
             optPath = var10000.append(var10001.getPath()).append("/opt_dex").toString();

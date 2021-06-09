@@ -51,10 +51,14 @@ public class CleanupHelper {
 
     public void deletePatchFileOnPhone() {
         String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
+        String destPath2 = "/sdcard/litebuild/patch_file/";
+
         String cmds = "";
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell rm -rf " + destPath;
         cmds += '\n' + "adb shell mkdir " + destPath;
+
+        cmds += '\n' + "adb shell rm -rf " + destPath2;
         Utils.runShell(cmds);
     }
 

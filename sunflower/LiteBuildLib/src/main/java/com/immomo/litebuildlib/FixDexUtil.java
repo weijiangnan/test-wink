@@ -181,21 +181,20 @@ public class FixDexUtil {
     }
 
     public static File getDexPatchFile(Context context) {
-        String patchName = FixDexUtil.getPatchVersion(context) + "_patch.jar";
+        String patchName = FixDexUtil.getPatchVersion(context) + "_patch.png";
         String dexPath = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/" + context.getPackageName() + "/patch_file/" + patchName;
-
-        // 拷贝
-        File dexFile2 = new File("/sdcard/litebuild/patch_file/" + patchName);
-        if (dexFile2.exists()) {
-            return dexFile2;
-//            Utils.copyFile(dexFile2, dexPath);
-        }
 
         Log.e("weijiangnan", "version" + patchName);
         File dexFile = new File(dexPath);
         if (dexFile.exists()) {
             return dexFile;
+        }
+
+        // 拷贝
+        File dexFile2 = new File("/sdcard/litebuild/patch_file/" + patchName);
+        if (dexFile2.exists()) {
+            return dexFile2;
         }
 
         return null;
@@ -205,13 +204,13 @@ public class FixDexUtil {
         String patchVersion = FixDexUtil.getPatchVersion(context);
         File patchFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/" + context.getApplicationContext().getPackageName() + "/patch_file/apk/"
-                + patchVersion + "_resources-debug.apk");
+                + patchVersion + "_resources-debug.png");
         if (patchFile.exists()) {
             return patchFile;
         }
 
         patchFile = new File("/sdcard/litebuild/patch_file/apk/"
-                + patchVersion + "_resources-debug.apk");
+                + patchVersion + "_resources-debug.png");
         if (patchFile.exists()) {
             return patchFile;
         }
