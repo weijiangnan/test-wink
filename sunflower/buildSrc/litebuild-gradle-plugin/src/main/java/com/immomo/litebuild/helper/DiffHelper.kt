@@ -45,8 +45,8 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     }
 
 
-    private var git: Git
-    private var repo: Repository
+    //private var git: Git
+    //private var repo: Repository
     private var diffDir: String
     private var diffPropertiesPath: String
     private var csvPathCode: String
@@ -85,11 +85,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         properties.load(FileReader(diffPropertiesPath))
 
         //git
-        repo = FileRepositoryBuilder()
-                .findGitDir(File(Settings.env.rootDir))
-                .build()
+//        repo = FileRepositoryBuilder()
+//                .findGitDir(File(Settings.env.rootDir))
+//                .build()
 
-        git = Git(repo)
+        //git = Git(repo)
     }
 
 
@@ -130,13 +130,13 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     /**
      * 快照:git版
      */
-    private fun initSnapshotByGit() {
-        val lastCommitId: ObjectId = repo.resolve(Constants.HEAD)
-        println("lastCommitId=$lastCommitId")
-
-        properties.setProperty(KEY_COMMIT_ID, lastCommitId.name)
-        properties.store(FileWriter(diffPropertiesPath), "diff properties")
-    }
+//    private fun initSnapshotByGit() {
+//        val lastCommitId: ObjectId = repo.resolve(Constants.HEAD)
+//        println("lastCommitId=$lastCommitId")
+//
+//        properties.setProperty(KEY_COMMIT_ID, lastCommitId.name)
+//        properties.store(FileWriter(diffPropertiesPath), "diff properties")
+//    }
 
     /**
      * 快照:md5版
@@ -150,67 +150,67 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     }
 
 
-    private fun diffByGit(): Triple<Set<String>, Set<String>, Boolean> {
-        val setJava = mutableSetOf<String>()
-        val setKt = mutableSetOf<String>()
-        var isResChanged = false
-        val rst = Triple<Set<String>, Set<String>, Boolean>(setJava, setKt, isResChanged)
-
-        val lastCommitId = properties.getProperty(KEY_COMMIT_ID, "")
-        val lastCommit = git.repository.resolve(lastCommitId)
-        val revCommitOld = git.repository.parseCommit(lastCommit)
-
-        val treeOld: AbstractTreeIterator? = prepareTreeParser(repo, revCommitOld)
-        val diff = git.diff()
-                .setShowNameAndStatusOnly(true)
-                .setOldTree(treeOld)
-                .call()
-
-        println("Gson().toJson(diff)")
-        println(Gson().toJson(diff))
-
-        val rootParentPath = "${git.repository.directory.absolutePath.replace(".git", "")}"
-        Log.v(str = "rootParentPath=${rootParentPath}")
-
-        diff.forEach {
-            when (it.changeType) {
-                DiffEntry.ChangeType.ADD, DiffEntry.ChangeType.MODIFY, DiffEntry.ChangeType.COPY, DiffEntry.ChangeType.RENAME -> {
-                    Log.v(str = "${it.changeType} newPath=${it.newPath}")
-                    if (rootParentPath.plus(it.newPath).startsWith(project.fixedInfo.dir)) {
-                        if (it.newPath.endsWith(".java")) {
-                            setJava.add(rootParentPath.plus(it.newPath))
-                        }
-                        if (it.newPath.endsWith(".kt")) {
-                            setKt.add(rootParentPath.plus(it.newPath))
-                        }
-                        if (it.newPath.endsWith(".kt")) {
-                            isResChanged = true
-                        }
-                    }
-                }
-
-                DiffEntry.ChangeType.DELETE, DiffEntry.ChangeType.RENAME -> {
-                    if (rootParentPath.plus(it.oldPath).startsWith(project.fixedInfo.dir)) {
-                        Log.v(str = "${it.changeType} oldPath=${it.oldPath}")
-                        if (it.oldPath.endsWith(".java")) {
-                            setJava.add(rootParentPath.plus(it.oldPath))
-                        }
-                        if (it.oldPath.endsWith(".kt")) {
-                            setKt.add(rootParentPath.plus(it.oldPath))
-                        }
-                        if (it.oldPath.contains("/src/main/res")) {
-                            isResChanged = true
-                        }
-                    }
-                }
-
-
-            }
-        }
-
-
-        return rst
-    }
+//    private fun diffByGit(): Triple<Set<String>, Set<String>, Boolean> {
+//        val setJava = mutableSetOf<String>()
+//        val setKt = mutableSetOf<String>()
+//        var isResChanged = false
+//        val rst = Triple<Set<String>, Set<String>, Boolean>(setJava, setKt, isResChanged)
+//
+//        val lastCommitId = properties.getProperty(KEY_COMMIT_ID, "")
+//        val lastCommit = git.repository.resolve(lastCommitId)
+//        val revCommitOld = git.repository.parseCommit(lastCommit)
+//
+//        val treeOld: AbstractTreeIterator? = prepareTreeParser(repo, revCommitOld)
+//        val diff = git.diff()
+//                .setShowNameAndStatusOnly(true)
+//                .setOldTree(treeOld)
+//                .call()
+//
+//        println("Gson().toJson(diff)")
+//        println(Gson().toJson(diff))
+//
+//        val rootParentPath = "${git.repository.directory.absolutePath.replace(".git", "")}"
+//        Log.v(str = "rootParentPath=${rootParentPath}")
+//
+//        diff.forEach {
+//            when (it.changeType) {
+//                DiffEntry.ChangeType.ADD, DiffEntry.ChangeType.MODIFY, DiffEntry.ChangeType.COPY, DiffEntry.ChangeType.RENAME -> {
+//                    Log.v(str = "${it.changeType} newPath=${it.newPath}")
+//                    if (rootParentPath.plus(it.newPath).startsWith(project.fixedInfo.dir)) {
+//                        if (it.newPath.endsWith(".java")) {
+//                            setJava.add(rootParentPath.plus(it.newPath))
+//                        }
+//                        if (it.newPath.endsWith(".kt")) {
+//                            setKt.add(rootParentPath.plus(it.newPath))
+//                        }
+//                        if (it.newPath.endsWith(".kt")) {
+//                            isResChanged = true
+//                        }
+//                    }
+//                }
+//
+//                DiffEntry.ChangeType.DELETE, DiffEntry.ChangeType.RENAME -> {
+//                    if (rootParentPath.plus(it.oldPath).startsWith(project.fixedInfo.dir)) {
+//                        Log.v(str = "${it.changeType} oldPath=${it.oldPath}")
+//                        if (it.oldPath.endsWith(".java")) {
+//                            setJava.add(rootParentPath.plus(it.oldPath))
+//                        }
+//                        if (it.oldPath.endsWith(".kt")) {
+//                            setKt.add(rootParentPath.plus(it.oldPath))
+//                        }
+//                        if (it.oldPath.contains("/src/main/res")) {
+//                            isResChanged = true
+//                        }
+//                    }
+//                }
+//
+//
+//            }
+//        }
+//
+//
+//        return rst
+//    }
 
     private fun diffByMd5(projectInfo: Settings.ProjectTmpInfo) {
         diffInner(scanPathCode, csvPathCode) {

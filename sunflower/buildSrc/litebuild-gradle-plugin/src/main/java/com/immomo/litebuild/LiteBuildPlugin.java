@@ -17,6 +17,7 @@
 package com.immomo.litebuild;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.internal.dsl.ProductFlavor;
 import com.immomo.litebuild.helper.CleanupHelper;
 import com.immomo.litebuild.helper.CompileHelper;
 import com.immomo.litebuild.helper.DiffHelper;
@@ -28,11 +29,16 @@ import com.immomo.litebuild.util.Log;
 import com.immomo.litebuild.util.Utils;
 
 import org.gradle.api.Action;
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.UnknownTaskException;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class LiteBuildPlugin implements Plugin<Project> {
 
@@ -43,7 +49,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
     public void apply(Project project) {
         Log.TimerLog timer = Log.timerStart("apply init", "_________");
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
-
 //        appExtension.getDefaultConfig().buildConfigField("String", "LITEBUILD_VERSION", "20000912");
         appExtension.aaptOptions(aaptOptions -> {
             Log.v("aaptOptions", "开始aapt配置 execute!");
@@ -97,7 +102,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         Task taskProcessResources = project.getTasks().getByName("litebuildProcessResources");
         Task taskResources = project.getTasks().getByName("litebuildResources");
-        Task taskGradleProcessDebugResources = project.getTasks().getByName("processDebugResources");
+        Task taskGradleProcessDebugResources = getFlavorProcessDebugResources(project);
         Task taskLitebuild = project.getTasks().getByName("litebuild");
         Task taskPackageResources = project.getTasks().getByName("litebuildPackageResources");
 
@@ -107,7 +112,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task assembleDebug = project.getTasks().getByName("assembleDebug");
         assembleDebug.doLast(task -> afterFullBuild(project));
 
-        project.getTasks().getByName("preDebugBuild")
+        getFlavorPreDebugBuild(project)
                 .doFirst(task -> {
                     Settings.data.newVersion = System.currentTimeMillis() + "";
                     ((AppExtension) project.getExtensions().getByName("android"))
@@ -138,6 +143,43 @@ public class LiteBuildPlugin implements Plugin<Project> {
             taskLitebuild.dependsOn(installDebug);
         }
     }
+
+    private Task getFlavorProcessDebugResources(Project project){
+        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+        NamedDomainObjectContainer<ProductFlavor> flavors = appExtension.getProductFlavors();
+        if(flavors!=null && flavors.getNames().size()>0){
+            Set<String> flavorNames = flavors.getNames();
+            for(String name:flavorNames){
+                String processDebugResources = "process"+Utils.upperCaseFirst(name)+"DebugResources";
+                try {
+                    Task targetTask = project.getTasks().getByName(processDebugResources);
+                    return targetTask;
+                }catch (UnknownTaskException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return project.getTasks().getByName("processDebugResources");
+    }
+    private Task getFlavorPreDebugBuild(Project project){
+        //preDebugBuild
+        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+        NamedDomainObjectContainer<ProductFlavor> flavors = appExtension.getProductFlavors();
+        if(flavors!=null && flavors.getNames().size()>0){
+            Set<String> flavorNames = flavors.getNames();
+            for(String name:flavorNames){
+                String processDebugResources = "pre"+Utils.upperCaseFirst(name)+"DebugBuild";
+                try {
+                    Task targetTask = project.getTasks().getByName(processDebugResources);
+                    return targetTask;
+                }catch (UnknownTaskException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        return project.getTasks().getByName("preDebugBuild");
+    }
+
 
     public void createInitTask(Project project) {
         project.getTasks().register("litebuildInit", task -> {
