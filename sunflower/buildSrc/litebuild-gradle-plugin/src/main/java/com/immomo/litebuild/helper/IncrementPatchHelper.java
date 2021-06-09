@@ -43,19 +43,19 @@ public class IncrementPatchHelper {
         Settings.data.patchPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
         Utils.ShellResult result = Utils.runShells("source ~/.bash_profile",
                 "adb shell mkdir " + Settings.data.patchPath);
-        boolean noPermission = false;
-        for (String error: result.getErrorResult()) {
-            if (error.contains("Permission denied")) {
-                // 标志没文件权限
-                noPermission = true;
-                break;
-            }
-        }
+//        boolean noPermission = false;
+//        for (String error: result.getErrorResult()) {
+//            if (error.contains("Permission denied")) {
+//                // 标志没文件权限
+//                noPermission = true;
+//                break;
+//            }
+//        }
 
 //        if (noPermission) {
-            Settings.data.patchPath = "/sdcard/" + Settings.NAME + "/patch_file/";
-            Utils.runShells("source ~/.bash_profile\n" +
-                    "adb shell mkdir " + Settings.data.patchPath);
+//            Settings.data.patchPath = "/sdcard/" + Settings.NAME + "/patch_file/";
+//            Utils.runShells("source ~/.bash_profile\n" +
+//                    "adb shell mkdir " + Settings.data.patchPath);
 //        }
     }
 
