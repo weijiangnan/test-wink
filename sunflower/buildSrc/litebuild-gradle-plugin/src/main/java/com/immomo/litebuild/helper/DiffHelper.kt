@@ -230,8 +230,8 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         }
 
         diffInner(scanPathRes, csvPathRes) {
-            Log.v(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$it")
-            Log.v(TAG, "被修改的资源是：$scanPathRes")
+            Log.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$it")
+            Log.e(TAG, "被修改的资源是：$scanPathRes")
             projectInfo.hasResourceChanged = true
         }
     }

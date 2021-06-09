@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Locale;
 
 public class CompileHelper {
+
     public void compileCode() {
         File file = new File(Settings.env.tmpPath + "/tmp_class");
         if (!file.exists()) {
@@ -109,11 +110,11 @@ public class CompileHelper {
         if (kotlinc == null || kotlinc.equals("")) {
             if (!new File(kotlinc).exists()) {
                 System.out.println();
-                System.out.println("================== 请配置 KOTLINC_HOME ==================");
-                System.out.println("1. 打开：~/.bash_profile");
-                System.out.println("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
-                System.out.println("3. 执行：source ~/.bash_profile");
-                System.out.println("========================================================");
+                Log.e("================== 请配置 KOTLINC_HOME ==================");
+                Log.e("1. 打开：~/.bash_profile");
+                Log.e("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
+                Log.e("3. 执行：source ~/.bash_profile");
+                Log.e("========================================================");
                 System.out.println();
             }
 
@@ -127,10 +128,6 @@ public class CompileHelper {
 
         return kotlinc;
     }
-
-
-
-
 
     private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.ProjectTmpInfo projectInfo) {
         LitebuildOptions options = Settings.env.options;

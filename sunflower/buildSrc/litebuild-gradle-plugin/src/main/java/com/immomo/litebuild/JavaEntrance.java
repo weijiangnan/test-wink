@@ -5,6 +5,8 @@ import com.immomo.litebuild.helper.DiffHelper;
 import com.immomo.litebuild.helper.IncrementPatchHelper;
 import com.immomo.litebuild.helper.InitEnvHelper;
 import com.immomo.litebuild.helper.ResourceHelper;
+import com.immomo.litebuild.util.Log;
+import com.immomo.litebuild.util.Utils;
 
 import java.util.List;
 
@@ -13,16 +15,16 @@ public class JavaEntrance {
     public static void main(String[] args) {
 
         if (args == null || args.length == 0) {
-            System.out.println("Java 命令需要指定参数：path");
+            Log.e("Java 命令需要指定参数：path");
             return;
         }
 
-        System.out.println("====== 开始执行 Java 任务 ======");
+        Log.cyan("====== 开始执行 Java 任务 ======");
 
         String path = args[0];
 //        String func = args[1];
 
-        System.out.println("====== path : " + path);
+        Log.cyan("====== path : " + path);
 //        System.out.println("====== Func : " + func);
 
         // /Users/momo/Documents/MomoProject/litebuild/sunflower
@@ -35,22 +37,26 @@ public class JavaEntrance {
         boolean hasFileChanged = diff();  // 更新：Settings.data.hasResourceChanged
 
         if (!hasFileChanged) {
-            System.out.println("======>>> 没有文件变更");
+            Log.cyan("======>>> 没有文件变更");
         }
 
         new ResourceHelper().checkResource(); // 内部判断：Settings.data.hasResourceChanged
 
         // 编译资源
         if (Settings.data.needProcessDebugResources) {
-            new ResourceHelper().packageResources();
-        } else {
-            System.out.println("======>>> 没有资源变更");
+//            new ResourceHelper().packageResources();
+            Log.cyan("======>>> 资源变更，执行 gradle task");
+            String scriptStr = "cd " + path + " && " + " ./gradlew litebuild";
+            try {
+                Utils.executeScript(scriptStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
         }
 
-        // project.changedKotlinFiles.size()
-        // project.changedJavaFiles.size()
+        Log.cyan("======>>> 没有资源变更");
         new CompileHelper().compileCode();
-
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
         }
