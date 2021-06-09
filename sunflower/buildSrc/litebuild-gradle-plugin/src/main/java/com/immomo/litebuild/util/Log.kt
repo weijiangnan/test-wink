@@ -37,15 +37,24 @@ object Log {
         println("${Constant.TAG}: $str")
     }
 
-    @JvmOverloads
+    @JvmStatic
     fun e(tag: String = "momo", str: String) {
         println("${tag}: " + TEXT_RED + str + TEXT_RESET)
     }
 
     @JvmStatic
-    @JvmOverloads
+    fun e(str: String) {
+        println("${Constant.TAG}: " + TEXT_RED + str + TEXT_RESET)
+    }
+
+    @JvmStatic
     fun cyan(tag: String = "momo", str: String) {
         println(TEXT_CYAN + "${tag}: " + str + TEXT_RESET)
+    }
+
+    @JvmStatic
+    fun cyan(str: String) {
+        println(TEXT_CYAN + "${Constant.TAG}: " + str + TEXT_RESET)
     }
 
     @JvmStatic
