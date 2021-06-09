@@ -80,37 +80,83 @@ public class Utils {
             System.out.println(line);
         }
     }
-//    /**
-//     * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
-//     *
-//     * @param
-//     * @return
-//     */
-//    public static List<String> runShell(String... cmds) {
-//        List<String> strList = new ArrayList<>();
-//        List<String> cmdArray = new ArrayList<>();
-//
-//        cmdArray.add("/bin/sh");
-//        cmdArray.add("-c");
-//        for (String cmd: cmdArray) {
+
+    public static class ShellResult {
+        List<String> result = new ArrayList<>();
+        List<String> errorResult = new ArrayList<>();
+        Exception e;
+
+        public List<String> getResult() {
+            return result;
+        }
+
+        public ShellResult setResult(List<String> result) {
+            this.result = result;
+            return this;
+        }
+
+        public List<String> getErrorResult() {
+            return errorResult;
+        }
+
+        public ShellResult setErrorResult(List<String> errorResult) {
+            this.errorResult = errorResult;
+            return this;
+        }
+
+        public Exception getE() {
+            return e;
+        }
+
+        public ShellResult setE(Exception e) {
+            this.e = e;
+            return this;
+        }
+    }
+
+    /**
+     * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
+     *
+     * @param
+     * @return
+     */
+    public static ShellResult runShells(String... cmds) {
+        ShellResult result = new ShellResult();
+
+        List<String> cmdArray = new ArrayList<>();
+
+        cmdArray.add("/bin/sh");
+        cmdArray.add("-c");
+        for (String cmd: cmds) {
 //            cmdArray.add("`" + cmd + "`");
-//        }
-//
-//        try {
-//            Process process = Runtime.getRuntime().exec((String[]) cmdArray.toArray());
-//            InputStreamReader ir = new InputStreamReader(process.getInputStream());
-//            LineNumberReader input = new LineNumberReader(ir);
-//            String line;
-//            process.waitFor();
-//            while ((line = input.readLine()) != null){
-//                strList.add(line);
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return strList;
-//    }
+            cmdArray.add(cmd);
+            Log.v("Execute shell: ", cmd);
+        }
+
+        try {
+            Process process = Runtime.getRuntime().exec(cmdArray.toArray(new String[cmdArray.size()]));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String line;
+            process.waitFor();
+
+            while ((line = reader.readLine()) != null) {
+                result.getResult().add(line);
+                Log.v("Shell result: ", line);
+            }
+
+            while ((line = errorReader.readLine()) != null) {
+                result.getErrorResult().add(line);
+                Log.v("Shell error: ", line);
+            }
+
+        } catch (Exception e) {
+            Log.v("Shell exception: ", e.getMessage());
+            result.setE(e);
+        }
+
+        return result;
+    }
 
     /**
      * 获取单个文件的MD5值

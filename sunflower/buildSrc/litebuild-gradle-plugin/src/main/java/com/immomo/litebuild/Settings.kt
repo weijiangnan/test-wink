@@ -75,7 +75,8 @@ object Settings {
                     @JvmField var hasResourceChanged: Boolean = false,
                     @JvmField var hasClassChanged: Boolean = false,
                     @JvmField var needProcessDebugResources: Boolean = false,
-                    @JvmField var newVersion: String = "") : Serializable {
+                    @JvmField var newVersion: String = "",
+                    @JvmField var patchPath: String = "") : Serializable {
     }
 
     data class ProjectFixedInfo(@JvmField var children: MutableList<ProjectFixedInfo> = ArrayList(),

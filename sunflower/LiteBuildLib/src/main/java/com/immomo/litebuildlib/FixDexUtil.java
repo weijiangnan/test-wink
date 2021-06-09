@@ -1,6 +1,8 @@
 package com.immomo.litebuildlib;
 
 import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 import java.io.File;
 import java.lang.reflect.Array;
@@ -176,6 +178,45 @@ public class FixDexUtil {
         }
 
         return (String) getBuildConfigValue(context.getPackageName(), "LITEBUILD_VERSION");
+    }
+
+    public static File getDexPatchFile(Context context) {
+        String patchName = FixDexUtil.getPatchVersion(context) + "_patch.jar";
+        String dexPath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/Android/data/" + context.getPackageName() + "/patch_file/" + patchName;
+
+        // 拷贝
+        File dexFile2 = new File("/sdcard/litebuild/patch_file/" + patchName);
+        if (dexFile2.exists()) {
+            return dexFile2;
+//            Utils.copyFile(dexFile2, dexPath);
+        }
+
+        Log.e("weijiangnan", "version" + patchName);
+        File dexFile = new File(dexPath);
+        if (dexFile.exists()) {
+            return dexFile;
+        }
+
+        return null;
+    }
+
+    public static File getResourcesPatchFile(Context context) {
+        String patchVersion = FixDexUtil.getPatchVersion(context);
+        File patchFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/Android/data/" + context.getApplicationContext().getPackageName() + "/patch_file/apk/"
+                + patchVersion + "_resources-debug.apk");
+        if (patchFile.exists()) {
+            return patchFile;
+        }
+
+        patchFile = new File("/sdcard/litebuild/patch_file/apk/"
+                + patchVersion + "_resources-debug.apk");
+        if (patchFile.exists()) {
+            return patchFile;
+        }
+
+        return null;
     }
 
     public static Object getBuildConfigValue(String packageName, String fieldName) {

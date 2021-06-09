@@ -42,7 +42,6 @@ public class LiteBuildPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         Log.TimerLog timer = Log.timerStart("apply init", "_________");
-
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
 
 //        appExtension.getDefaultConfig().buildConfigField("String", "LITEBUILD_VERSION", "20000912");

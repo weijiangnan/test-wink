@@ -28,7 +28,7 @@ public final class HotFixEngineWrapper {
     private static final String BASE_DEX_CLASSLOADER = "dalvik.system.BaseDexClassLoader";
     private static final String PATH_LIST_FIELD = "pathList";
     private static final String DEX_ELEMENTS_FIELD = "dexElements";
-    private static String dexPath;
+//    private static String dexPath;
     private static String optPath;
     public static final HotFixEngineWrapper INSTANCE;
 
@@ -38,7 +38,7 @@ public final class HotFixEngineWrapper {
     static {
         HotFixEngineWrapper var0 = new HotFixEngineWrapper();
         INSTANCE = var0;
-        dexPath = "";
+//        dexPath = "";
         optPath = "";
     }
     private final Object getFieldValue(Object obj, Class clazz, String fieldName) {
@@ -106,11 +106,8 @@ public final class HotFixEngineWrapper {
     }
 
     public final void loadPatch( Context context) {
-        String patchName = FixDexUtil.getPatchVersion(context) + "_patch.jar";
-        dexPath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/Android/data/" + context.getPackageName() + "/patch_file/" + patchName;
-        Log.e("weijiangnan", dexPath);
-        if ((new File(dexPath)).exists()) {
+        File dexFile = FixDexUtil.getDexPatchFile(context);
+        if (dexFile != null && dexFile.exists()) {
             StringBuilder var10000 = new StringBuilder();
             File var10001 = context.getFilesDir();
             optPath = var10000.append(var10001.getPath()).append("/opt_dex").toString();
@@ -119,7 +116,7 @@ public final class HotFixEngineWrapper {
                 optFile.mkdirs();
             }
 
-            File dexFile = new File(dexPath);
+//            File dexFile = new File(dexFile2.getAbsolutePath());
             if (!dexFile.exists()) {
                 Log.e("weijiangnan", "file no found");
             } else {
@@ -132,7 +129,7 @@ public final class HotFixEngineWrapper {
                 throw new NullPointerException("null cannot be cast to non-null type dalvik.system.PathClassLoader");
             } else {
                 PathClassLoader pathClassLoader = (PathClassLoader)var12;
-                DexClassLoader dexClassLoader = new DexClassLoader(dexPath, optPath, (String)null, (ClassLoader)pathClassLoader);
+                DexClassLoader dexClassLoader = new DexClassLoader(dexFile.getAbsolutePath(), optPath, (String)null, (ClassLoader)pathClassLoader);
                 Object pathPathList = this.getPathList((BaseDexClassLoader)pathClassLoader);
                 Object dexPathList = this.getPathList((BaseDexClassLoader)dexClassLoader);
                 Log.e("weijiangnan", "2");

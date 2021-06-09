@@ -22,6 +22,11 @@ object Log {
     }
 
     @JvmStatic
+    fun v(str: String) {
+        println("${Constant.TAG}: $str")
+    }
+
+    @JvmStatic
     fun timerStart(name: String, other: String = ""): TimerLog {
         var log = TimerLog(name, other)
         v(Constant.TAG, " ${log.name} start. $other >>>>>>>>")

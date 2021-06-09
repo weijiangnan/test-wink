@@ -154,15 +154,15 @@ public class CompileHelper {
             // 没有数据变更
             return;
         }
-        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
+//        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
 
         String patchName = Settings.env.version + "_patch.jar";
         String cmds = new String();
 
         Log.TimerLog log = Log.timerStart("!!!!!!!!!!!!!!!");
 
-        Utils.runShell("source ~/.bash_profile" +
-                '\n' + "adb shell mkdir " + destPath);
+//        Utils.runShell("source ~/.bash_profile" +
+//                '\n' + "adb shell mkdir " + destPath);
 
 //        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
 //        classpath = "";
@@ -177,10 +177,8 @@ public class CompileHelper {
 //        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
 //                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
 
-//        /Users/weijiangnan/Desktop/opt/sdk/build-tools/30.0.3/d8 /Users/weijiangnan/Desktop/git2/litebuild/sunflower/.idea/litebuild/tmp_class/com/immomo/wink/*.class --intermediate --output /Users/weijiangnan/Desktop/git2/litebuild/sunflower/.idea/litebuild/1622793498989_patch.jar --lib /Users/weijiangnan/Desktop/opt/sdk/platforms/android-29/android.jar
-
-        cmds += '\n' + "adb shell mkdir " + destPath;
-        cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;
+//        cmds += '\n' + "adb shell mkdir " + destPath;
+//        cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;
 
         System.out.println("安装 CMD 命令：" + cmds);
 

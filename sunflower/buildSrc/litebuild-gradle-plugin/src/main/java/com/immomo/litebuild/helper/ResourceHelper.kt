@@ -52,7 +52,6 @@ class ResourceHelper {
         println("packageResources-packageResources rootPath=====${ap_ParentDir.absolutePath}")
         println("找到的 findap==${ap_path}")
 
-
         if (!ap_path.isBlank()) {
             println("ap_文件存在")
         } else {
@@ -78,9 +77,6 @@ class ResourceHelper {
             zip -r -o -q $apkPath *
             cd ..
             rm -rf tempResFolder
-            adb shell rm -rf $pushSdcardPath
-            adb shell mkdir $pushSdcardPath
-            adb push $patchName $pushSdcardPath/
         """.trimIndent()
 
         Utils.executeScript(localScript)
