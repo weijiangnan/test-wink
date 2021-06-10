@@ -17,8 +17,8 @@
 package com.immomo.litebuild.helper;
 
 import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
-import com.android.build.gradle.TestedExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.build.gradle.internal.dsl.AnnotationProcessorOptions;
@@ -223,10 +223,12 @@ public class InitEnvHelper {
         }
 
         //注解处理器参数
-        StringBuilder aptOptions = new StringBuilder();
-        AnnotationProcessorOptions annotationProcessorOptions = ((TestedExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
-        annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
-        args.add(aptOptions.toString());
+        if (extension instanceof BaseExtension) {
+            StringBuilder aptOptions = new StringBuilder();
+            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
+            args.add(aptOptions.toString());
+        }
 
 
         args.add("-classpath");
