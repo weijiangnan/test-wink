@@ -72,7 +72,7 @@ class ResourceHelper {
             rm -rf $lastPath/.idea/litebuild/tempResFolder
             mkdir $lastPath/.idea/litebuild/tempResFolder
             unzip -o -q ${ap_path} -d $lastPath/.idea/litebuild/tempResFolder
-            cp -R $lastPath/$app/build/intermediates/merged_assets/debug/out/. $lastPath/.idea/litebuild/tempResFolder/assets
+            cp -R $lastPath/$app/build/intermediates/merged_assets/${Settings.env.variantName}/out/. $lastPath/.idea/litebuild/tempResFolder/assets
             cd $lastPath/.idea/litebuild/tempResFolder
             zip -r -o -q $apkPath *
             cd ..

@@ -68,7 +68,9 @@ object Settings {
                    @JvmField var packageName: String? = null,
                    @JvmField var projectTreeRoot: ProjectFixedInfo? = null,
                    @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
-                   @JvmField var options: LitebuildOptions? = null) : Serializable {
+                   @JvmField var options: LitebuildOptions? = null,
+                   @JvmField var defaultFlavor: String = "",
+                   @JvmField var variantName: String = "debug") : Serializable {
     }
 
     data class Data(@JvmField var projectBuildSortList: MutableList<ProjectTmpInfo> = ArrayList(),

@@ -102,6 +102,10 @@ public class InitEnvHelper {
         env.compileSdkDir = FileUtils.join(env.sdkDir, "platforms", env.compileSdkVersion);
 
         env.rootDir = project.getRootDir().getAbsolutePath();
+        if (androidExt.getProductFlavors() != null && androidExt.getProductFlavors().getNames().size() > 0) {
+            env.defaultFlavor = androidExt.getProductFlavors().getNames().first();
+            env.variantName = env.defaultFlavor + "Debug";
+        }
 
         if (!Settings.data.newVersion.isEmpty()) {
             env.version = Settings.data.newVersion;
@@ -112,9 +116,10 @@ public class InitEnvHelper {
         env.tmpPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;
 
         env.packageName = androidExt.getDefaultConfig().getApplicationId();
-        while (androidExt.getApplicationVariants().iterator().hasNext()) {
-            ApplicationVariant variant = androidExt.getApplicationVariants().iterator().next();
-            if (variant.getName().equals("debug")) {
+        Iterator<ApplicationVariant> itApp = androidExt.getApplicationVariants().iterator();
+        while (itApp.hasNext()) {
+            ApplicationVariant variant = itApp.next();
+            if (variant.getName().equals(env.variantName)) {
                 env.debugPackageName = variant.getApplicationId();
                 break;
             }
@@ -162,7 +167,7 @@ public class InitEnvHelper {
             Iterator<ApplicationVariant> itApp = ((AppExtension) extension).getApplicationVariants().iterator();
             while (itApp.hasNext()) {
                 ApplicationVariant variant = itApp.next();
-                if (variant.getName().equals("debug")) {
+                if (variant.getName().equals(Settings.env.variantName)) {
                     javaCompile = variant.getJavaCompileProvider().get();
                     break;
                 }
@@ -171,7 +176,7 @@ public class InitEnvHelper {
             Iterator<LibraryVariant> it = ((LibraryExtension) extension).getLibraryVariants().iterator();
             while (it.hasNext()) {
                 LibraryVariant variant = it.next();
-                if (variant.getName().equals("debug")) {
+                if (variant.getName().equals(Settings.env.variantName)) {
                     javaCompile = variant.getJavaCompileProvider().get();
                     break;
                 }
@@ -208,7 +213,7 @@ public class InitEnvHelper {
         args.add("-classpath");
 
         fixedInfo.classPath = javaCompile.getClasspath().getAsPath() + ":"
-                + project.getProjectDir().toString() + "/build/intermediates/javac/debug/classes"
+                + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes"
                 + ":" + Settings.env.tmpPath + "/tmp_class";
 
         args.add(fixedInfo.classPath);

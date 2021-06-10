@@ -36,8 +36,6 @@ import org.gradle.api.Task;
 import org.gradle.api.UnknownTaskException;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 public class LiteBuildPlugin implements Plugin<Project> {
@@ -109,8 +107,8 @@ public class LiteBuildPlugin implements Plugin<Project> {
         Task cleanUp = project.getTasks().getByName("litebuildCleanup");
         Task clean = project.getTasks().getByName("clean");
 
-        Task assembleDebug = project.getTasks().getByName("assembleDebug");
-        assembleDebug.doLast(task -> afterFullBuild(project));
+        Task packageDebug = getFlavorTask(project, "package", "Debug");
+        packageDebug.doLast(task -> afterFullBuild(project));
 
         getFlavorPreDebugBuild(project)
                 .doFirst(task -> {
@@ -139,7 +137,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
             taskProcessResources.dependsOn(taskGradleProcessDebugResources);
         } else {
             Log.cyan("【LiteBuildPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
-            Task installDebug = project.getTasks().getByName("installDebug");
+            Task installDebug = getFlavorInstallDebug(project);
             taskLitebuild.dependsOn(installDebug);
         }
     }
@@ -159,8 +157,10 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 }
             }
         }
+
         return project.getTasks().getByName("processDebugResources");
     }
+
     private Task getFlavorPreDebugBuild(Project project){
         //preDebugBuild
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
@@ -177,9 +177,49 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 }
             }
         }
+
         return project.getTasks().getByName("preDebugBuild");
     }
 
+    private Task getFlavorInstallDebug(Project project) {
+        //preDebugBuild
+        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+        NamedDomainObjectContainer<ProductFlavor> flavors = appExtension.getProductFlavors();
+        if (flavors != null && flavors.getNames().size() > 0) {
+            Set<String> flavorNames = flavors.getNames();
+            for (String name : flavorNames) {
+                String processDebugResources = "install" + Utils.upperCaseFirst(name) + "Debug";
+                try {
+                    Task targetTask = project.getTasks().getByName(processDebugResources);
+                    return targetTask;
+                } catch (UnknownTaskException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return project.getTasks().getByName("installDebug");
+    }
+
+    private Task getFlavorTask(Project project, String pre, String post){
+        //preDebugBuild
+        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+        NamedDomainObjectContainer<ProductFlavor> flavors = appExtension.getProductFlavors();
+        if(flavors!=null && flavors.getNames().size()>0){
+            Set<String> flavorNames = flavors.getNames();
+            for(String name:flavorNames){
+                String processDebugResources = pre + Utils.upperCaseFirst(name) + post;
+                try {
+                    Task targetTask = project.getTasks().getByName(processDebugResources);
+                    return targetTask;
+                }catch (UnknownTaskException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return project.getTasks().getByName(pre + post);
+    }
 
     public void createInitTask(Project project) {
         project.getTasks().register("litebuildInit", task -> {
