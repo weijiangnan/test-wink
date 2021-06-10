@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -66,6 +67,7 @@ public class InitEnvHelper {
         if (reload) {
             createEnv(project);
         } else {
+//            createEnv(project);
 //            reloadEnv(project);
             // /Users/momo/Documents/MomoProject/litebuild/sunflower
             System.out.println("project.getRootDir() : " + project.getRootDir());
@@ -161,9 +163,13 @@ public class InitEnvHelper {
 
         Object extension = project.getExtensions().findByName("android");
         JavaCompile javaCompile = null;
+        String processorArgs = "";
         if (extension == null) {
             return;
         } else if (extension instanceof AppExtension) {
+            processorArgs = getProcessorArgs(((AppExtension) extension).getDefaultConfig()
+                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
+
             Iterator<ApplicationVariant> itApp = ((AppExtension) extension).getApplicationVariants().iterator();
             while (itApp.hasNext()) {
                 ApplicationVariant variant = itApp.next();
@@ -173,6 +179,9 @@ public class InitEnvHelper {
                 }
             }
         } else if (extension instanceof LibraryExtension) {
+            processorArgs = getProcessorArgs(((LibraryExtension) extension).getDefaultConfig()
+                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
+
             Iterator<LibraryVariant> it = ((LibraryExtension) extension).getLibraryVariants().iterator();
             while (it.hasNext()) {
                 LibraryVariant variant = it.next();
@@ -204,11 +213,16 @@ public class InitEnvHelper {
 //            args.add("-sourcepath");
 //            args.add("");
 
-        String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
-        if (!processorpath.trim().isEmpty()) {
-            args.add("-processorpath");
-            args.add(processorpath);
-        }
+//        String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
+//        if (!processorpath.trim().isEmpty()) {
+//            args.add("-processorpath");
+//            args.add(processorpath);
+//        }
+//
+//        if (processorArgs != null && !processorArgs.isEmpty()) {
+//            args.add(processorArgs);
+//        }
+
 
         args.add("-classpath");
 
@@ -242,6 +256,10 @@ public class InitEnvHelper {
         kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
                 + fixedInfo.classPath);
 
+//        if (processorArgs != null && !processorArgs.isEmpty()) {
+//            kotlinArgs.add(processorArgs);
+//        }
+
         kotlinArgs.add("-jvm-target");
         kotlinArgs.add(getSupportVersion(javaCompile.getTargetCompatibility()));
 
@@ -255,6 +273,26 @@ public class InitEnvHelper {
         }
 
         fixedInfo.kotlincArgs = sbKotlin.toString();
+    }
+
+    private String getProcessorArgs(Map<String, String> argsA) {
+        StringBuilder sb = new StringBuilder();
+        if (argsA.size() > 0) {
+            boolean firstA = true;
+            for (String key: argsA.keySet()) {
+                if (!firstA) {
+                    sb.append(".");
+                }
+
+                if (argsA.get(key) == null || argsA.get(key).isEmpty()) {
+                    sb.append("-A" + key);
+                } else {
+                    sb.append("-A" + key + "=" + argsA.get(key));
+                }
+            }
+        }
+
+        return sb.toString();
     }
 
     private String getSupportVersion(String jvmVersion) {
