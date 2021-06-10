@@ -18,8 +18,10 @@ package com.immomo.litebuild.helper;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.LibraryExtension;
+import com.android.build.gradle.TestedExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
+import com.android.build.gradle.internal.dsl.AnnotationProcessorOptions;
 import com.android.utils.FileUtils;
 import com.immomo.litebuild.LitebuildOptions;
 import com.immomo.litebuild.Settings;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -213,15 +216,17 @@ public class InitEnvHelper {
 //            args.add("-sourcepath");
 //            args.add("");
 
-//        String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
-//        if (!processorpath.trim().isEmpty()) {
-//            args.add("-processorpath");
-//            args.add(processorpath);
-//        }
-//
-//        if (processorArgs != null && !processorArgs.isEmpty()) {
-//            args.add(processorArgs);
-//        }
+        String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
+        if (!processorpath.trim().isEmpty()) {
+            args.add("-processorpath");
+            args.add(processorpath);
+        }
+
+        //注解处理器参数
+        StringBuilder aptOptions = new StringBuilder();
+        AnnotationProcessorOptions annotationProcessorOptions = ((TestedExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+        annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
+        args.add(aptOptions.toString());
 
 
         args.add("-classpath");
