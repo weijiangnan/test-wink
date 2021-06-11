@@ -29,7 +29,6 @@ import java.util.Map;
 
 public class DataManager {
     private static DataManager dataManager;
-    private ProjectInfo projectInfo;
     private Map<String,ProjectInfo> projectInfoMap = new HashMap<>();
     private VersionInfo cacheInfo;
     private boolean needUpdate = true;
@@ -58,7 +57,7 @@ public class DataManager {
     }
     public ProjectInfo checkWinkInstall(Project project){
         String projectKey = project.toString();
-        projectInfo = projectInfoMap.get(projectKey);
+        ProjectInfo projectInfo = projectInfoMap.get(projectKey);
         if(!needUpdate && projectInfo!=null){
             return projectInfo;
         }

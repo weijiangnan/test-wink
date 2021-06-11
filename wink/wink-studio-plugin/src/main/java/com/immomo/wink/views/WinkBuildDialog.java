@@ -130,7 +130,7 @@ public class WinkBuildDialog extends JDialog {
             setJCBoxData(comboBox1, appaths);
             setJCBoxData(comboBox2, paths);
         } catch (Exception e) {
-            NotificationUtils.errorNotification(Utils.getErrorString(e));
+            NotificationUtils.errorNotification(e.getMessage());
         }
 
         DataManager.getInstance().getVersion(projectInfo.getCurrentProject(), new VersionInfo.VersionCallBack() {
@@ -187,8 +187,8 @@ public class WinkBuildDialog extends JDialog {
                     DataManager.getInstance().updateWinkInstall(projectInfo.getCurrentProject());
                     NotificationUtils.infoNotification("WinkBuild Install Success");
                 } catch (Exception e) {
-                    NotificationUtils.infoNotification("WinkBuild Install Failed");
-                    NotificationUtils.infoNotification(Utils.getErrorString(e));
+                    //NotificationUtils.infoNotification("WinkBuild Install Failed");
+                    NotificationUtils.infoNotification(Utils.getErrorString("WinkBuild Install Failed",e));
                 }
             }
         });

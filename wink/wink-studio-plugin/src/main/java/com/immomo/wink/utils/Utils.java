@@ -97,11 +97,16 @@ public final class Utils {
 
 
     public static String getErrorString(Throwable e) {
+        return getErrorString(null,e);
+    }
+
+
+    public static String getErrorString(String tag,Throwable e) {
         StringBuilder sb = new StringBuilder();
-        StackTraceElement[] cause = e.getCause().getStackTrace();
-        for(int i=0;i<cause.length;i++){
-            sb.append(cause[i].toString()+"\n");
+        if(tag!=null){
+            sb.append(tag+"\n");
         }
+        sb.append(e.getMessage()+"\n");
         StackTraceElement[] elements = e.getStackTrace();
         int shortLength = elements.length>5?5:elements.length;
         for(int i=0;i<shortLength;i++){

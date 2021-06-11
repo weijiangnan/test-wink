@@ -28,6 +28,10 @@ public class ProjectListener implements ProjectManagerListener {
         checkVersion(project);
     }
     private void checkWinkProject(Project project){
+        File winkDir = new File(project.getBasePath(),ConstantPool.IEAD_WINK_DIR);
+        if(!winkDir.exists() && !winkDir.isDirectory()){
+            winkDir.mkdirs();
+        }
         DataManager.getInstance().checkWinkInstall(project);
     }
 

@@ -5,9 +5,11 @@ import com.intellij.openapi.project.Project;
 
 public class ConstantPool {
     public static String COMMAND = "./gradlew litebuild";
-    public static String IEAD_DIR = ".idea/winkbuild/backup";
-    public static String IEAD_WINK_JAR = ".idea/winkbuild/jars";
-    public static String WINK_CONFIG = ".idea/winkbuild/wink.config";
+
+    public static String IEAD_WINK_DIR = ".idea/winkbuild/";
+    public static String IEAD_DIR = IEAD_WINK_DIR+"backup";
+    public static String IEAD_WINK_JAR = IEAD_WINK_DIR+"jars";
+    public static String WINK_CONFIG = IEAD_WINK_DIR+"wink.config";
 
     public static String LAST_INSTALL_MODULE = "last_install_module";
     public static String LAST_MAIN_PATH = "last_main_build";

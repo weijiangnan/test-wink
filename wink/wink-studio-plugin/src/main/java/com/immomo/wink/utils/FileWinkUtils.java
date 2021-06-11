@@ -279,6 +279,9 @@ public class FileWinkUtils {
     public static synchronized void saveToPro(File rootFile,String key,String value) throws Exception {
         Properties props = new Properties();
         File propsFile = new File(rootFile,ConstantPool.WINK_CONFIG);
+        if (!propsFile.getParentFile().exists()){
+            propsFile.getParentFile().mkdirs();
+        }
         if(!propsFile.exists()){
             propsFile.createNewFile();
         }
@@ -290,6 +293,9 @@ public class FileWinkUtils {
     public static synchronized String getValuePro(File rootFile,String key) throws Exception {
         Properties props = new Properties();
         File propsFile = new File(rootFile,ConstantPool.WINK_CONFIG);
+        if (!propsFile.getParentFile().exists()){
+            propsFile.getParentFile().mkdirs();
+        }
         if(!propsFile.exists()){
             propsFile.createNewFile();
         }
