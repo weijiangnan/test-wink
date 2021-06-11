@@ -1,7 +1,17 @@
-
 <!-- Plugin description -->
-Wink is a quick build plugin for AndroidStudio. Wink's goal is to build an easy-to-use and easy-to-maintain Android quick build plugin.
-The difference between us and other quick build plugins is that our quick build process is fully implemented using Gradle and Java language, 
-supporting quick compilation of java files, kotlin files and resource changes.
+## Run by AndroidStudio Plugin
+1. When you install plugin success. After you open a project  you can see wink button like this screenshot. 
+
+    ![wink_btn](https://s.momocdn.com/s1/u/dcehhhadi/wink_btn.png)
+
+
+2. Click wink button you can see dialog like this.Choose your project‘s root build.gradle file and main app build.gradle file. Automic change gradle file by click install btn.
+   
+    <img src="https://s.momocdn.com/s1/u/dcehhhadi/sh_config_dialog.jpeg" width = "500"  alt="图片名称" align=center />
+
+
+3. Click wink button again ,you will see log on wink console.
+   
+    <img src="https://s.momocdn.com/s1/u/dcehhhadi/sh_console.png" width = "500"  alt="图片名称" align=center />
 <!-- Plugin description end -->
 
