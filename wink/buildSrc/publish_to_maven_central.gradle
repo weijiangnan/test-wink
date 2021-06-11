@@ -2,7 +2,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 version = '0.1.30' 	    // sdk版本号   需要更改
-group = 'com.immomo.litebuild'           // groupID， 必须com.immomo开头    需要更改
+group = 'com.immomo.wink'           // groupID， 必须com.immomo开头    需要更改
 //artifactId = 'build-lib'
 def ARTIFACT_ID = 'plugin'
 def siteUrl = "https://git.wemomo.com/live/litebuild"      // 项目的主页  需要更改
