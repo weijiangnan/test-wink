@@ -15,9 +15,9 @@
  */
 gradle.ext.dev = true
 
-include ':LiteBuildLib'
-include ':mylibrary'
+include ':wink-patch-lib'
+include ':wink-demo-lib'
 //include ':litebuild-gradle-plugin'
 //include ':app'
 //include ':sunflower:buildSrc:litebuild-gradle-plugin'
-include ':wink-demo'
+include ':wink-demo-app'

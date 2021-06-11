@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         button.setBackgroundColor(Color.BLACK);
 
         TextView textView = findViewById(R.id.textView);
-        textView.setText(Tools.getTitle() + "444" + new ZZ().getKK());
+        textView.setText(Tools.getTitle() + "555" + new ZZ().getKK());
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{

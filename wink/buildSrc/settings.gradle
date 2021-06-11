@@ -1,1 +1,2 @@
-include ':litebuild-gradle-plugin'
+includeFlat 'wink-gradle-plugin'
+include ':wink-gradle-plugin'

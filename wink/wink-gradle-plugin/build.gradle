@@ -61,7 +61,7 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 
-// 在项目根路径下执行 ./gradlew -p buildSrc :litebuild-gradle-plugin:uploadArchives
+// 在项目根路径下执行 ./gradlew -p buildSrc :wink-gradle-plugin:uploadArchives
 def isUploadMavenCenter = false
 if (isUploadMavenCenter) {
     apply from: rootProject.file('publish_to_maven_central.gradle')

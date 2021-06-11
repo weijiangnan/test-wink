@@ -34,8 +34,8 @@ android {
 }
 
 dependencies {
-    implementation project(':LiteBuildLib')
-    implementation project(':mylibrary')
+    implementation project(':wink-patch-lib')
+    implementation project(':wink-demo-lib')
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
