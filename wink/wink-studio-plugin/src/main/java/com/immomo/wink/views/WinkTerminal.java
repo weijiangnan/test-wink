@@ -279,7 +279,7 @@ public class WinkTerminal implements FocusListener, ProjectComponent {
     private static class RunAction extends BaseTerminalAction {
         String pythonLocation;
         public RunAction(WinkTerminal terminal) {
-            this(terminal, "./gradlew lite-build", "Run Wink", PluginIcons.WinkIcon);
+            this(terminal, ConstantPool.COMMAND, "Run Wink", PluginIcons.WinkIcon);
         }
 
         public RunAction(WinkTerminal terminal, String text, String description, Icon icon) {

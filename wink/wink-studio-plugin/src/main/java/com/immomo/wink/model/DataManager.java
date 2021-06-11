@@ -23,11 +23,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DataManager {
     private static DataManager dataManager;
     private ProjectInfo projectInfo;
+    private Map<String,ProjectInfo> projectInfoMap = new HashMap<>();
     private VersionInfo cacheInfo;
     private boolean needUpdate = true;
     private DataManager(){
@@ -54,6 +57,8 @@ public class DataManager {
         return checkWinkInstall(project);
     }
     public ProjectInfo checkWinkInstall(Project project){
+        String projectKey = project.toString();
+        projectInfo = projectInfoMap.get(projectKey);
         if(!needUpdate && projectInfo!=null){
             return projectInfo;
         }
@@ -114,6 +119,7 @@ public class DataManager {
                 }
             }
             projectInfo.setLastAppModule(lastInstallModule);
+            projectInfoMap.put(projectKey,projectInfo);
             return projectInfo;
         }catch (Exception e){
             NotificationUtils.infoNotification(Utils.getErrorString(e));
