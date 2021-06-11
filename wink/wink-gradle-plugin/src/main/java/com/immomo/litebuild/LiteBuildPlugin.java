@@ -88,7 +88,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         if (!project.getGroup().equals("sunflower")) {
             project.getDependencies().add("debugImplementation",
-                    project.getDependencies().create("com.immomo.litebuild:build-lib:0.1.52i"));
+                    project.getDependencies().create("com.immomo.wink:patch-lib:0.1.60i"));
         }
     }
 

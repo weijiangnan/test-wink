@@ -50,18 +50,18 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
-// ./gradlew LiteBuildLib:uploadArchives
+// ./gradlew wink-patch-lib:uploadArchives
 def isUploadMavenCenter = false
 if (isUploadMavenCenter) {
-    apply from: rootProject.file('LiteBuildLib/publish_to_maven_central.gradle')
+    apply from: rootProject.file('wink-patch-lib/publish_to_maven_central.gradle')
 } else {
     afterEvaluate { project ->
         uploadArchives {
             repositories {
                 mavenDeployer {
-                    pom.groupId = 'com.immomo.litebuild'
-                    pom.artifactId = 'build-lib'
-                    pom.version = '0.1.52i'
+                    pom.groupId = 'com.immomo.wink'
+                    pom.artifactId = 'patch-lib'
+                    pom.version = '0.1.60i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }

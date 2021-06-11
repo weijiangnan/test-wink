@@ -1,4 +1,4 @@
-package com.immomo.litebuildlib;
+package com.immomo.wink.patch;
 
 
 import java.io.File;

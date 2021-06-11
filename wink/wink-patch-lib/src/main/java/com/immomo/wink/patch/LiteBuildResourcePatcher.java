@@ -1,4 +1,4 @@
-package com.immomo.litebuildlib;
+package com.immomo.wink.patch;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -17,9 +17,9 @@ import java.util.Map;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.KITKAT;
-import static com.immomo.litebuildlib.ShareReflectUtil.findConstructor;
-import static com.immomo.litebuildlib.ShareReflectUtil.findField;
-import static com.immomo.litebuildlib.ShareReflectUtil.findMethod;
+import static com.immomo.wink.patch.ShareReflectUtil.findConstructor;
+import static com.immomo.wink.patch.ShareReflectUtil.findField;
+import static com.immomo.wink.patch.ShareReflectUtil.findMethod;
 
 public class LiteBuildResourcePatcher {
     private static final String TAG = "ResourcePatcher";

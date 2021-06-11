@@ -1,8 +1,6 @@
-package com.immomo.litebuildlib;
+package com.immomo.wink.patch;
 
 import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
 
 
 import java.io.File;
