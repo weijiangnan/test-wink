@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.immomo.litebuild;
+package com.immomo.wink;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.internal.dsl.ProductFlavor;
-import com.immomo.litebuild.helper.CleanupHelper;
-import com.immomo.litebuild.helper.CompileHelper;
-import com.immomo.litebuild.helper.DiffHelper;
-import com.immomo.litebuild.helper.IncrementPatchHelper;
-import com.immomo.litebuild.helper.InitEnvHelper;
-import com.immomo.litebuild.helper.ResourceHelper;
-import com.immomo.litebuild.hilt.HiltTransform;
-import com.immomo.litebuild.util.Log;
-import com.immomo.litebuild.util.Utils;
+import com.immomo.wink.helper.ResourceHelper;
+import com.immomo.wink.helper.CleanupHelper;
+import com.immomo.wink.helper.CompileHelper;
+import com.immomo.wink.helper.DiffHelper;
+import com.immomo.wink.helper.IncrementPatchHelper;
+import com.immomo.wink.helper.InitEnvHelper;
+import com.immomo.wink.hilt.HiltTransform;
+import com.immomo.wink.util.Log;
+import com.immomo.wink.util.Utils;
 
 import org.gradle.api.Action;
 import org.gradle.api.NamedDomainObjectContainer;
@@ -38,45 +38,45 @@ import org.gradle.api.UnknownTaskException;
 import java.io.File;
 import java.util.Set;
 
-public class LiteBuildPlugin implements Plugin<Project> {
+public class WinkPlugin implements Plugin<Project> {
 
     public static final String GROUP = "momo";
     public boolean isFirstCompile = false;
 
     @Override
     public void apply(Project project) {
-        Log.TimerLog timer = Log.timerStart("apply init", "_________");
+        com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("apply init", "_________");
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
-//        appExtension.getDefaultConfig().buildConfigField("String", "LITEBUILD_VERSION", "20000912");
+//        appExtension.getDefaultConfig().buildConfigField("String", "wink_VERSION", "20000912");
         appExtension.aaptOptions(aaptOptions -> {
-            Log.v("aaptOptions", "开始aapt配置 execute!");
-            String stableIdPath = project.getRootDir() + "/.idea/litebuild/stableIds.txt";
-            String litebuildFolder = project.getRootDir() + "/.idea/litebuild";
+            com.immomo.wink.util.Log.v("aaptOptions", "开始aapt配置 execute!");
+            String stableIdPath = project.getRootDir() + "/.idea/" + Constant.TAG + "/stableIds.txt";
+            String winkFolder = project.getRootDir() + "/.idea/" + Constant.TAG;
             File file = new File(stableIdPath);
-            File lbfolder = new File(litebuildFolder);
+            File lbfolder = new File(winkFolder);
             if (!lbfolder.exists()) {
                 lbfolder.mkdir();
             }
             if (file.exists()) {
-                Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
+                com.immomo.wink.util.Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
             } else {
-                Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
+                com.immomo.wink.util.Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
                 aaptOptions.additionalParameters("--emit-ids", file.getAbsolutePath());
             }
         });
 
-        project.getExtensions().create("litebuildOptions",
-                LitebuildOptions.class);
+        project.getExtensions().create("winkOptions",
+                WinkOptions.class);
 
         project.afterEvaluate(it -> {
-            Log.TimerLog timerAfterEvaluate = Log.timerStart("timerAfterEvaluate");
+            com.immomo.wink.util.Log.TimerLog timerAfterEvaluate = com.immomo.wink.util.Log.timerStart("timerAfterEvaluate");
             createInitTask(it);
             createDiffTask(it);
             createCompileTask(it);
             //createTransformTask(it);
             createResourcesTask(it);
-            createLiteBuildTask(it);
+            createWinkBuildTask(it);
             createCleanupTask(it);
 
             combineTask(it);
@@ -86,25 +86,25 @@ public class LiteBuildPlugin implements Plugin<Project> {
             timer.end("_________");
         });
 
-        if (!project.getGroup().equals("sunflower")) {
+        if (!project.getGroup().equals("wink")) {
             project.getDependencies().add("debugImplementation",
-                    project.getDependencies().create("com.immomo.wink:patch-lib:0.1.60i"));
+                    project.getDependencies().create("com.immomo.wink:patch-lib:0.1.61i"));
         }
     }
 
     public void combineTask(Project project) {
         System.out.println("执行了我们插件");
-        Task taskInit = project.getTasks().getByName("litebuildInit");
-        Task taskDiff = project.getTasks().getByName("litebuildDiff");
-        Task taskCompile = project.getTasks().getByName("litebuildCompile");
+        Task taskInit = project.getTasks().getByName("winkInit");
+        Task taskDiff = project.getTasks().getByName("winkDiff");
+        Task taskCompile = project.getTasks().getByName("winkCompile");
 
-        Task taskProcessResources = project.getTasks().getByName("litebuildProcessResources");
-        Task taskResources = project.getTasks().getByName("litebuildResources");
+        Task taskProcessResources = project.getTasks().getByName("winkProcessResources");
+        Task taskResources = project.getTasks().getByName("winkResources");
         Task taskGradleProcessDebugResources = getFlavorProcessDebugResources(project);
-        Task taskLitebuild = project.getTasks().getByName("litebuild");
-        Task taskPackageResources = project.getTasks().getByName("litebuildPackageResources");
+        Task taskWink = project.getTasks().getByName("wink");
+        Task taskPackageResources = project.getTasks().getByName("winkPackageResources");
 
-        Task cleanUp = project.getTasks().getByName("litebuildCleanup");
+        Task cleanUp = project.getTasks().getByName("winkCleanup");
         Task clean = project.getTasks().getByName("clean");
 
         Task packageDebug = getFlavorTask(project, "package", "Debug");
@@ -112,33 +112,33 @@ public class LiteBuildPlugin implements Plugin<Project> {
 
         getFlavorPreDebugBuild(project)
                 .doFirst(task -> {
-                    Settings.data.newVersion = System.currentTimeMillis() + "";
+                    com.immomo.wink.Settings.data.newVersion = System.currentTimeMillis() + "";
                     ((AppExtension) project.getExtensions().getByName("android"))
                             .getDefaultConfig().buildConfigField("String",
-                            "LITEBUILD_VERSION", "\"" + Settings.data.newVersion + "\"");
+                            "WINK_VERSION", "\"" + com.immomo.wink.Settings.data.newVersion + "\"");
                 });
 
         clean.dependsOn(cleanUp);
         cleanUp.dependsOn(taskInit);
 
-        boolean isStableFileExist = Utils.isStableFileExist(project);
+        boolean isStableFileExist = com.immomo.wink.util.Utils.isStableFileExist(project);
         isFirstCompile = !isStableFileExist;
 
         if (isStableFileExist) {
-            Log.cyan("【LiteBuildPlugin】", "=========== 开始增量编译 ===========");
+            com.immomo.wink.util.Log.cyan("【WinkPlugin】", "=========== 开始增量编译 ===========");
             taskDiff.dependsOn(taskInit);
             taskCompile.dependsOn(taskDiff);
-            taskLitebuild.dependsOn(taskCompile);
-            taskLitebuild.dependsOn(taskResources);
-            taskLitebuild.dependsOn(taskPackageResources);
+            taskWink.dependsOn(taskCompile);
+            taskWink.dependsOn(taskResources);
+            taskWink.dependsOn(taskPackageResources);
             taskPackageResources.dependsOn(taskResources);
             taskPackageResources.dependsOn(taskProcessResources);
             taskProcessResources.mustRunAfter(taskResources);
             taskProcessResources.dependsOn(taskGradleProcessDebugResources);
         } else {
-            Log.cyan("【LiteBuildPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
+            com.immomo.wink.util.Log.cyan("【WinkPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
             Task installDebug = getFlavorInstallDebug(project);
-            taskLitebuild.dependsOn(installDebug);
+            taskWink.dependsOn(installDebug);
         }
     }
 
@@ -148,7 +148,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         if(flavors!=null && flavors.getNames().size()>0){
             Set<String> flavorNames = flavors.getNames();
             for(String name:flavorNames){
-                String processDebugResources = "process"+Utils.upperCaseFirst(name)+"DebugResources";
+                String processDebugResources = "process"+ com.immomo.wink.util.Utils.upperCaseFirst(name)+"DebugResources";
                 try {
                     Task targetTask = project.getTasks().getByName(processDebugResources);
                     return targetTask;
@@ -168,7 +168,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         if(flavors!=null && flavors.getNames().size()>0){
             Set<String> flavorNames = flavors.getNames();
             for(String name:flavorNames){
-                String processDebugResources = "pre"+Utils.upperCaseFirst(name)+"DebugBuild";
+                String processDebugResources = "pre"+ com.immomo.wink.util.Utils.upperCaseFirst(name)+"DebugBuild";
                 try {
                     Task targetTask = project.getTasks().getByName(processDebugResources);
                     return targetTask;
@@ -188,7 +188,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
         if (flavors != null && flavors.getNames().size() > 0) {
             Set<String> flavorNames = flavors.getNames();
             for (String name : flavorNames) {
-                String processDebugResources = "install" + Utils.upperCaseFirst(name) + "Debug";
+                String processDebugResources = "install" + com.immomo.wink.util.Utils.upperCaseFirst(name) + "Debug";
                 try {
                     Task targetTask = project.getTasks().getByName(processDebugResources);
                     return targetTask;
@@ -222,75 +222,75 @@ public class LiteBuildPlugin implements Plugin<Project> {
     }
 
     public void createInitTask(Project project) {
-        project.getTasks().register("litebuildInit", task -> {
+        project.getTasks().register("winkInit", task -> {
             task.doLast(it -> {
                 // init
-                new InitEnvHelper().initEnv(project, false);
+                new com.immomo.wink.helper.InitEnvHelper().initEnv(project, false);
             });
 
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
     }
 
     public void createCompileTask(Project project) {
-        project.getTasks().register("litebuildCompile", task -> {
+        project.getTasks().register("winkCompile", task -> {
             task.doLast(it -> {
-                Log.TimerLog timer = Log.timerStart("litebuildCompile");
+                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkCompile");
                 new CompileHelper().compileCode();
                 timer.end();
             });
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
     }
 
     public void createTransformTask(Project project) {
-        project.getTasks().register("litebuildTransform", task -> {
+        project.getTasks().register("winkTransform", task -> {
             task.doLast(it -> {
-                Log.TimerLog timer = Log.timerStart("litebuildCompile");
+                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkCompile");
                 HiltTransform.INSTANCE.transform();
                 timer.end();
             });
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
 //        BaseExtension androidExtension = project.getExtensions().findByType(BaseExtension.class);
 //        androidExtension.registerTransform(new AndroidEntryPointTransform());
     }
 
     public void createResourcesTask(Project project) {
-        project.getTasks().register("litebuildProcessResources", task -> {
-        }).get().setGroup(Settings.NAME);
+        project.getTasks().register("winkProcessResources", task -> {
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
 
-        project.getTasks().getByName("litebuildProcessResources").setOnlyIf(it2 -> {
-            return Settings.data.hasResourceChanged;
+        project.getTasks().getByName("winkProcessResources").setOnlyIf(it2 -> {
+            return com.immomo.wink.Settings.data.hasResourceChanged;
         });
 
-        project.getTasks().register("litebuildResources", task -> {
+        project.getTasks().register("winkResources", task -> {
             task.doLast(it -> {
-                Log.TimerLog timer = Log.timerStart("litebuildResources");
+                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkResources");
                 // compile resource.
                 new ResourceHelper().checkResource();
                 timer.end();
             });
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
 
-        project.getTasks().register("litebuildPackageResources", task -> {
+        project.getTasks().register("winkPackageResources", task -> {
             task.doLast(it -> {
-                Log.TimerLog timer = Log.timerStart("litebuildPackageResources");
-                if (Settings.data.hasResourceChanged) {
+                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkPackageResources");
+                if (com.immomo.wink.Settings.data.hasResourceChanged) {
                     new ResourceHelper().packageResources();
                 }
 
                 timer.end();
             });
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
     }
 
-    public void createLiteBuildTask(Project project) {
-        project.getTasks().register("litebuild", task -> {
+    public void createWinkBuildTask(Project project) {
+        project.getTasks().register("wink", task -> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
                     if (isFirstCompile) {
                         return;
                     }
-                    Log.TimerLog timer = Log.timerStart("litebuild", "patchToApp...");
+                    com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("wink", "patchToApp...");
                     // patch
                     if (new IncrementPatchHelper().patchToApp()) {
                         updateSnapShot();
@@ -298,40 +298,40 @@ public class LiteBuildPlugin implements Plugin<Project> {
                     timer.end("patchToApp...");
                 }
             });
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
-        project.getTasks().register("litebuildCleanup", task -> {
+        project.getTasks().register("winkCleanup", task -> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
-                    Log.TimerLog timer = Log.timerStart("litebuildCleanup", "cleanUp");
-                    new CleanupHelper().cleanup();
+                    com.immomo.wink.util.Log.TimerLog timer = Log.timerStart("winkCleanup", "cleanUp");
+                    new com.immomo.wink.helper.CleanupHelper().cleanup();
                     timer.end("cleanUp");
                 }
             });
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
     }
 
     public void createDiffTask(Project project) {
-        project.getTasks().register("litebuildDiff", task -> {
+        project.getTasks().register("winkDiff", task -> {
 
             task.doLast(it2 -> {
                 long diffStartTime = System.currentTimeMillis();
 
-                for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+                for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
                     //
                     long startTime = System.currentTimeMillis();
-                    new DiffHelper(projectInfo).diff(projectInfo);
+                    new com.immomo.wink.helper.DiffHelper(projectInfo).diff(projectInfo);
                     System.out.println("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
 //
-                for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+                for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
                     if (projectInfo.hasResourceChanged) {
                         System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
                         System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                        Settings.data.hasResourceChanged = true;
+                        com.immomo.wink.Settings.data.hasResourceChanged = true;
                         break;
                     }
                 }
@@ -339,7 +339,7 @@ public class LiteBuildPlugin implements Plugin<Project> {
                 System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
 
-        }).get().setGroup(Settings.NAME);
+        }).get().setGroup(com.immomo.wink.Settings.NAME);
     }
 
     private void afterFullBuild(Project project) {
@@ -348,15 +348,15 @@ public class LiteBuildPlugin implements Plugin<Project> {
         // 初始化
         new InitEnvHelper().initEnv(project, true);
         // 产生快照
-        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
-            new DiffHelper(info).initSnapshot();
+        for (com.immomo.wink.Settings.ProjectTmpInfo info : com.immomo.wink.Settings.data.projectBuildSortList) {
+            new com.immomo.wink.helper.DiffHelper(info).initSnapshot();
         }
     }
 
     private void updateSnapShot() {
-        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
+        for (com.immomo.wink.Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
             if (info.changedJavaFiles.size() > 0 || info.changedKotlinFiles.size() > 0) {
-                new DiffHelper(info).initSnapshotForCode();
+                new com.immomo.wink.helper.DiffHelper(info).initSnapshotForCode();
             }
 
             if (info.hasResourceChanged) {

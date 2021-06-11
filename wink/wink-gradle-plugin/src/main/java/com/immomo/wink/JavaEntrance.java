@@ -1,12 +1,12 @@
-package com.immomo.litebuild;
+package com.immomo.wink;
 
-import com.immomo.litebuild.helper.CompileHelper;
-import com.immomo.litebuild.helper.DiffHelper;
-import com.immomo.litebuild.helper.IncrementPatchHelper;
-import com.immomo.litebuild.helper.InitEnvHelper;
-import com.immomo.litebuild.helper.ResourceHelper;
-import com.immomo.litebuild.util.Log;
-import com.immomo.litebuild.util.Utils;
+import com.immomo.wink.helper.ResourceHelper;
+import com.immomo.wink.helper.CompileHelper;
+import com.immomo.wink.helper.DiffHelper;
+import com.immomo.wink.helper.IncrementPatchHelper;
+import com.immomo.wink.helper.InitEnvHelper;
+import com.immomo.wink.util.Log;
+import com.immomo.wink.util.Utils;
 
 import java.util.List;
 
@@ -15,38 +15,37 @@ public class JavaEntrance {
     public static void main(String[] args) {
 
         if (args == null || args.length == 0) {
-            Log.e("Java 命令需要指定参数：path");
+            com.immomo.wink.util.Log.e("Java 命令需要指定参数：path");
             return;
         }
 
-        Log.cyan("====== 开始执行 Java 任务 ======");
+        com.immomo.wink.util.Log.cyan("====== 开始执行 Java 任务 ======");
 
         String path = args[0];
 //        String func = args[1];
 
-        Log.cyan("====== path : " + path);
+        com.immomo.wink.util.Log.cyan("====== path : " + path);
 //        System.out.println("====== Func : " + func);
 
-        // /Users/momo/Documents/MomoProject/litebuild/sunflower
         new InitEnvHelper().initEnvByPath(path);
-//        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/litebuild/sunflower");
+//        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/wink/sunflower");
 
-        List<Settings.ProjectTmpInfo> projectBuildSortList = Settings.data.projectBuildSortList;
+        List<com.immomo.wink.Settings.ProjectTmpInfo> projectBuildSortList = com.immomo.wink.Settings.data.projectBuildSortList;
         System.out.println("projectBuildSortList : " + projectBuildSortList.toString());
 
         boolean hasFileChanged = diff();  // 更新：Settings.data.hasResourceChanged
 
         if (!hasFileChanged) {
-            Log.cyan("======>>> 没有文件变更");
+            com.immomo.wink.util.Log.cyan("======>>> 没有文件变更");
         }
 
         new ResourceHelper().checkResource(); // 内部判断：Settings.data.hasResourceChanged
 
         // 编译资源
-        if (Settings.data.needProcessDebugResources) {
+        if (com.immomo.wink.Settings.data.needProcessDebugResources) {
 //            new ResourceHelper().packageResources();
-            Log.cyan("======>>> 资源变更，执行 gradle task");
-            String scriptStr = "cd " + path + " && " + " ./gradlew litebuild";
+            com.immomo.wink.util.Log.cyan("======>>> 资源变更，执行 gradle task");
+            String scriptStr = "cd " + path + " && " + " ./gradlew wink";
             try {
                 Utils.executeScript(scriptStr);
             } catch (Exception e) {
@@ -64,13 +63,13 @@ public class JavaEntrance {
     }
 
     private static void updateSnapShot() {
-        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
+        for (com.immomo.wink.Settings.ProjectTmpInfo info : com.immomo.wink.Settings.data.projectBuildSortList) {
             if (info.changedJavaFiles.size() > 0 || info.changedKotlinFiles.size() > 0) {
-                new DiffHelper(info).initSnapshotForCode();
+                new com.immomo.wink.helper.DiffHelper(info).initSnapshotForCode();
             }
 
             if (info.hasResourceChanged) {
-                new DiffHelper(info).initSnapshotForRes();
+                new com.immomo.wink.helper.DiffHelper(info).initSnapshotForRes();
             }
         }
     }
@@ -78,17 +77,17 @@ public class JavaEntrance {
     public static boolean diff() {
         System.out.println("====== diff run ~~~ ======");
 
-        for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+        for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
             long startTime = System.currentTimeMillis();
             new DiffHelper(projectInfo).diff(projectInfo);
             System.out.println("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
         }
 //
-        for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+        for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
             if (projectInfo.hasResourceChanged) {
                 System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
                 System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                Settings.data.hasResourceChanged = true;
+                com.immomo.wink.Settings.data.hasResourceChanged = true;
                 break;
             }
         }

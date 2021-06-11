@@ -1,7 +1,8 @@
-package com.immomo.litebuild.helper
+package com.immomo.wink.helper
 
-import com.immomo.litebuild.Settings
-import com.immomo.litebuild.util.Utils
+import com.immomo.wink.Constant
+import com.immomo.wink.Settings
+import com.immomo.wink.util.Utils
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -59,9 +60,9 @@ class ResourceHelper {
         }
 
         val lastPath = Settings.env.rootDir
-        val litebuildFolderPath = Settings.env.tmpPath
+        val winkFolderPath = Settings.env.tmpPath
         val patchName = Settings.env.version + "_resources-debug.apk"
-        val apkPath = "$litebuildFolderPath/$patchName"
+        val apkPath = "$winkFolderPath/$patchName"
         val pushSdcardPath = "/sdcard/Android/data/${Settings.env.debugPackageName}/patch_file/apk"
 
         println("资源打包路径：$apkPath")
@@ -69,11 +70,11 @@ class ResourceHelper {
         val localScript = """
             source ~/.bash_profile
             echo "开始资源解压，重新压缩！"
-            rm -rf $lastPath/.idea/litebuild/tempResFolder
-            mkdir $lastPath/.idea/litebuild/tempResFolder
-            unzip -o -q ${ap_path} -d $lastPath/.idea/litebuild/tempResFolder
-            cp -R $lastPath/$app/build/intermediates/merged_assets/${Settings.env.variantName}/out/. $lastPath/.idea/litebuild/tempResFolder/assets
-            cd $lastPath/.idea/litebuild/tempResFolder
+            rm -rf $lastPath/.idea/${Constant.TAG}/tempResFolder
+            mkdir $lastPath/.idea/${Constant.TAG}/tempResFolder
+            unzip -o -q ${ap_path} -d $lastPath/.idea/${Constant.TAG}/tempResFolder
+            cp -R $lastPath/$app/build/intermediates/merged_assets/${Settings.env.variantName}/out/. $lastPath/.idea/${Constant.TAG}/tempResFolder/assets
+            cd $lastPath/.idea/${Constant.TAG}/tempResFolder
             zip -r -o -q $apkPath *
             cd ..
             rm -rf tempResFolder

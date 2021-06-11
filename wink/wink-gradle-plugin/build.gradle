@@ -45,9 +45,9 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        liteBuildPlugin {
-            id = 'com.immomo.litebuild.plugin'
-            implementationClass = 'com.immomo.litebuild.LiteBuildPlugin'
+        winkPlugin {
+            id = 'com.immomo.wink.plugin'
+            implementationClass = 'com.immomo.wink.WinkPlugin'
         }
     }
 }
@@ -70,9 +70,9 @@ if (isUploadMavenCenter) {
         uploadArchives {
             repositories {
                 mavenDeployer {
-                    pom.groupId = 'com.immomo.litebuild'
+                    pom.groupId = 'com.immomo.wink'
                     pom.artifactId = 'plugin'
-                    pom.version = '0.1.55i'
+                    pom.version = '0.1.60i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }
@@ -117,25 +117,25 @@ jar {
 
         if (copyLib) {
             println("copyLib run ===================>>>>>>>>")
-            def path = new File(System.getProperties().getProperty("user.home") + '/LiteBuild');
+            def path = new File(System.getProperties().getProperty("user.home") + '/Wink');
             if (!path.exists()) {
                 path.mkdirs();
             }
             configurations.compileClasspath.collect { file ->
                 map.each { entry ->
                     if (file.toString().contains(entry.key)) {
-                        copy(file.toString(), System.getProperties().getProperty("user.home") + "/LiteBuild/" + entry.key + ".jar")
+                        copy(file.toString(), System.getProperties().getProperty("user.home") + "/Wink/" + entry.key + ".jar")
                         someString = someString + " " + file.toString()
                     }
                 }
             }
-            copy(System.getProperties().getProperty("user.home") + "/.gradle/caches/modules-2/files-2.1/io.github.microutils/kotlin-logging/1.7.9/910dfb87d91a48f52d3afb4b0b09cff9d2f23f6b/kotlin-logging-1.7.9.jar", System.getProperties().getProperty("user.home") + "/LiteBuild/kotlin-logging-1.7.9.jar")
+            copy(System.getProperties().getProperty("user.home") + "/.gradle/caches/modules-2/files-2.1/io.github.microutils/kotlin-logging/1.7.9/910dfb87d91a48f52d3afb4b0b09cff9d2f23f6b/kotlin-logging-1.7.9.jar", System.getProperties().getProperty("user.home") + "/Wink/kotlin-logging-1.7.9.jar")
             //  无法获取 jar 包中的依赖
             someString = someString + " " + System.getProperties().getProperty("user.home") + "/.gradle/caches/modules-2/files-2.1/io.github.microutils/kotlin-logging/1.7.9/910dfb87d91a48f52d3afb4b0b09cff9d2f23f6b/kotlin-logging-1.7.9.jar"
             println(someString)
         }
 
-        attributes 'Main-Class': 'com.immomo.litebuild.JavaEntrance'//,
+        attributes 'Main-Class': 'com.immomo.wink.JavaEntrance'//,
 //                    'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
 //                    'Class-Path': '/Users/momo/Desktop/jar_test/kotlin-stdlib-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-stdlib-common-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-csv-jvm-0.15.2.jar /Users/momo/Desktop/jar_test/org.eclipse.jgit-5.11.0.202103091610-r.jar /Users/momo/Desktop/jar_test/slf4j-api-1.7.30.jar /Users/momo/Desktop/jar_test/kotlin-logging-1.7.9.jar'
 //                    'Class-Path' : someString

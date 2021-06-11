@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.immomo.litebuild
+package com.immomo.wink
 
-import com.immomo.litebuild.util.LocalCacheUtil
+import com.immomo.wink.util.LocalCacheUtil
 import java.io.Serializable
 import java.util.*
 
 object Settings {
     @JvmField
-    var NAME = "litebuild"
+    var NAME = "wink"
 
     @JvmField
     var env = Env()
@@ -38,7 +38,7 @@ object Settings {
     @JvmStatic
     fun storeEnv(env: Env, filePath: String?) {
         LocalCacheUtil.save2File(env, filePath)
-        this.env = env
+        Settings.env = env
     }
 
     @JvmField
@@ -68,7 +68,7 @@ object Settings {
                    @JvmField var packageName: String? = null,
                    @JvmField var projectTreeRoot: ProjectFixedInfo? = null,
                    @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
-                   @JvmField var options: LitebuildOptions? = null,
+                   @JvmField var options: WinkOptions? = null,
                    @JvmField var defaultFlavor: String = "",
                    @JvmField var variantName: String = "debug") : Serializable {
     }

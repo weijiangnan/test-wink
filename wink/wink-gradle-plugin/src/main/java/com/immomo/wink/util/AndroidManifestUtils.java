@@ -1,4 +1,4 @@
-package com.immomo.litebuild.util;
+package com.immomo.wink.util;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

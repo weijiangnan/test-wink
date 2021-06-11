@@ -1,10 +1,10 @@
-package com.immomo.litebuild.helper;
+package com.immomo.wink.helper;
 
 
-import com.immomo.litebuild.LitebuildOptions;
-import com.immomo.litebuild.Settings;
-import com.immomo.litebuild.util.Log;
-import com.immomo.litebuild.util.Utils;
+import com.immomo.wink.WinkOptions;
+import com.immomo.wink.Settings;
+import com.immomo.wink.util.Log;
+import com.immomo.wink.util.Utils;
 
 import java.io.File;
 import java.util.Locale;
@@ -131,7 +131,7 @@ public class CompileHelper {
     }
 
     private String buildKotlinAndroidPluginCommand(String kotlinHome, Settings.ProjectTmpInfo projectInfo) {
-        LitebuildOptions options = Settings.env.options;
+        WinkOptions options = Settings.env.options;
         String args = "";
         if (options.kotlinSyntheticsEnable) {
             String pluginHome = kotlinHome + "/kotlinc/lib/android-extensions-compiler.jar";

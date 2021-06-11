@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.immomo.litebuild.helper
+package com.immomo.wink.helper
 
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.google.gson.Gson
-import com.immomo.litebuild.Settings
-import com.immomo.litebuild.util.Log
+import com.immomo.wink.Constant
+import com.immomo.wink.Settings
+import com.immomo.wink.util.Log
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.*
@@ -41,7 +42,7 @@ const val KEY_COMMIT_ID = "key_commit_id"
 
 class DiffHelper(var project: Settings.ProjectTmpInfo) {
     companion object {
-        const val TAG = "litebuild.diff"
+        const val TAG = "wink.diff"
     }
 
 
@@ -63,7 +64,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         Log.v(TAG, "[${project.fixedInfo.name}]:init")
 
         val moduleName = project.fixedInfo.name
-        diffDir = "${Settings.env!!.rootDir}/.idea/litebuild/diff/${moduleName}"
+        diffDir = "${Settings.env!!.rootDir}/.idea/${Constant.TAG}/diff/${moduleName}"
 
         scanPathCode = "${project.fixedInfo.dir}/src/main/java"
         scanPathRes = "${project.fixedInfo.dir}/src/main/res"

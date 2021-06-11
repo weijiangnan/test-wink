@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.immomo.litebuild.helper;
+package com.immomo.wink.helper;
 
-import com.immomo.litebuild.Settings;
-import com.immomo.litebuild.util.Utils;
+import com.immomo.wink.Constant;
+import com.immomo.wink.Settings;
+import com.immomo.wink.util.Utils;
 
 import java.io.File;
 
@@ -51,7 +52,7 @@ public class CleanupHelper {
 
     public void deletePatchFileOnPhone() {
         String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
-        String destPath2 = "/sdcard/litebuild/patch_file/";
+        String destPath2 = "/sdcard/" + Constant.TAG + "/patch_file/";
 
         String cmds = "";
         cmds += "source ~/.bash_profile";

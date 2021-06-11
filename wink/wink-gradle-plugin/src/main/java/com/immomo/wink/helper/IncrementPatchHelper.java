@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.immomo.litebuild.helper;
+package com.immomo.wink.helper;
 
-import com.immomo.litebuild.Constant;
-import com.immomo.litebuild.Settings;
-import com.immomo.litebuild.util.Log;
-import com.immomo.litebuild.util.Utils;
+import com.immomo.wink.Constant;
+import com.immomo.wink.Settings;
+import com.immomo.wink.util.Log;
+import com.immomo.wink.util.Utils;
 
 public class IncrementPatchHelper {
     public boolean patchToApp() {

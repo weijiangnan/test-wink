@@ -1,6 +1,6 @@
-package com.immomo.litebuild.hilt
+package com.immomo.wink.hilt
 
-import com.immomo.litebuild.Settings
+import com.immomo.wink.Settings
 import java.io.File
 
 object HiltTransform{

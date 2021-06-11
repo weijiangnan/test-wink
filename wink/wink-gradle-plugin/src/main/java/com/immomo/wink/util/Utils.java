@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.immomo.litebuild.util;
+package com.immomo.wink.util;
 
-import com.immomo.litebuild.Settings;
+import com.immomo.wink.Settings;
 
 import org.gradle.api.Project;
 

@@ -2,9 +2,9 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'com.immomo.litebuild.plugin'
+    id 'com.immomo.wink.plugin'
 }
-litebuildOptions {
+winkOptions {
     kotlinSyntheticsEnable = false
 }
 android {

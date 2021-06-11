@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.immomo.litebuild.hilt
+package com.immomo.wink.hilt
 
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.Format
@@ -139,10 +139,10 @@ class AndroidEntryPointTransform : Transform() {
       (input.directoryInputs + input.jarInputs).map { it.file }
     }
     return AndroidEntryPointClassTransformer(
-      taskName = name,
-      allInputs = classFiles,
-      sourceRootOutputDir = outputDir,
-      copyNonTransformed = true
+            taskName = name,
+            allInputs = classFiles,
+            sourceRootOutputDir = outputDir,
+            copyNonTransformed = true
     )
   }
 

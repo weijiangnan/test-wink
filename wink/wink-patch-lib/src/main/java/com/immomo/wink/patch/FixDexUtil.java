@@ -177,7 +177,7 @@ public class FixDexUtil {
             return sPatchVersion;
         }
 
-        return (String) getBuildConfigValue(context.getPackageName(), "LITEBUILD_VERSION");
+        return (String) getBuildConfigValue(context.getPackageName(), "WINK_VERSION");
     }
 
     public static File getDexPatchFile(Context context) {
@@ -192,7 +192,7 @@ public class FixDexUtil {
         }
 
         // 拷贝
-        File dexFile2 = new File("/sdcard/litebuild/patch_file/" + patchName);
+        File dexFile2 = new File("/sdcard/wink/patch_file/" + patchName);
         if (dexFile2.exists()) {
             return dexFile2;
         }
@@ -209,7 +209,7 @@ public class FixDexUtil {
             return patchFile;
         }
 
-        patchFile = new File("/sdcard/litebuild/patch_file/apk/"
+        patchFile = new File("/sdcard/wink/patch_file/apk/"
                 + patchVersion + "_resources-debug.png");
         if (patchFile.exists()) {
             return patchFile;

@@ -1,6 +1,6 @@
-package com.immomo.litebuild.util
+package com.immomo.wink.util
 
-import com.immomo.litebuild.Constant
+import com.immomo.wink.Constant
 
 object Log {
 

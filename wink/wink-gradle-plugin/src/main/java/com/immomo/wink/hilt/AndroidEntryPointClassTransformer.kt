@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.immomo.litebuild.hilt
+package com.immomo.wink.hilt
 
 import com.immomo.litebuild.isClassFile
 import com.immomo.litebuild.isJarFile

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.immomo.litebuild.helper;
+package com.immomo.wink.helper;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.BaseExtension;
@@ -23,9 +23,9 @@ import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
 import com.android.build.gradle.internal.dsl.AnnotationProcessorOptions;
 import com.android.utils.FileUtils;
-import com.immomo.litebuild.LitebuildOptions;
-import com.immomo.litebuild.Settings;
-import com.immomo.litebuild.util.AndroidManifestUtils;
+import com.immomo.wink.WinkOptions;
+import com.immomo.wink.Settings;
+import com.immomo.wink.util.AndroidManifestUtils;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -72,7 +72,6 @@ public class InitEnvHelper {
         } else {
 //            createEnv(project);
 //            reloadEnv(project);
-            // /Users/momo/Documents/MomoProject/litebuild/sunflower
             System.out.println("project.getRootDir() : " + project.getRootDir());
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
@@ -133,8 +132,8 @@ public class InitEnvHelper {
         String manifestPath = androidExt.getSourceSets().getByName("main").getManifest().getSrcFile().getPath();
         env.launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, env.packageName);
 
-        LitebuildOptions options = project.getExtensions().getByType(LitebuildOptions.class);
-        env.options = new LitebuildOptions();
+        WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
+        env.options = new WinkOptions();
         env.options.moduleBlacklist = options.moduleBlacklist;
         env.options.moduleWhitelist = options.moduleWhitelist;
         env.options.kotlinSyntheticsEnable = options.kotlinSyntheticsEnable;
@@ -330,8 +329,8 @@ public class InitEnvHelper {
 
         for (Project item : project.getRootProject().getSubprojects()) {
             String name = item.getName();
-            if (name.equals("litebuild-gradle-plugin")
-                    || name.equals("LiteBuildLib")
+            if (name.equals("wink-gradle-plugin")
+                    || name.equals("wink-patch-lib")
                     || hasAddProject.contains(name)) {
                 continue;
             }
@@ -351,14 +350,14 @@ public class InitEnvHelper {
     }
 
     private boolean isIgnoreProject(String moduleName) {
-        LitebuildOptions litebuildOptions = Settings.env.options;
-        if (litebuildOptions == null) {
+        WinkOptions winkOptions = Settings.env.options;
+        if (winkOptions == null) {
             return false;
         }
 
-        if (litebuildOptions.moduleWhitelist != null
-                && litebuildOptions.moduleWhitelist.length > 0) {
-            for (String module : litebuildOptions.moduleWhitelist) {
+        if (winkOptions.moduleWhitelist != null
+                && winkOptions.moduleWhitelist.length > 0) {
+            for (String module : winkOptions.moduleWhitelist) {
                 if (moduleName.equals(module)) {
                     return false;
 
@@ -366,9 +365,9 @@ public class InitEnvHelper {
             }
 
             return true;
-        } else if (litebuildOptions.moduleBlacklist != null
-                && litebuildOptions.moduleBlacklist.length > 0) {
-            for (String module : litebuildOptions.moduleBlacklist) {
+        } else if (winkOptions.moduleBlacklist != null
+                && winkOptions.moduleBlacklist.length > 0) {
+            for (String module : winkOptions.moduleBlacklist) {
                 if (moduleName.equals(module)) {
                     return true;
                 }
@@ -414,8 +413,8 @@ public class InitEnvHelper {
                     DefaultProjectDependency dp = (DefaultProjectDependency) dependency;
                     // 孩子节点
                     String name = dp.getDependencyProject().getName();
-                    if (name.equals("litebuild-gradle-plugin")
-                            || name.equals("LiteBuildLib")
+                    if (name.equals("wink-gradle-plugin")
+                            || name.equals("wink-patch-lib")
                             || hasAddProject.contains(name)) {
                         return;
                     }
