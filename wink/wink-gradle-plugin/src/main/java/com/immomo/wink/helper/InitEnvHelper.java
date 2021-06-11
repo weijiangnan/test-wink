@@ -215,6 +215,8 @@ public class InitEnvHelper {
 //            args.add("-sourcepath");
 //            args.add("");
 
+
+
         String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
         if (!processorpath.trim().isEmpty()) {
             args.add("-processorpath");
