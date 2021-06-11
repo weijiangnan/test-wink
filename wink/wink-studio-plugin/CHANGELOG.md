@@ -3,6 +3,7 @@
 # Winkbuild Studio Plugin Changelog
 
 ## [Unreleased]
+## [1.0.0]
 ### Changed
 - Please look forward to
 
