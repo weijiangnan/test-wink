@@ -33,6 +33,7 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.tasks.compile.JavaCompile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -81,6 +82,12 @@ public class InitEnvHelper {
         Settings.initData();
 
 //        Log.v(Constant.TAG, Settings.env.toString());
+    }
+
+    public boolean isEnvExist(String path) {
+        String envFilePath = path + "/.idea/" + Settings.NAME + "/env";
+        File envFile = new File(envFilePath);
+        return envFile.exists();
     }
 
     public void initEnvByPath(String path) {

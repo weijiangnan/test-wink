@@ -27,7 +27,16 @@ public class JavaEntrance {
         com.immomo.wink.util.Log.cyan("====== path : " + path);
 //        System.out.println("====== Func : " + func);
 
-        new InitEnvHelper().initEnvByPath(path);
+        InitEnvHelper helper = new InitEnvHelper();
+        boolean envFileExist = helper.isEnvExist(path);
+        com.immomo.wink.util.Log.cyan("======> envFileExist : " + envFileExist);
+
+        if (!envFileExist) {
+            runWinkCommand(path);
+            return;
+        }
+
+        helper.initEnvByPath(path);
 //        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/wink/sunflower");
 
         List<com.immomo.wink.Settings.ProjectTmpInfo> projectBuildSortList = com.immomo.wink.Settings.data.projectBuildSortList;
@@ -45,12 +54,7 @@ public class JavaEntrance {
         if (com.immomo.wink.Settings.data.needProcessDebugResources) {
 //            new ResourceHelper().packageResources();
             com.immomo.wink.util.Log.cyan("======>>> 资源变更，执行 gradle task");
-            String scriptStr = "cd " + path + " && " + " ./gradlew wink";
-            try {
-                Utils.executeScript(scriptStr);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            runWinkCommand(path);
             return;
         }
 
@@ -60,6 +64,15 @@ public class JavaEntrance {
             updateSnapShot();
         }
 
+    }
+
+    private static void runWinkCommand(String path) {
+        String scriptStr = "cd " + path + " && " + " ./gradlew wink";
+        try {
+            Utils.executeScript(scriptStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static void updateSnapShot() {
