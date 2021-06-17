@@ -4,16 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.immomo.litebuild.mylibrary.TestLibJava;
-import com.immomo.wink.utils.JJ;
-import com.immomo.wink.utils.KK;
 import com.immomo.wink.utils.Tools;
-import com.immomo.wink.utils.YY;
 import com.immomo.wink.utils.ZZ;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,13 +16,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_5);
 
         Button button = findViewById(R.id.button);
         button.setBackgroundColor(Color.BLACK);
 
         TextView textView = findViewById(R.id.textView);
-        textView.setText(Tools.getTitle() + "444" + new ZZ().getKK());
+        textView.setText(Tools.getTitle() + "111111111" + new ZZ().getKK());
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{

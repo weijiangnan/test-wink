@@ -235,7 +235,8 @@ public class InitEnvHelper {
 
         fixedInfo.classPath = javaCompile.getClasspath().getAsPath() + ":"
                 + project.getProjectDir().toString() + "/build/intermediates/javac/" + Settings.env.variantName + "/classes"
-                + ":" + Settings.env.tmpPath + "/tmp_class";
+                + ":" + Settings.env.tmpPath + "/tmp_class"
+                + ":" + project.getProjectDir().toString() + "/build/generated/not_namespaced_r_class_sources/" + Settings.env.variantName + "/r";
 
         args.add(fixedInfo.classPath);
 

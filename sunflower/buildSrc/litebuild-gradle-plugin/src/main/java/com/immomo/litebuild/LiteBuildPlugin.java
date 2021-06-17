@@ -127,10 +127,12 @@ public class LiteBuildPlugin implements Plugin<Project> {
         if (isStableFileExist) {
             Log.cyan("【LiteBuildPlugin】", "=========== 开始增量编译 ===========");
             taskDiff.dependsOn(taskInit);
-            taskCompile.dependsOn(taskDiff);
+            taskResources.dependsOn(taskDiff);
+            taskCompile.dependsOn(taskPackageResources);
+//            taskResources.dependsOn(taskCompile);
             taskLitebuild.dependsOn(taskCompile);
             taskLitebuild.dependsOn(taskResources);
-            taskLitebuild.dependsOn(taskPackageResources);
+//            taskLitebuild.dependsOn(taskPackageResources);
             taskPackageResources.dependsOn(taskResources);
             taskPackageResources.dependsOn(taskProcessResources);
             taskProcessResources.mustRunAfter(taskResources);
