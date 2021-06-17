@@ -18,12 +18,12 @@ package com.immomo.wink;
 
 import com.android.build.gradle.AppExtension;
 import com.android.build.gradle.internal.dsl.ProductFlavor;
-import com.immomo.wink.helper.ResourceHelper;
 import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.CompileHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
+import com.immomo.wink.helper.ResourceHelper;
 import com.immomo.wink.hilt.HiltTransform;
 import com.immomo.wink.util.Log;
 import com.immomo.wink.util.Utils;
@@ -65,6 +65,7 @@ public class WinkPlugin implements Plugin<Project> {
                 aaptOptions.additionalParameters("--emit-ids", file.getAbsolutePath());
             }
         });
+        appExtension.registerTransform(new WinkAsmTransform(project, ""));
 
         project.getExtensions().create("winkOptions",
                 WinkOptions.class);
@@ -109,6 +110,8 @@ public class WinkPlugin implements Plugin<Project> {
 
         Task packageDebug = getFlavorTask(project, "package", "Debug");
         packageDebug.doLast(task -> afterFullBuild(project));
+
+
 
         getFlavorPreDebugBuild(project)
                 .doFirst(task -> {

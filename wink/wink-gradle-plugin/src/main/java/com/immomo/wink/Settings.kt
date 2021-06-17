@@ -16,8 +16,10 @@
 package com.immomo.wink
 
 import com.immomo.wink.util.LocalCacheUtil
+import java.io.File
 import java.io.Serializable
 import java.util.*
+import kotlin.collections.HashSet
 
 object Settings {
     @JvmField
@@ -70,7 +72,8 @@ object Settings {
                    @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
                    @JvmField var options: WinkOptions? = null,
                    @JvmField var defaultFlavor: String = "",
-                   @JvmField var variantName: String = "debug") : Serializable {
+                   @JvmField var variantName: String = "debug",
+                   @JvmField var kaptTaskParam: KaptTaskParam? = null) : Serializable {
     }
 
     data class Data(@JvmField var projectBuildSortList: MutableList<ProjectTmpInfo> = ArrayList(),
@@ -95,4 +98,15 @@ object Settings {
                          @JvmField var changedJavaFiles: MutableList<String> = ArrayList(),
                          @JvmField var changedKotlinFiles: MutableList<String> = ArrayList(),
                          @JvmField var hasResourceChanged: Boolean = false) : Serializable
+
+    data class KaptTaskParam(@JvmField var compileClassPath: String? = null,
+                             @JvmField var javaSourceRoots: HashSet<File>? = null,
+                             @JvmField var processorOptions: List<String>? = null,
+                             @JvmField var processingClassPath: Set<File>? = null,
+                             @JvmField var javacOptions: Map<String, String>? = null,
+                             @JvmField var kotlinStdlibClasspath: List<File>? = null,
+                             @JvmField var annotationProcessorFqNames: List<String>? = null,
+                             @JvmField var sourcesOutputDir: File? = null,
+                             @JvmField var classesOutputDir: File? = null,
+                             @JvmField var stubsOutputDir: String? = null) : Serializable
 }
