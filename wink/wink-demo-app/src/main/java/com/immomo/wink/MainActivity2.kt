@@ -9,6 +9,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main2)
         Log.e("Test","tes33ddd3t");
     }

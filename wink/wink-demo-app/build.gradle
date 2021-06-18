@@ -43,9 +43,10 @@ dependencies {
     implementation project(':wink-demo-lib')
     implementation 'com.jakewharton:butterknife:10.2.3'
     kapt 'com.jakewharton:butterknife-compiler:10.2.3'
+    kapt project(':wink-compiler-hook-lib')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'com.alibaba:arouter-api:1.2.1.1'
-    annotationProcessor 'com.alibaba:arouter-compiler:1.1.2.1'
+    kapt 'com.alibaba:arouter-compiler:1.1.2.1'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
