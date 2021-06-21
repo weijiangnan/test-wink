@@ -5,7 +5,7 @@
     <application>
         <provider
             android:name="com.immomo.wink.patch.LiteBuildProvider"
-            android:authorities="${applicationId}.litebuild-sentry-installer"
+            android:authorities="${applicationId}.wink-sentry-installer"
             android:exported="false"/>
     </application>
 

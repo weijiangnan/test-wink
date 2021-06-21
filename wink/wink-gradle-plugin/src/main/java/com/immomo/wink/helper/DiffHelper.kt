@@ -37,6 +37,7 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
+import kotlin.collections.HashMap
 
 const val KEY_COMMIT_ID = "key_commit_id"
 
@@ -230,21 +231,72 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
             }
         }
 
-        diffInner(scanPathRes, csvPathRes) {
-            Log.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$it")
-            Log.e(TAG, "被修改的资源是：$scanPathRes")
-            projectInfo.hasResourceChanged = true
+//        diffInner(scanPathRes, csvPathRes) {
+//            Log.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$it")
+//            Log.e(TAG, "被修改的资源是：$scanPathRes")
+//            projectInfo.hasResourceChanged = true
+//        }
+
+        diffResource(scanPathRes, csvPathRes,
+            { newFile ->
+                projectInfo.hasResourceChanged = true
+                projectInfo.hasAddNewOrChangeResName = true
+                Log.e(TAG, "[${project.fixedInfo.name}]:有资源被新增或改名了！！！！！！差异数据:$newFile")
+            }, { changeFile ->
+
+                projectInfo.hasResourceChanged = true
+                Log.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$changeFile")
+            })
+    }
+
+    private fun diffResource(
+        scanPath: String,
+        csvPath: String,
+        newFileBlock: (String) -> Unit,
+        changeFileBlock: (String) -> Unit
+    ) {
+        val mapOrigin = loadSnapshotToCacheFromDisk(csvPath)
+        if (mapOrigin.isEmpty()) {
+            Log.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
+            return
+        } else {
+            val mapNew = hashMapOf<String, String>()
+            genSnapshotAndSaveToCache(scanPath, mapNew)
+            Log.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
+
+            var m1 = mapOrigin
+            var m2 = mapNew
+            if (mapOrigin.size < mapNew.size) {
+                m1 = mapNew
+                m2 = mapOrigin as HashMap<String, String>
+            }
+
+            m1.forEach { (k, v) ->
+                if (m2.containsKey(k)) {
+                    //如果包含,则比较value
+                    if (m2[k] != v) {
+                        changeFileBlock(k)
+                    }
+                } else {
+                    //如果不包含,则直接加入
+                    newFileBlock(k)
+                }
+            }
         }
     }
 
-    private fun prepareTreeParser(repository: Repository, commit: RevCommit): AbstractTreeIterator? {
+    private fun prepareTreeParser(
+        repository: Repository,
+        commit: RevCommit
+    ): AbstractTreeIterator? {
         println(commit.id)
         try {
             RevWalk(repository).use { walk ->
                 println(commit.tree.id)
                 val tree: RevTree = walk.parseTree(commit.tree.id)
                 val oldTreeParser = CanonicalTreeParser()
-                repository.newObjectReader().use { oldReader -> oldTreeParser.reset(oldReader, tree.id) }
+                repository.newObjectReader()
+                    .use { oldReader -> oldTreeParser.reset(oldReader, tree.id) }
                 walk.dispose()
                 return oldTreeParser
             }
@@ -271,11 +323,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
             Log.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
             compareMap(mapOrigin, mapNew)
-                    .also { if (it.isEmpty()) Log.v(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
-                    .forEach {
-                        System.out.println(it)
-                        block(it)
-                    }
+                .also { if (it.isEmpty()) Log.v(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
+                .forEach {
+                    System.out.println(it)
+                    block(it)
+                }
 
         }
     }
@@ -312,15 +364,15 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 //        Log.v(TAG, "[${project.fixedInfo.name}]:遍历目录[$path]下的java,kt文件,并生成md5并保存到map...")
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
-                .filter {
-                    it.isFile
-                }
-                .filter {
-                    it.extension in extensionList
-                }
-                .forEach {
-                    map[it.absolutePath] = getSnapshot(it)
-                }
+            .filter {
+                it.isFile
+            }
+            .filter {
+                it.extension in extensionList
+            }
+            .forEach {
+                map[it.absolutePath] = getSnapshot(it)
+            }
 
         Log.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
@@ -336,18 +388,18 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
         val timeBegin = System.currentTimeMillis()
         File(path).walk()
-                .filter {
-                    it.isFile
+            .filter {
+                it.isFile
+            }
+            .filter {
+                it.extension in extensionList
+            }
+            .forEach {
+                val row = listOf(it.absolutePath, getSnapshot(it))
+                csvWriter.open(csvPath, append = true) {
+                    writeRow(row)
                 }
-                .filter {
-                    it.extension in extensionList
-                }
-                .forEach {
-                    val row = listOf(it.absolutePath, getSnapshot(it))
-                    csvWriter.open(csvPath, append = true) {
-                        writeRow(row)
-                    }
-                }
+            }
 
         Log.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
 
@@ -371,7 +423,8 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         }
     }
 
-    private fun getSnapshot(it: File) = ((it.lastModified() / 1000).toString())//Utils.getFileMD5s(it, 64)
+    private fun getSnapshot(it: File) =
+        ((it.lastModified() / 1000).toString())//Utils.getFileMD5s(it, 64)
 
 
 }

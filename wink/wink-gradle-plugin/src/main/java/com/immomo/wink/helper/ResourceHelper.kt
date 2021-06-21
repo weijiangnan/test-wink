@@ -10,7 +10,7 @@ class ResourceHelper {
     var st : Long = 0
 
     fun checkResource() {
-        println("ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
+        println("=========================== 资源编译开始 ============== \n ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
         if (!Settings.data.hasResourceChanged) return
 
         st = System.currentTimeMillis()

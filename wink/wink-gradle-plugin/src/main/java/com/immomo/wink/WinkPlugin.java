@@ -65,7 +65,7 @@ public class WinkPlugin implements Plugin<Project> {
                 aaptOptions.additionalParameters("--emit-ids", file.getAbsolutePath());
             }
         });
-        appExtension.registerTransform(new WinkAsmTransform(project, ""));
+//        appExtension.registerTransform(new WinkAsmTransform(project, ""));
 
         project.getExtensions().create("winkOptions",
                 WinkOptions.class);
@@ -115,10 +115,10 @@ public class WinkPlugin implements Plugin<Project> {
 
         getFlavorPreDebugBuild(project)
                 .doFirst(task -> {
-                    com.immomo.wink.Settings.data.newVersion = System.currentTimeMillis() + "";
+                    Settings.data.newVersion = System.currentTimeMillis() + "";
                     ((AppExtension) project.getExtensions().getByName("android"))
                             .getDefaultConfig().buildConfigField("String",
-                            "WINK_VERSION", "\"" + com.immomo.wink.Settings.data.newVersion + "\"");
+                            "WINK_VERSION", "\"" + Settings.data.newVersion + "\"");
                 });
 
         clean.dependsOn(cleanUp);
@@ -130,10 +130,12 @@ public class WinkPlugin implements Plugin<Project> {
         if (isStableFileExist) {
             com.immomo.wink.util.Log.cyan("【WinkPlugin】", "=========== 开始增量编译 ===========");
             taskDiff.dependsOn(taskInit);
-            taskCompile.dependsOn(taskDiff);
+            taskResources.dependsOn(taskDiff);
+            taskCompile.dependsOn(taskPackageResources);
+//            taskResources.dependsOn(taskCompile);
             taskWink.dependsOn(taskCompile);
             taskWink.dependsOn(taskResources);
-            taskWink.dependsOn(taskPackageResources);
+//            taskWink.dependsOn(taskPackageResources);
             taskPackageResources.dependsOn(taskResources);
             taskPackageResources.dependsOn(taskProcessResources);
             taskProcessResources.mustRunAfter(taskResources);
@@ -231,7 +233,7 @@ public class WinkPlugin implements Plugin<Project> {
                 new com.immomo.wink.helper.InitEnvHelper().initEnv(project, false);
             });
 
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createCompileTask(Project project) {
@@ -241,7 +243,7 @@ public class WinkPlugin implements Plugin<Project> {
                 new CompileHelper().compileCode();
                 timer.end();
             });
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createTransformTask(Project project) {
@@ -251,17 +253,17 @@ public class WinkPlugin implements Plugin<Project> {
                 HiltTransform.INSTANCE.transform();
                 timer.end();
             });
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
 //        BaseExtension androidExtension = project.getExtensions().findByType(BaseExtension.class);
 //        androidExtension.registerTransform(new AndroidEntryPointTransform());
     }
 
     public void createResourcesTask(Project project) {
         project.getTasks().register("winkProcessResources", task -> {
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
 
         project.getTasks().getByName("winkProcessResources").setOnlyIf(it2 -> {
-            return com.immomo.wink.Settings.data.hasResourceChanged;
+            return Settings.data.hasResourceChanged;
         });
 
         project.getTasks().register("winkResources", task -> {
@@ -271,18 +273,18 @@ public class WinkPlugin implements Plugin<Project> {
                 new ResourceHelper().checkResource();
                 timer.end();
             });
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
 
         project.getTasks().register("winkPackageResources", task -> {
             task.doLast(it -> {
                 com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkPackageResources");
-                if (com.immomo.wink.Settings.data.hasResourceChanged) {
+                if (Settings.data.hasResourceChanged) {
                     new ResourceHelper().packageResources();
                 }
 
                 timer.end();
             });
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createWinkBuildTask(Project project) {
@@ -301,7 +303,7 @@ public class WinkPlugin implements Plugin<Project> {
                     timer.end("patchToApp...");
                 }
             });
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
@@ -314,7 +316,7 @@ public class WinkPlugin implements Plugin<Project> {
                     timer.end("cleanUp");
                 }
             });
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     public void createDiffTask(Project project) {
@@ -323,26 +325,29 @@ public class WinkPlugin implements Plugin<Project> {
             task.doLast(it2 -> {
                 long diffStartTime = System.currentTimeMillis();
 
-                for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
+                for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
                     //
                     long startTime = System.currentTimeMillis();
                     new com.immomo.wink.helper.DiffHelper(projectInfo).diff(projectInfo);
                     System.out.println("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
 //
-                for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
+                for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
                     if (projectInfo.hasResourceChanged) {
                         System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
                         System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                        com.immomo.wink.Settings.data.hasResourceChanged = true;
-                        break;
+                        Settings.data.hasResourceChanged = true;
+                    }
+
+                    if (projectInfo.hasAddNewOrChangeResName) {
+                        Settings.data.hasResourceAddOrRename = true;
                     }
                 }
 
                 System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
 
-        }).get().setGroup(com.immomo.wink.Settings.NAME);
+        }).get().setGroup(Settings.NAME);
     }
 
     private void afterFullBuild(Project project) {
@@ -351,13 +356,13 @@ public class WinkPlugin implements Plugin<Project> {
         // 初始化
         new InitEnvHelper().initEnv(project, true);
         // 产生快照
-        for (com.immomo.wink.Settings.ProjectTmpInfo info : com.immomo.wink.Settings.data.projectBuildSortList) {
+        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
             new com.immomo.wink.helper.DiffHelper(info).initSnapshot();
         }
     }
 
     private void updateSnapShot() {
-        for (com.immomo.wink.Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
+        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
             if (info.changedJavaFiles.size() > 0 || info.changedKotlinFiles.size() > 0) {
                 new com.immomo.wink.helper.DiffHelper(info).initSnapshotForCode();
             }

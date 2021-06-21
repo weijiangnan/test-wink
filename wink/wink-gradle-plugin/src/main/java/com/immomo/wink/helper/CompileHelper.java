@@ -167,18 +167,19 @@ public class CompileHelper {
             // 没有数据变更
             return;
         }
-//        String destPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
 
         String patchName = Settings.env.version + "_patch.jar";
-        String cmds = new String();
+        String cmds = useD8(patchName);
 
-        Log.TimerLog log = Log.timerStart("!!!!!!!!!!!!!!!");
+        Log.TimerLog log = Log.timerStart("开始打DexPatch！");
 
-//        Utils.runShell("source ~/.bash_profile" +
-//                '\n' + "adb shell mkdir " + destPath);
+        Utils.runShell(cmds);
 
-//        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
-//        classpath = "";
+        log.end();
+    }
+
+    public String useD8(String patchName) {
+        String cmds = "";
         String dest = Settings.env.tmpPath + "/tmp_class.zip";
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "rm -rf " + dest;
@@ -187,16 +188,26 @@ public class CompileHelper {
         cmds += '\n' + Settings.env.buildToolsDir + "/d8 --intermediate --output " + Settings.env.tmpPath + "/" + patchName
                 + " " + Settings.env.tmpPath + "/tmp_class.zip";
 
-//        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
-//                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
+        if (Settings.data.hasResourceAddOrRename) {
+            cmds += " " + Settings.env.appProjectDir + "/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/" + Settings.env.variantName + "/R.jar";
+        }
+        return cmds;
+    }
 
-//        cmds += '\n' + "adb shell mkdir " + destPath;
-//        cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;
+    public String useDx(String patchName, String destPath) {
+//        Utils.runShell("source ~/.bash_profile" +
+//                '\n' + "adb shell mkdir " + destPath);
 
-        System.out.println("安装 CMD 命令：" + cmds);
+//        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
+//        classpath = "";
 
-        Utils.runShell(cmds);
+//        System.out.println("Dex生成命令cmd =======\n" + cmds);
+        String cmds = "";
+        cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
+                + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";
 
-        log.end();
+        cmds += '\n' + "adb shell mkdir " + destPath;
+        cmds += '\n' + "adb push " + Settings.env.tmpPath + "/" + patchName + " " + destPath;
+        return cmds;
     }
 }

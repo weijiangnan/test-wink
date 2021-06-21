@@ -20,7 +20,6 @@ import com.immomo.wink.util.LocalCacheUtil
 import java.io.File
 import java.io.Serializable
 import java.util.*
-import kotlin.collections.HashSet
 
 object Settings {
     @JvmField
@@ -60,50 +59,58 @@ object Settings {
         return data
     }
 
-    data class Env(@JvmField var javaHome: String? = null,
-                   @JvmField var rootDir: String? = null,
-                   @JvmField var version: String? = null,
-                   @JvmField var sdkDir: String? = null,
-                   @JvmField var buildToolsVersion: String? = null,
-                   @JvmField var buildToolsDir: String? = null,
-                   @JvmField var compileSdkVersion: String? = null,
-                   @JvmField var compileSdkDir: String? = null,
-                   @JvmField var debugPackageName: String? = null,
-                   @JvmField var launcherActivity: String? = null,
-                   @JvmField var appProjectDir: String? = null,
-                   @JvmField var tmpPath: String = "",
-                   @JvmField var packageName: String? = null,
-                   @JvmField var projectTreeRoot: ProjectFixedInfo? = null,
-                   @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
-                   @JvmField var options: WinkOptions? = null,
-                   @JvmField var defaultFlavor: String = "",
-                   @JvmField var variantName: String = "debug",
-                   @JvmField var kaptTaskParam: KaptTaskParam? = null) : Serializable {
-    }
+    data class Env(
+            @JvmField var javaHome: String? = null,
+            @JvmField var rootDir: String? = null,
+            @JvmField var version: String? = null,
+            @JvmField var sdkDir: String? = null,
+            @JvmField var buildToolsVersion: String? = null,
+            @JvmField var buildToolsDir: String? = null,
+            @JvmField var compileSdkVersion: String? = null,
+            @JvmField var compileSdkDir: String? = null,
+            @JvmField var debugPackageName: String? = null,
+            @JvmField var launcherActivity: String? = null,
+            @JvmField var appProjectDir: String? = null,
+            @JvmField var tmpPath: String = "",
+            @JvmField var packageName: String? = null,
+            @JvmField var projectTreeRoot: ProjectFixedInfo? = null,
+            @JvmField var projectBuildSortList: MutableList<ProjectFixedInfo> = ArrayList(),
+            @JvmField var options: WinkOptions? = null,
+            @JvmField var defaultFlavor: String = "",
+            @JvmField var variantName: String = "debug",
+            @JvmField var kaptTaskParam: KaptTaskParam? = null
+    ) : Serializable
 
-    data class Data(@JvmField var projectBuildSortList: MutableList<ProjectTmpInfo> = ArrayList(),
-                    @JvmField var hasResourceChanged: Boolean = false,
-                    @JvmField var hasClassChanged: Boolean = false,
-                    @JvmField var needProcessDebugResources: Boolean = false,
-                    @JvmField var newVersion: String = "",
-                    @JvmField var patchPath: String = "",
-                    @JvmField var processorMapping: ProcessorMapping? = null) : Serializable {
-    }
+    data class Data(
+            @JvmField var projectBuildSortList: MutableList<ProjectTmpInfo> = ArrayList(),
+            @JvmField var hasResourceChanged: Boolean = false,
+            @JvmField var hasResourceAddOrRename: Boolean = false,
+            @JvmField var hasClassChanged: Boolean = false,
+            @JvmField var needProcessDebugResources: Boolean = false,
+            @JvmField var newVersion: String = "",
+            @JvmField var patchPath: String = "",
+            @JvmField var processorMapping: ProcessorMapping? = null
+    ) : Serializable
 
-    data class ProjectFixedInfo(@JvmField var children: MutableList<ProjectFixedInfo> = ArrayList(),
-                                @JvmField var isProjectIgnore: Boolean = false,
-                                @JvmField var name: String = "",
-                                @JvmField var dir: String = "",
-                                @JvmField var buildDir: String? = null,
-                                @JvmField var manifestPath: String? = null,
-                                @JvmField var javacArgs: String? = null,
-                                @JvmField var classPath: String? = null,
-                                @JvmField var kotlincArgs: String? = null) : Serializable
+    data class ProjectFixedInfo(
+            @JvmField var children: MutableList<ProjectFixedInfo> = ArrayList(),
+            @JvmField var isProjectIgnore: Boolean = false,
+            @JvmField var name: String = "",
+            @JvmField var dir: String = "",
+            @JvmField var buildDir: String? = null,
+            @JvmField var manifestPath: String? = null,
+            @JvmField var javacArgs: String? = null,
+            @JvmField var classPath: String? = null,
+            @JvmField var kotlincArgs: String? = null
+    ) : Serializable
 
-    class ProjectTmpInfo(@JvmField var fixedInfo: ProjectFixedInfo,
-                         @JvmField var changedJavaFiles: MutableList<String> = ArrayList(),
-                         @JvmField var changedKotlinFiles: MutableList<String> = ArrayList(),
-                         @JvmField var hasResourceChanged: Boolean = false) : Serializable
+    class ProjectTmpInfo(
+            @JvmField var fixedInfo: ProjectFixedInfo,
+            @JvmField var changedJavaFiles: MutableList<String> = ArrayList(),
+            @JvmField var changedKotlinFiles: MutableList<String> = ArrayList(),
+            @JvmField var hasResourceChanged: Boolean = false,
+            @JvmField var hasAddNewOrChangeResName: Boolean = false,
+    ) : Serializable
 
     data class KaptTaskParam(@JvmField var compileClassPath: String? = null,
                              @JvmField var javaSourceRoots: HashSet<File>? = null,
