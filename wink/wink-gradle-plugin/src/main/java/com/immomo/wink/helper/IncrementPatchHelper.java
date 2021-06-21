@@ -23,10 +23,9 @@ import com.immomo.wink.util.WinkLog;
 public class IncrementPatchHelper {
     public boolean patchToApp() {
         if (!Settings.data.hasClassChanged && !Settings.data.hasResourceChanged) {
-            WinkLog.vNoLimit("无变动，无需执行增量操作");
+            WinkLog.i("No changed, nothing to do.");
             return false;
         }
-
 
         WinkLog.d("[IncrementPatchHelper]->[patchToApp] \n是否有资源变动：" + Settings.data.hasClassChanged + "，是否新增改名：" + Settings.data.hasResourceChanged);
 

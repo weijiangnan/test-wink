@@ -190,7 +190,6 @@ public class Utils {
 
     public static boolean isStableFileExist(Project project) {
         String path = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME + "/stableIds.txt";
-        WinkLog.i("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
         File f = new File(path);
         return f.exists();
     }

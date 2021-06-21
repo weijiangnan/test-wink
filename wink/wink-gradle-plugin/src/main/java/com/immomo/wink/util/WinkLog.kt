@@ -5,16 +5,16 @@ import com.immomo.wink.Settings
 
 object WinkLog {
     object WinkLogLevel {
-        const val LOG_LEVEL_NONE = 10
-
-        // 正常信息，比如目前执行哪个阶段
-        const val LOG_LEVEL_INFO = 1
+        // 预留，打印所有
+        const val LOG_LEVEL_ALL = 0
 
         // debug信息，比如javac指令
-        const val LOG_LEVEL_DEBUG= 2
+        const val LOG_LEVEL_DEBUG = 3
 
-        // 预留，打印所有
-        const val LOG_LEVEL_ALL= 0
+        // 正常信息，比如目前执行哪个阶段
+        const val LOG_LEVEL_INFO = 4
+
+        const val LOG_LEVEL_NONE = Int.MAX_VALUE
     }
 
     // Define color constants
@@ -77,16 +77,6 @@ object WinkLog {
     }
 
     @JvmStatic
-    fun cyan(tag: String = Constant.TAG, str: String) {
-        winkPrintln(tag, str, WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_CYAN)
-    }
-
-    @JvmStatic
-    fun cyan(str: String) {
-        winkPrintln(Constant.TAG, str, WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_CYAN)
-    }
-
-    @JvmStatic
     fun timerStart(name: String, other: String = ""): TimerLog {
         var log = TimerLog(name, other)
         d(" ${log.name} start. $other >>>>>>>>")
@@ -103,7 +93,7 @@ object WinkLog {
         if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
             println(color + "[${tag}] $msg" + TEXT_RESET)
         } else {
-            if (Settings.env.options!!.logLevel >= level) {
+            if (Settings.env.options!!.logLevel <= level) {
                 println(color + "[${tag}] $msg" + TEXT_RESET)
             }
         }
@@ -113,7 +103,7 @@ object WinkLog {
         var starTime = System.currentTimeMillis()
 
         fun end(other: String = "") {
-            d("$name end, duration: ${System.currentTimeMillis() - starTime}. $other <<<<<<<<")
+            d("$name end, duration: ${System.currentTimeMillis() - starTime}ms. $other <<<<<<<<")
         }
 
         fun end() {

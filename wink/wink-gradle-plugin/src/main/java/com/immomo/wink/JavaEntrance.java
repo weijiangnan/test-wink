@@ -19,17 +19,17 @@ public class JavaEntrance {
             return;
         }
 
-        com.immomo.wink.util.WinkLog.cyan("====== 开始执行 Java 任务 ======");
+        com.immomo.wink.util.WinkLog.i("====== 开始执行 Java 任务 ======");
 
         String path = args[0];
 //        String func = args[1];
 
-        com.immomo.wink.util.WinkLog.cyan("====== path : " + path);
+        com.immomo.wink.util.WinkLog.i("====== path : " + path);
 //        WinkLog.v("====== Func : " + func);
 
         InitEnvHelper helper = new InitEnvHelper();
         boolean envFileExist = helper.isEnvExist(path);
-        com.immomo.wink.util.WinkLog.cyan("======> envFileExist : " + envFileExist);
+        com.immomo.wink.util.WinkLog.i("======> envFileExist : " + envFileExist);
 
         if (!envFileExist) {
             runWinkCommand(path);
@@ -45,7 +45,7 @@ public class JavaEntrance {
         boolean hasFileChanged = diff();  // 更新：Settings.data.hasResourceChanged
 
         if (!hasFileChanged) {
-            com.immomo.wink.util.WinkLog.cyan("======>>> 没有文件变更");
+            com.immomo.wink.util.WinkLog.i("======>>> 没有文件变更");
         }
 
         new ResourceHelper().checkResource(); // 内部判断：Settings.data.hasResourceChanged
@@ -53,12 +53,12 @@ public class JavaEntrance {
         // 编译资源
         if (com.immomo.wink.Settings.data.needProcessDebugResources) {
 //            new ResourceHelper().packageResources();
-            com.immomo.wink.util.WinkLog.cyan("======>>> 资源变更，执行 gradle task");
+            com.immomo.wink.util.WinkLog.i("======>>> 资源变更，执行 gradle task");
             runWinkCommand(path);
             return;
         }
 
-        WinkLog.cyan("======>>> 没有资源变更");
+        WinkLog.i("======>>> 没有资源变更");
         new CompileHelper().compileCode();
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
