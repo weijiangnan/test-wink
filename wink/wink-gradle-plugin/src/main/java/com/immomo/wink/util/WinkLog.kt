@@ -45,24 +45,12 @@ object WinkLog {
 
     @JvmStatic
     fun v(tag: String = Constant.TAG, str: String) {
-        if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
-            println("${Constant.TAG}: $str")
-        } else {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_VERBOSE) {
-                println("${tag}: $str")
-            }
-        }
+        winkPrintln("${tag}: $str", WinkLogLevel.LOG_LEVEL_VERBOSE, TEXT_WHITE)
     }
 
     @JvmStatic
     fun v(str: String) {
-        if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
-            println("${Constant.TAG}: $str")
-        } else {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_VERBOSE) {
-                println("${Constant.TAG}: $str")
-            }
-        }
+        winkPrintln("${Constant.TAG}: $str", WinkLogLevel.LOG_LEVEL_VERBOSE, TEXT_WHITE)
     }
 
     @JvmStatic
@@ -72,51 +60,27 @@ object WinkLog {
 
     @JvmStatic
     fun e(tag: String = Constant.TAG, str: String) {
-        if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
-            println("${tag}: " + TEXT_RED + str + TEXT_RESET)
-        } else {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_DEBUG) {
-                println("${tag}: " + TEXT_RED + str + TEXT_RESET)
-            }
-        }
+        winkPrintln("${Constant.TAG}: $str", WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_RED)
     }
 
     @JvmStatic
     fun e(str: String) {
-        if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
-            println("${Constant.TAG}: " + TEXT_RED + str + TEXT_RESET)
-        } else {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_DEBUG) {
-                println("${Constant.TAG}: " + TEXT_RED + str + TEXT_RESET)
-            }
-        }
+        winkPrintln("${Constant.TAG}: $str", WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_RED)
     }
 
     @JvmStatic
     fun d(str: String) {
-        Settings.env.options?.let {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_DEBUG) {
-                println("${Constant.TAG}: " + TEXT_YELLOW + str + TEXT_RESET)
-            }
-        }
+        winkPrintln("${Constant.TAG}: $str", WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_YELLOW)
     }
 
     @JvmStatic
     fun cyan(tag: String = Constant.TAG, str: String) {
-        Settings.env.options?.let {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_DEBUG) {
-                println(TEXT_CYAN + "${tag}: " + str + TEXT_RESET)
-            }
-        }
+        winkPrintln("${tag}: $str", WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_CYAN)
     }
 
     @JvmStatic
     fun cyan(str: String) {
-        Settings.env.options?.let {
-            if (Settings.env.options!!.logLevel >= WinkLogLevel.LOG_LEVEL_DEBUG) {
-                println(TEXT_CYAN + "${Constant.TAG}: " + str + TEXT_RESET)
-            }
-        }
+        winkPrintln("${Constant.TAG}: $str", WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_CYAN)
     }
 
     @JvmStatic
@@ -129,6 +93,17 @@ object WinkLog {
     @JvmStatic
     fun timerStart(name: String): TimerLog {
         return timerStart(name, "")
+    }
+
+    @JvmStatic
+    fun winkPrintln(msg: String, level: Int, color: String) {
+        if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
+            println(color + msg + TEXT_RESET)
+        } else {
+            if (Settings.env.options!!.logLevel >= level) {
+                println(color + msg + TEXT_RESET)
+            }
+        }
     }
 
     class TimerLog(var name: String = "", var other: String = "") {
