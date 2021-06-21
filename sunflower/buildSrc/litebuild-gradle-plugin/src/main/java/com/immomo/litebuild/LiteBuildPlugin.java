@@ -334,7 +334,9 @@ public class LiteBuildPlugin implements Plugin<Project> {
                         System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
                         System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
                         Settings.data.hasResourceChanged = true;
-                        break;
+                    }
+                    if (projectInfo.hasAddNewOrChangeResName) {
+                        Settings.data.hasResourceAddOrRename = true;
                     }
                 }
 
