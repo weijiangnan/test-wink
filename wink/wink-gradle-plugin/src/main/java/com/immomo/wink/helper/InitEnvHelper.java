@@ -26,6 +26,7 @@ import com.android.utils.FileUtils;
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.Settings;
 import com.immomo.wink.util.AndroidManifestUtils;
+import com.immomo.wink.util.LocalCacheUtil;
 import com.immomo.wink.util.ShareReflectUtil;
 
 import org.gradle.api.Project;
@@ -87,8 +88,23 @@ public class InitEnvHelper {
 
         // Data每次初始化
         Settings.initData();
-
 //        Log.v(Constant.TAG, Settings.env.toString());
+    }
+
+    public void initE() {
+        File fileDir = new File(Settings.env.tmpPath + "/annotation");
+        if (!fileDir.exists()) {
+            fileDir.mkdir();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String[] injects = new String[] { "com.alibaba.android.arouter.facade.annotation.Route" };
+        for (String inject : injects) {
+            sb.append(inject);
+            sb.append(",");
+        }
+
+        LocalCacheUtil.save2File(sb.toString(), Settings.env.tmpPath + "/annotation/whitelist");
     }
 
     public boolean isEnvExist(String path) {
@@ -152,9 +168,10 @@ public class InitEnvHelper {
         env.options.moduleWhitelist = options.moduleWhitelist;
         env.options.kotlinSyntheticsEnable = options.kotlinSyntheticsEnable;
 
-        findModuleTree2(project, "");
+        // todo apt
+//        initKaptTaskParams(env);
 
-        initKaptTaskParams(env);
+        findModuleTree2(project, "");
 
         Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
     }
@@ -210,12 +227,12 @@ public class InitEnvHelper {
 
         Object extension = project.getExtensions().findByName("android");
         JavaCompile javaCompile = null;
-        String processorArgs = "";
+//        String processorArgs = "";
         if (extension == null) {
             return;
         } else if (extension instanceof AppExtension) {
-            processorArgs = getProcessorArgs(((AppExtension) extension).getDefaultConfig()
-                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
+//            processorArgs = getProcessorArgs(((AppExtension) extension).getDefaultConfig()
+//                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
 
             Iterator<ApplicationVariant> itApp = ((AppExtension) extension).getApplicationVariants().iterator();
             while (itApp.hasNext()) {
@@ -226,8 +243,8 @@ public class InitEnvHelper {
                 }
             }
         } else if (extension instanceof LibraryExtension) {
-            processorArgs = getProcessorArgs(((LibraryExtension) extension).getDefaultConfig()
-                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
+//            processorArgs = getProcessorArgs(((LibraryExtension) extension).getDefaultConfig()
+//                    .getJavaCompileOptions().getAnnotationProcessorOptions().getArguments());
 
             Iterator<LibraryVariant> it = ((LibraryExtension) extension).getLibraryVariants().iterator();
             while (it.hasNext()) {
@@ -260,22 +277,39 @@ public class InitEnvHelper {
 //            args.add("-sourcepath");
 //            args.add("");
 
-
-
         String processorpath = javaCompile.getOptions().getAnnotationProcessorPath().getAsPath();
-        if (!processorpath.trim().isEmpty()) {
-            args.add("-processorpath");
-            args.add(processorpath);
-        }
+        // todo apt
+//        if (Settings.env.kaptTaskParam != null &&
+//                Settings.env.kaptTaskParam.processorOptions != null) {
+//            for (File file : Settings.env.kaptTaskParam.processingClassPath) {
+//                if (processorpath != null && !processorpath.isEmpty()) {
+//                    processorpath += ":";
+//                }
+//
+//                processorpath += file.getAbsolutePath();
+//            }
+//        }
 
-        //注解处理器参数
-        if (extension instanceof BaseExtension) {
-            StringBuilder aptOptions = new StringBuilder();
-            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
-            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
-            args.add(aptOptions.toString());
-        }
-
+        // todo apt
+//        if (!processorpath.trim().isEmpty()) {
+//            args.add("-processorpath");
+//            args.add(processorpath);
+//        }
+//
+//        //注解处理器参数
+//        if (extension instanceof BaseExtension) {
+//            StringBuilder aptOptions = new StringBuilder();
+//            AnnotationProcessorOptions annotationProcessorOptions = ((BaseExtension) extension).getDefaultConfig().getJavaCompileOptions().getAnnotationProcessorOptions();
+//            annotationProcessorOptions.getArguments().forEach((k, v) -> aptOptions.append(String.format(Locale.US, "-A%s=%s ",k, v)));
+//
+//            // todo apt
+////            // add kapt args
+////            if (Settings.env.kaptTaskParam != null && Settings.env.kaptTaskParam.processorOptions != null) {
+////                Settings.env.kaptTaskParam.processorOptions.forEach((v) -> aptOptions.append(String.format(Locale.US, "-A%s ", v)));
+////            }
+//
+//            args.add(aptOptions.toString());
+//        }
 
         args.add("-classpath");
 

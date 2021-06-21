@@ -15,6 +15,7 @@
  */
 package com.immomo.wink
 
+import com.immomo.wink.compiler.ProcessorMapping
 import com.immomo.wink.util.LocalCacheUtil
 import java.io.File
 import java.io.Serializable
@@ -52,6 +53,10 @@ object Settings {
         env!!.projectBuildSortList.forEach {
             data.projectBuildSortList.add(ProjectTmpInfo(it))
         }
+
+        // todo apt
+//        data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
+
         return data
     }
 
@@ -81,7 +86,8 @@ object Settings {
                     @JvmField var hasClassChanged: Boolean = false,
                     @JvmField var needProcessDebugResources: Boolean = false,
                     @JvmField var newVersion: String = "",
-                    @JvmField var patchPath: String = "") : Serializable {
+                    @JvmField var patchPath: String = "",
+                    @JvmField var processorMapping: ProcessorMapping? = null) : Serializable {
     }
 
     data class ProjectFixedInfo(@JvmField var children: MutableList<ProjectFixedInfo> = ArrayList(),

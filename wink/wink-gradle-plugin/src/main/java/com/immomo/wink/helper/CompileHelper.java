@@ -7,6 +7,8 @@ import com.immomo.wink.util.Log;
 import com.immomo.wink.util.Utils;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 
 public class CompileHelper {
@@ -85,10 +87,19 @@ public class CompileHelper {
         System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
         try {
             String mainKotlincArgs = project.fixedInfo.kotlincArgs;
-            String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
+
+            // todo apt
+//            String kotlinxArgs = buildKotlinAndroidPluginCommand(kotlinHome, project);
+
             String javaHomePath = Settings.env.javaHome;
             javaHomePath = javaHomePath.replace(" ", "\\ ");
-            String shellCommand = "sh " + kotlinc + kotlinxArgs + " -jdk-home " + javaHomePath + mainKotlincArgs + sb.toString();
+
+            // todo apt
+//            String shellCommand = "sh " + kotlinc + kotlinxArgs + " -jdk-home " + javaHomePath
+//                    + mainKotlincArgs + sb.toString();
+            String shellCommand = "sh " + kotlinc + " -jdk-home " + javaHomePath
+                    + mainKotlincArgs + sb.toString();
+
 //            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
             Utils.runShell(shellCommand);
         } catch (Exception e) {
@@ -145,6 +156,10 @@ public class CompileHelper {
         }
         System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
         return args;
+    }
+
+    private void findAptRelativeFiles(List<String> changeJavaFiles) {
+        HashSet<String> fileSet = new HashSet<>();
     }
 
     private void createDexPatch() {
