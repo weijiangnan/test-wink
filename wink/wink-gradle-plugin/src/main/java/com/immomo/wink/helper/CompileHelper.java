@@ -152,7 +152,7 @@ public class CompileHelper {
                     "-P plugin:org.jetbrains.kotlin.android:package=%s " +
                     "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
         }
-        WinkLog.v("【compile kotlinx.android.synthetic】 \n" + args);
+        WinkLog.i("【compile kotlinx.android.synthetic】 \n" + args);
         return args;
     }
 

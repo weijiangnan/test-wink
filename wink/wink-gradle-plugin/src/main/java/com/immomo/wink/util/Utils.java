@@ -48,7 +48,7 @@ public class Utils {
             }
 
             while ((line = errorReader.readLine()) != null) {
-                WinkLog.v(line);
+                WinkLog.i(line);
             }
 
         } catch (Exception e) {
@@ -72,12 +72,12 @@ public class Utils {
 
         String line = "";
         while ((line = reader.readLine()) != null) {
-            WinkLog.v(line);
+            WinkLog.i(line);
         }
 
         line = "";
         while ((line = errorReader.readLine()) != null) {
-            WinkLog.v(line);
+            WinkLog.i(line);
         }
     }
 
@@ -130,7 +130,7 @@ public class Utils {
         for (String cmd: cmds) {
 //            cmdArray.add("`" + cmd + "`");
             cmdArray.add(cmd);
-            WinkLog.v("Execute shell: ", cmd);
+            WinkLog.i("Execute shell: ", cmd);
         }
 
         try {
@@ -142,16 +142,16 @@ public class Utils {
 
             while ((line = reader.readLine()) != null) {
                 result.getResult().add(line);
-                WinkLog.v("Shell result: ", line);
+                WinkLog.i("Shell result: ", line);
             }
 
             while ((line = errorReader.readLine()) != null) {
                 result.getErrorResult().add(line);
-                WinkLog.v("Shell error: ", line);
+                WinkLog.i("Shell error: ", line);
             }
 
         } catch (Exception e) {
-            WinkLog.v("Shell exception: ", e.getMessage());
+            WinkLog.i("Shell exception: ", e.getMessage());
             result.setE(e);
         }
 
@@ -190,7 +190,7 @@ public class Utils {
 
     public static boolean isStableFileExist(Project project) {
         String path = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME + "/stableIds.txt";
-        WinkLog.v("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
+        WinkLog.i("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
         File f = new File(path);
         return f.exists();
     }

@@ -56,7 +56,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     private val properties = Properties()
 
     init {
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:init")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:init")
 
         val moduleName = project.fixedInfo.name
         diffDir = "${Settings.env!!.rootDir}/.idea/${Constant.TAG}/diff/${moduleName}"
@@ -90,28 +90,28 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
 
     fun initSnapshot() {
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         initSnapshotByMd5()
 //        initSnapshotByGit()
     }
 
     fun initSnapshotForCode() {
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
         genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
     }
 
     fun initSnapshotForRes() {
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
 
     fun diff(projectInfo: Settings.ProjectTmpInfo) {
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:获取差异...")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:获取差异...")
 
         diffByMd5(projectInfo)
 //        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
@@ -251,12 +251,12 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     ) {
         val mapOrigin = loadSnapshotToCacheFromDisk(csvPath)
         if (mapOrigin.isEmpty()) {
-            WinkLog.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
+            WinkLog.i(TAG, "[${project.fixedInfo.name}]:原始数据为空")
             return
         } else {
             val mapNew = hashMapOf<String, String>()
             genSnapshotAndSaveToCache(scanPath, mapNew)
-            WinkLog.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
+            WinkLog.i(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
 
             var m1 = mapOrigin
             var m2 = mapNew
@@ -306,7 +306,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         //Log.v(TAG, mapOrigin)
 
         if (mapOrigin.isEmpty()) {
-            WinkLog.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
+            WinkLog.i(TAG, "[${project.fixedInfo.name}]:原始数据为空")
             return
         } else {
             val mapNew = hashMapOf<String, String>()
@@ -315,11 +315,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
             //Log.v(TAG, "新数据:")
             //Log.v(TAG, mapNew)
 
-            WinkLog.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
+            WinkLog.i(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
             compareMap(mapOrigin, mapNew)
-                .also { if (it.isEmpty()) WinkLog.v(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
+                .also { if (it.isEmpty()) WinkLog.i(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
                 .forEach {
-                    WinkLog.v(it)
+                    WinkLog.i(it)
                     block(it)
                 }
 
@@ -327,7 +327,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     }
 
     private fun compareMap(map1: Map<String, String>, map2: Map<String, String>): Set<String> {
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:compareMap...")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:compareMap...")
 
         val rst = hashSetOf<String>()
         var m1 = map1
@@ -368,7 +368,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
                 map[it.absolutePath] = getSnapshot(it)
             }
 
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
 
     private fun genSnapshotAndSaveToDisk(path: String, csvPath: String) {
@@ -395,7 +395,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
                 }
             }
 
-        WinkLog.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+        WinkLog.i(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
 
     }
 
@@ -403,7 +403,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 //        Log.v(TAG, "[${project.fixedInfo.name}]:从[${path}]加载md5信息...")
 
         return if (!File(path).exists()) {
-            WinkLog.v(TAG, "[${project.fixedInfo.name}]:文件[${path}]不存在")
+            WinkLog.i(TAG, "[${project.fixedInfo.name}]:文件[${path}]不存在")
             hashMapOf()
         } else {
             val map = hashMapOf<String, String>()

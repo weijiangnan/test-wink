@@ -88,18 +88,18 @@ public class JavaEntrance {
     }
 
     public static boolean diff() {
-        WinkLog.v("====== diff run ~~~ ======");
+        WinkLog.i("====== diff run ~~~ ======");
 
         for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
             long startTime = System.currentTimeMillis();
             new DiffHelper(projectInfo).diff(projectInfo);
-            WinkLog.v("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+            WinkLog.i("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
         }
 //
         for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
             if (projectInfo.hasResourceChanged) {
-                WinkLog.v("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
-                WinkLog.v("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                WinkLog.i("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
+                WinkLog.i("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
                 com.immomo.wink.Settings.data.hasResourceChanged = true;
                 break;
             }

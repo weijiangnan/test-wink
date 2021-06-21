@@ -49,7 +49,7 @@ public class WinkPlugin implements Plugin<Project> {
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
 //        appExtension.getDefaultConfig().buildConfigField("String", "wink_VERSION", "20000912");
         appExtension.aaptOptions(aaptOptions -> {
-            com.immomo.wink.util.WinkLog.v("aaptOptions", "开始aapt配置 execute!");
+            com.immomo.wink.util.WinkLog.i("aaptOptions", "开始aapt配置 execute!");
             String stableIdPath = project.getRootDir() + "/.idea/" + Constant.TAG + "/stableIds.txt";
             String winkFolder = project.getRootDir() + "/.idea/" + Constant.TAG;
             File file = new File(stableIdPath);
@@ -58,10 +58,10 @@ public class WinkPlugin implements Plugin<Project> {
                 lbfolder.mkdir();
             }
             if (file.exists()) {
-                com.immomo.wink.util.WinkLog.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
+                com.immomo.wink.util.WinkLog.i("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
             } else {
-                com.immomo.wink.util.WinkLog.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
+                com.immomo.wink.util.WinkLog.i("aaptOptions", "开始aapt配置 execute! 文件不存在");
                 aaptOptions.additionalParameters("--emit-ids", file.getAbsolutePath());
             }
         });
@@ -96,7 +96,7 @@ public class WinkPlugin implements Plugin<Project> {
     }
 
     public void combineTask(Project project) {
-        WinkLog.v("执行了我们插件");
+        WinkLog.i("执行了我们插件");
         Task taskInit = project.getTasks().getByName("winkInit");
         Task taskDiff = project.getTasks().getByName("winkDiff");
         Task taskCompile = project.getTasks().getByName("winkCompile");
@@ -331,13 +331,13 @@ public class WinkPlugin implements Plugin<Project> {
                     //
                     long startTime = System.currentTimeMillis();
                     new com.immomo.wink.helper.DiffHelper(projectInfo).diff(projectInfo);
-                    WinkLog.v("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+                    WinkLog.i("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
 //
                 for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
                     if (projectInfo.hasResourceChanged) {
-                        WinkLog.v("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
-                        WinkLog.v("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                        WinkLog.i("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
+                        WinkLog.i("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
                         Settings.data.hasResourceChanged = true;
                     }
 
@@ -346,7 +346,7 @@ public class WinkPlugin implements Plugin<Project> {
                     }
                 }
 
-                WinkLog.v("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
+                WinkLog.i("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
 
         }).get().setGroup(Settings.NAME);

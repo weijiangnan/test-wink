@@ -21,9 +21,9 @@ class ResourceHelper {
     private fun compileResources() {
         val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
-            WinkLog.v("stableIds存在")
+            WinkLog.i("stableIds存在")
         } else {
-            WinkLog.v("=================================")
+            WinkLog.i("=================================")
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
 
