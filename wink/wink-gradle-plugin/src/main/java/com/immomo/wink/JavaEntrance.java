@@ -5,7 +5,7 @@ import com.immomo.wink.helper.CompileHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
-import com.immomo.wink.util.Log;
+import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
 import java.util.List;
@@ -15,21 +15,21 @@ public class JavaEntrance {
     public static void main(String[] args) {
 
         if (args == null || args.length == 0) {
-            com.immomo.wink.util.Log.e("Java 命令需要指定参数：path");
+            com.immomo.wink.util.WinkLog.e("Java 命令需要指定参数：path");
             return;
         }
 
-        com.immomo.wink.util.Log.cyan("====== 开始执行 Java 任务 ======");
+        com.immomo.wink.util.WinkLog.cyan("====== 开始执行 Java 任务 ======");
 
         String path = args[0];
 //        String func = args[1];
 
-        com.immomo.wink.util.Log.cyan("====== path : " + path);
-//        System.out.println("====== Func : " + func);
+        com.immomo.wink.util.WinkLog.cyan("====== path : " + path);
+//        WinkLog.v("====== Func : " + func);
 
         InitEnvHelper helper = new InitEnvHelper();
         boolean envFileExist = helper.isEnvExist(path);
-        com.immomo.wink.util.Log.cyan("======> envFileExist : " + envFileExist);
+        com.immomo.wink.util.WinkLog.cyan("======> envFileExist : " + envFileExist);
 
         if (!envFileExist) {
             runWinkCommand(path);
@@ -40,12 +40,12 @@ public class JavaEntrance {
 //        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/wink/sunflower");
 
         List<com.immomo.wink.Settings.ProjectTmpInfo> projectBuildSortList = com.immomo.wink.Settings.data.projectBuildSortList;
-        System.out.println("projectBuildSortList : " + projectBuildSortList.toString());
+        WinkLog.d("projectBuildSortList : " + projectBuildSortList.toString());
 
         boolean hasFileChanged = diff();  // 更新：Settings.data.hasResourceChanged
 
         if (!hasFileChanged) {
-            com.immomo.wink.util.Log.cyan("======>>> 没有文件变更");
+            com.immomo.wink.util.WinkLog.cyan("======>>> 没有文件变更");
         }
 
         new ResourceHelper().checkResource(); // 内部判断：Settings.data.hasResourceChanged
@@ -53,12 +53,12 @@ public class JavaEntrance {
         // 编译资源
         if (com.immomo.wink.Settings.data.needProcessDebugResources) {
 //            new ResourceHelper().packageResources();
-            com.immomo.wink.util.Log.cyan("======>>> 资源变更，执行 gradle task");
+            com.immomo.wink.util.WinkLog.cyan("======>>> 资源变更，执行 gradle task");
             runWinkCommand(path);
             return;
         }
 
-        Log.cyan("======>>> 没有资源变更");
+        WinkLog.cyan("======>>> 没有资源变更");
         new CompileHelper().compileCode();
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
@@ -88,18 +88,18 @@ public class JavaEntrance {
     }
 
     public static boolean diff() {
-        System.out.println("====== diff run ~~~ ======");
+        WinkLog.v("====== diff run ~~~ ======");
 
         for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
             long startTime = System.currentTimeMillis();
             new DiffHelper(projectInfo).diff(projectInfo);
-            System.out.println("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+            WinkLog.v("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
         }
 //
         for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
             if (projectInfo.hasResourceChanged) {
-                System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
-                System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                WinkLog.v("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
+                WinkLog.v("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
                 com.immomo.wink.Settings.data.hasResourceChanged = true;
                 break;
             }

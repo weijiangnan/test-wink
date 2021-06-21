@@ -16,20 +16,19 @@
 
 package com.immomo.wink.helper;
 
-import com.immomo.wink.Constant;
 import com.immomo.wink.Settings;
-import com.immomo.wink.util.Log;
 import com.immomo.wink.util.Utils;
+import com.immomo.wink.util.WinkLog;
 
 public class IncrementPatchHelper {
     public boolean patchToApp() {
         if (!Settings.data.hasClassChanged && !Settings.data.hasResourceChanged) {
-            Log.v("No..nothing to do.");
+            WinkLog.vNoLimit("无变动，无需执行增量操作");
             return false;
         }
 
 
-        Log.v(Constant.TAG, "No ------ !!" + Settings.data.hasClassChanged + Settings.data.hasResourceChanged);
+        WinkLog.d("[IncrementPatchHelper]->[patchToApp] \n是否有资源变动：" + Settings.data.hasClassChanged + "，是否新增改名：" + Settings.data.hasResourceChanged);
 
         createPatchFile();
         patchDex();

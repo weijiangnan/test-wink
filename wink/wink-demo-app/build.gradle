@@ -6,6 +6,7 @@ plugins {
 }
 winkOptions {
     kotlinSyntheticsEnable = false
+    logLevel = 10
 }
 android {
     compileSdkVersion 30

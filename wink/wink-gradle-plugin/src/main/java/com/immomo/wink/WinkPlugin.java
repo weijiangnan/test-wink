@@ -25,7 +25,7 @@ import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
 import com.immomo.wink.helper.ResourceHelper;
 import com.immomo.wink.hilt.HiltTransform;
-import com.immomo.wink.util.Log;
+import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
 import org.gradle.api.Action;
@@ -45,11 +45,11 @@ public class WinkPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("apply init", "_________");
+        com.immomo.wink.util.WinkLog.TimerLog timer = com.immomo.wink.util.WinkLog.timerStart("apply init", "_________");
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
 //        appExtension.getDefaultConfig().buildConfigField("String", "wink_VERSION", "20000912");
         appExtension.aaptOptions(aaptOptions -> {
-            com.immomo.wink.util.Log.v("aaptOptions", "开始aapt配置 execute!");
+            com.immomo.wink.util.WinkLog.v("aaptOptions", "开始aapt配置 execute!");
             String stableIdPath = project.getRootDir() + "/.idea/" + Constant.TAG + "/stableIds.txt";
             String winkFolder = project.getRootDir() + "/.idea/" + Constant.TAG;
             File file = new File(stableIdPath);
@@ -58,10 +58,10 @@ public class WinkPlugin implements Plugin<Project> {
                 lbfolder.mkdir();
             }
             if (file.exists()) {
-                com.immomo.wink.util.Log.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
+                com.immomo.wink.util.WinkLog.v("aaptOptions", "开始aapt配置 execute! 文件存在  " + file.getAbsolutePath());
                 aaptOptions.additionalParameters("--stable-ids", file.getAbsolutePath());
             } else {
-                com.immomo.wink.util.Log.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
+                com.immomo.wink.util.WinkLog.v("aaptOptions", "开始aapt配置 execute! 文件不存在");
                 aaptOptions.additionalParameters("--emit-ids", file.getAbsolutePath());
             }
         });
@@ -71,7 +71,7 @@ public class WinkPlugin implements Plugin<Project> {
                 WinkOptions.class);
 
         project.afterEvaluate(it -> {
-            com.immomo.wink.util.Log.TimerLog timerAfterEvaluate = com.immomo.wink.util.Log.timerStart("timerAfterEvaluate");
+            com.immomo.wink.util.WinkLog.TimerLog timerAfterEvaluate = com.immomo.wink.util.WinkLog.timerStart("timerAfterEvaluate");
             createInitTask(it);
             createDiffTask(it);
             createCompileTask(it);
@@ -84,6 +84,8 @@ public class WinkPlugin implements Plugin<Project> {
 
             timerAfterEvaluate.end();
 
+            WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
+            Settings.env.options = options.copy();
             timer.end("_________");
         });
 
@@ -94,7 +96,7 @@ public class WinkPlugin implements Plugin<Project> {
     }
 
     public void combineTask(Project project) {
-        System.out.println("执行了我们插件");
+        WinkLog.v("执行了我们插件");
         Task taskInit = project.getTasks().getByName("winkInit");
         Task taskDiff = project.getTasks().getByName("winkDiff");
         Task taskCompile = project.getTasks().getByName("winkCompile");
@@ -128,7 +130,7 @@ public class WinkPlugin implements Plugin<Project> {
         isFirstCompile = !isStableFileExist;
 
         if (isStableFileExist) {
-            com.immomo.wink.util.Log.cyan("【WinkPlugin】", "=========== 开始增量编译 ===========");
+            com.immomo.wink.util.WinkLog.cyan("【WinkPlugin】", "=========== 开始增量编译 ===========");
             taskDiff.dependsOn(taskInit);
             taskResources.dependsOn(taskDiff);
             taskCompile.dependsOn(taskPackageResources);
@@ -141,7 +143,7 @@ public class WinkPlugin implements Plugin<Project> {
             taskProcessResources.mustRunAfter(taskResources);
             taskProcessResources.dependsOn(taskGradleProcessDebugResources);
         } else {
-            com.immomo.wink.util.Log.cyan("【WinkPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
+            com.immomo.wink.util.WinkLog.cyan("【WinkPlugin】", "=========== 本地项目没有编译过，自动编译项目 ===========");
             Task installDebug = getFlavorInstallDebug(project);
             taskWink.dependsOn(installDebug);
         }
@@ -239,7 +241,7 @@ public class WinkPlugin implements Plugin<Project> {
     public void createCompileTask(Project project) {
         project.getTasks().register("winkCompile", task -> {
             task.doLast(it -> {
-                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkCompile");
+                com.immomo.wink.util.WinkLog.TimerLog timer = com.immomo.wink.util.WinkLog.timerStart("winkCompile");
                 new CompileHelper().compileCode();
                 timer.end();
             });
@@ -249,7 +251,7 @@ public class WinkPlugin implements Plugin<Project> {
     public void createTransformTask(Project project) {
         project.getTasks().register("winkTransform", task -> {
             task.doLast(it -> {
-                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkCompile");
+                com.immomo.wink.util.WinkLog.TimerLog timer = com.immomo.wink.util.WinkLog.timerStart("winkCompile");
                 HiltTransform.INSTANCE.transform();
                 timer.end();
             });
@@ -268,7 +270,7 @@ public class WinkPlugin implements Plugin<Project> {
 
         project.getTasks().register("winkResources", task -> {
             task.doLast(it -> {
-                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkResources");
+                com.immomo.wink.util.WinkLog.TimerLog timer = com.immomo.wink.util.WinkLog.timerStart("winkResources");
                 // compile resource.
                 new ResourceHelper().checkResource();
                 timer.end();
@@ -277,7 +279,7 @@ public class WinkPlugin implements Plugin<Project> {
 
         project.getTasks().register("winkPackageResources", task -> {
             task.doLast(it -> {
-                com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("winkPackageResources");
+                com.immomo.wink.util.WinkLog.TimerLog timer = com.immomo.wink.util.WinkLog.timerStart("winkPackageResources");
                 if (Settings.data.hasResourceChanged) {
                     new ResourceHelper().packageResources();
                 }
@@ -295,7 +297,7 @@ public class WinkPlugin implements Plugin<Project> {
                     if (isFirstCompile) {
                         return;
                     }
-                    com.immomo.wink.util.Log.TimerLog timer = com.immomo.wink.util.Log.timerStart("wink", "patchToApp...");
+                    com.immomo.wink.util.WinkLog.TimerLog timer = com.immomo.wink.util.WinkLog.timerStart("wink", "patchToApp...");
                     // patch
                     if (new IncrementPatchHelper().patchToApp()) {
                         updateSnapShot();
@@ -311,7 +313,7 @@ public class WinkPlugin implements Plugin<Project> {
             task.doLast(new Action<Task>() {
                 @Override
                 public void execute(Task task) {
-                    com.immomo.wink.util.Log.TimerLog timer = Log.timerStart("winkCleanup", "cleanUp");
+                    com.immomo.wink.util.WinkLog.TimerLog timer = WinkLog.timerStart("winkCleanup", "cleanUp");
                     new com.immomo.wink.helper.CleanupHelper().cleanup();
                     timer.end("cleanUp");
                 }
@@ -329,13 +331,13 @@ public class WinkPlugin implements Plugin<Project> {
                     //
                     long startTime = System.currentTimeMillis();
                     new com.immomo.wink.helper.DiffHelper(projectInfo).diff(projectInfo);
-                    System.out.println("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
+                    WinkLog.v("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
                 }
 //
                 for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
                     if (projectInfo.hasResourceChanged) {
-                        System.out.println("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
-                        System.out.println("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
+                        WinkLog.v("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
+                        WinkLog.v("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
                         Settings.data.hasResourceChanged = true;
                     }
 
@@ -344,7 +346,7 @@ public class WinkPlugin implements Plugin<Project> {
                     }
                 }
 
-                System.out.println("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
+                WinkLog.v("【【【===================================================>>>>>> " + "diff 耗时：" + (System.currentTimeMillis() - diffStartTime) + " ms");
             });
 
         }).get().setGroup(Settings.NAME);

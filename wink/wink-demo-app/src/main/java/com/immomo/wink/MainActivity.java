@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{
-            Toast.makeText(this, "333" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "11111" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
         });
     }
 }

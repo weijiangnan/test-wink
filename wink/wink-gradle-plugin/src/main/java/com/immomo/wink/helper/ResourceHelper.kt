@@ -3,6 +3,7 @@ package com.immomo.wink.helper
 import com.immomo.wink.Constant
 import com.immomo.wink.Settings
 import com.immomo.wink.util.Utils
+import com.immomo.wink.util.WinkLog
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -10,7 +11,7 @@ class ResourceHelper {
     var st : Long = 0
 
     fun checkResource() {
-        println("=========================== 资源编译开始 ============== \n ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
+        WinkLog.cyan("=========================== 资源编译开始 ============== \n ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
         if (!Settings.data.hasResourceChanged) return
 
         st = System.currentTimeMillis()
@@ -20,9 +21,9 @@ class ResourceHelper {
     private fun compileResources() {
         val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
-            println("stableIds存在")
+            WinkLog.v("stableIds存在")
         } else {
-            println("=================================")
+            WinkLog.v("=================================")
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
 
@@ -32,15 +33,15 @@ class ResourceHelper {
     var ap_path = ""
     fun findAp_(file: File) {
         if (file.isFile) {
-            println("findAp_是文件 file=${file.name}")
+            WinkLog.d("findAp_是文件 file=${file.name}")
             if (file.name.endsWith(".ap_")) {
-                println("是ap_ file=${file.name}")
+                WinkLog.d("是ap_ file=${file.name}")
                 ap_path = file.absolutePath
             }
         }
         if (file.isDirectory) {
             for (f : File in file.listFiles()) {
-                println("递归找ap_ f=${f.name}")
+                WinkLog.d("递归找ap_ f=${f.name}")
                 findAp_(f)
             }
         }
@@ -50,11 +51,11 @@ class ResourceHelper {
         val ap_ParentDir = File("${Settings.env.appProjectDir}/build/intermediates/processed_res")
         findAp_(ap_ParentDir)
 
-        println("packageResources-packageResources rootPath=====${ap_ParentDir.absolutePath}")
-        println("找到的 findap==${ap_path}")
+        WinkLog.d("packageResources-packageResources rootPath=====${ap_ParentDir.absolutePath}")
+        WinkLog.d("找到的 findap==${ap_path}")
 
         if (!ap_path.isBlank()) {
-            println("ap_文件存在")
+            WinkLog.d("ap_文件存在")
         } else {
             throw FileNotFoundException("ap_文件 不 存在")
         }
@@ -65,7 +66,7 @@ class ResourceHelper {
         val apkPath = "$winkFolderPath/$patchName"
         val pushSdcardPath = "/sdcard/Android/data/${Settings.env.debugPackageName}/patch_file/apk"
 
-        println("资源打包路径：$apkPath")
+        WinkLog.d("资源打包路径：$apkPath")
         val app = Settings.env.projectTreeRoot!!.name
         val localScript = """
             source ~/.bash_profile
@@ -82,7 +83,7 @@ class ResourceHelper {
 
         Utils.executeScript(localScript)
 
-        println("资源编译耗时：" + (System.currentTimeMillis() - st))
+        WinkLog.d("资源编译耗时：" + (System.currentTimeMillis() - st))
     }
 
 

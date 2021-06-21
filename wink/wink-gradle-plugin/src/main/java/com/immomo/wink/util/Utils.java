@@ -34,7 +34,7 @@ import java.util.List;
 public class Utils {
 
     public static List<String> runShell(String shStr) {
-//        System.out.println("准备运行shell : " + shStr);
+//        WinkLog.v("准备运行shell : " + shStr);
         List<String> strList = new ArrayList<String>();
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + shStr + "`"}, null, null);
@@ -48,7 +48,7 @@ public class Utils {
             }
 
             while ((line = errorReader.readLine()) != null) {
-                System.out.println(line);
+                WinkLog.v(line);
             }
 
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class Utils {
         for (String str : strList) {
             System.out.print(str);
         }
-//        System.out.println("结束运行shell : " + shStr);
+//        WinkLog.v("结束运行shell : " + shStr);
         return strList;
     }
 
@@ -72,12 +72,12 @@ public class Utils {
 
         String line = "";
         while ((line = reader.readLine()) != null) {
-            System.out.println(line);
+            WinkLog.v(line);
         }
 
         line = "";
         while ((line = errorReader.readLine()) != null) {
-            System.out.println(line);
+            WinkLog.v(line);
         }
     }
 
@@ -130,7 +130,7 @@ public class Utils {
         for (String cmd: cmds) {
 //            cmdArray.add("`" + cmd + "`");
             cmdArray.add(cmd);
-            Log.v("Execute shell: ", cmd);
+            WinkLog.v("Execute shell: ", cmd);
         }
 
         try {
@@ -142,16 +142,16 @@ public class Utils {
 
             while ((line = reader.readLine()) != null) {
                 result.getResult().add(line);
-                Log.v("Shell result: ", line);
+                WinkLog.v("Shell result: ", line);
             }
 
             while ((line = errorReader.readLine()) != null) {
                 result.getErrorResult().add(line);
-                Log.v("Shell error: ", line);
+                WinkLog.v("Shell error: ", line);
             }
 
         } catch (Exception e) {
-            Log.v("Shell exception: ", e.getMessage());
+            WinkLog.v("Shell exception: ", e.getMessage());
             result.setE(e);
         }
 
@@ -190,7 +190,7 @@ public class Utils {
 
     public static boolean isStableFileExist(Project project) {
         String path = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME + "/stableIds.txt";
-        System.out.println("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
+        WinkLog.v("isStableFileExist === Settings.env.tmpPath : " + Settings.env.tmpPath);
         File f = new File(path);
         return f.exists();
     }

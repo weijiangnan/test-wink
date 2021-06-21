@@ -3,7 +3,7 @@ package com.immomo.wink.helper;
 
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.Settings;
-import com.immomo.wink.util.Log;
+import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
 
 import java.io.File;
@@ -31,9 +31,9 @@ public class CompileHelper {
     }
 
     private int compileJava(Settings.ProjectTmpInfo project) {
-        System.out.println("compileJava ================================");
-        System.out.println("changedJavaFiles : " + project.changedJavaFiles.toString());
-        System.out.println("compileJava ================================");
+        WinkLog.d("compileJava ================================");
+        WinkLog.d("changedJavaFiles : " + project.changedJavaFiles.toString());
+        WinkLog.d("compileJava ================================");
 
         if (project.changedJavaFiles.size() <= 0) {
             return 0;
@@ -48,8 +48,8 @@ public class CompileHelper {
 
         String shellCommand = "javac" + project.fixedInfo.javacArgs
                 + sb.toString();
-        System.out.println("[LiteBuild] : javac shellCommand = " + shellCommand);
-        System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
+        WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
+        WinkLog.d("[LiteBuild] projectName : " + project.fixedInfo.name);
         Utils.runShell(
 //                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
                 shellCommand
@@ -62,12 +62,12 @@ public class CompileHelper {
 
     private void compileKotlin(Settings.ProjectTmpInfo project) {
 
-        System.out.println("compileKotlin ================================");
-        System.out.println("changedKotlinFiles : " + project.changedKotlinFiles.toString());
-        System.out.println("compileKotlin ================================");
+        WinkLog.d("compileKotlin ================================");
+        WinkLog.d("changedKotlinFiles : " + project.changedKotlinFiles.toString());
+        WinkLog.d("compileKotlin ================================");
 
         if (project.changedKotlinFiles.size() <= 0) {
-            System.out.println("LiteBuild: ================> 没有 Kotlin 文件变更。");
+            WinkLog.d("LiteBuild: ================> 没有 Kotlin 文件变更。");
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -83,8 +83,8 @@ public class CompileHelper {
 
         String kotlinc = getKotlinc();
 
-        System.out.println("[LiteBuild] kotlincHome : " + kotlinc);
-        System.out.println("[LiteBuild] projectName : " + project.fixedInfo.name);
+        WinkLog.d("[LiteBuild] kotlincHome : " + kotlinc);
+        WinkLog.d("[LiteBuild] projectName : " + project.fixedInfo.name);
         try {
             String mainKotlincArgs = project.fixedInfo.kotlincArgs;
 
@@ -100,7 +100,7 @@ public class CompileHelper {
             String shellCommand = "sh " + kotlinc + " -jdk-home " + javaHomePath
                     + mainKotlincArgs + sb.toString();
 
-//            System.out.println("[LiteBuild] kotlinc shellCommand : " + shellCommand);
+//            WinkLog.d("[LiteBuild] kotlinc shellCommand : " + shellCommand);
             Utils.runShell(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,13 +121,11 @@ public class CompileHelper {
 
         if (kotlinc == null || kotlinc.equals("")) {
             if (!new File(kotlinc).exists()) {
-                System.out.println();
-                Log.e("================== 请配置 KOTLINC_HOME ==================");
-                Log.e("1. 打开：~/.bash_profile");
-                Log.e("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
-                Log.e("3. 执行：source ~/.bash_profile");
-                Log.e("========================================================");
-                System.out.println();
+                WinkLog.e("\n\n================== 请配置 KOTLINC_HOME ==================");
+                WinkLog.e("1. 打开：~/.bash_profile");
+                WinkLog.e("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
+                WinkLog.e("3. 执行：source ~/.bash_profile");
+                WinkLog.e("========================================================\n\n");
             }
 
             return "";
@@ -154,7 +152,7 @@ public class CompileHelper {
                     "-P plugin:org.jetbrains.kotlin.android:package=%s " +
                     "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
         }
-        System.out.println("【compile kotlinx.android.synthetic】 \n" + args);
+        WinkLog.v("【compile kotlinx.android.synthetic】 \n" + args);
         return args;
     }
 
@@ -171,7 +169,7 @@ public class CompileHelper {
         String patchName = Settings.env.version + "_patch.jar";
         String cmds = useD8(patchName);
 
-        Log.TimerLog log = Log.timerStart("开始打DexPatch！");
+        WinkLog.TimerLog log = WinkLog.timerStart("开始打DexPatch！");
 
         Utils.runShell(cmds);
 
@@ -201,7 +199,7 @@ public class CompileHelper {
 //        String classpath = " --classpath " + Settings.env.projectTreeRoot.classPath.replace(":", " --classpath ");
 //        classpath = "";
 
-//        System.out.println("Dex生成命令cmd =======\n" + cmds);
+//        WinkLog.v("Dex生成命令cmd =======\n" + cmds);
         String cmds = "";
         cmds += '\n' + Settings.env.buildToolsDir + "/dx --dex --no-strict --output "
                 + Settings.env.tmpPath + "/" + patchName + " " +  Settings.env.tmpPath + "/tmp_class/";

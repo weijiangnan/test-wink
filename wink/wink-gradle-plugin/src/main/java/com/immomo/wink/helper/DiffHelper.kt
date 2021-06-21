@@ -19,23 +19,17 @@ import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
-import com.google.gson.Gson
 import com.immomo.wink.Constant
 import com.immomo.wink.Settings
-import com.immomo.wink.util.Log
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.diff.DiffEntry
+import com.immomo.wink.util.WinkLog
 import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevTree
 import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.treewalk.AbstractTreeIterator
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
-import org.gradle.api.Project
 import java.io.File
 import java.io.FileReader
-import java.io.FileWriter
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -62,7 +56,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     private val properties = Properties()
 
     init {
-        Log.v(TAG, "[${project.fixedInfo.name}]:init")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:init")
 
         val moduleName = project.fixedInfo.name
         diffDir = "${Settings.env!!.rootDir}/.idea/${Constant.TAG}/diff/${moduleName}"
@@ -96,28 +90,28 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
 
     fun initSnapshot() {
-        Log.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         initSnapshotByMd5()
 //        initSnapshotByGit()
     }
 
     fun initSnapshotForCode() {
-        Log.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
         genSnapshotAndSaveToDisk(scanPathCode, csvPathCode)
     }
 
     fun initSnapshotForRes() {
-        Log.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")
 
         File(csvPathRes).takeIf { it.exists() }?.let { it.delete() }
         genSnapshotAndSaveToDisk(scanPathRes, csvPathRes)
     }
 
     fun diff(projectInfo: Settings.ProjectTmpInfo) {
-        Log.v(TAG, "[${project.fixedInfo.name}]:获取差异...")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:获取差异...")
 
         diffByMd5(projectInfo)
 //        File(csvPathCode).takeIf { it.exists() }?.let { it.delete() }
@@ -216,7 +210,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
     private fun diffByMd5(projectInfo: Settings.ProjectTmpInfo) {
         diffInner(scanPathCode, csvPathCode) {
-            Log.v(TAG, "[${project.fixedInfo.name}]:    差异数据:$it")
+            WinkLog.d("[${project.fixedInfo.name}]:    差异数据:$it")
             when {
                 it.endsWith(".java") -> {
                     if (!projectInfo.changedJavaFiles.contains(it)) {
@@ -241,11 +235,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
             { newFile ->
                 projectInfo.hasResourceChanged = true
                 projectInfo.hasAddNewOrChangeResName = true
-                Log.e(TAG, "[${project.fixedInfo.name}]:有资源被新增或改名了！！！！！！差异数据:$newFile")
+                WinkLog.e(TAG, "[${project.fixedInfo.name}]:有资源被新增或改名了！！！！！！差异数据:$newFile")
             }, { changeFile ->
 
                 projectInfo.hasResourceChanged = true
-                Log.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$changeFile")
+                WinkLog.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$changeFile")
             })
     }
 
@@ -257,12 +251,12 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     ) {
         val mapOrigin = loadSnapshotToCacheFromDisk(csvPath)
         if (mapOrigin.isEmpty()) {
-            Log.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
+            WinkLog.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
             return
         } else {
             val mapNew = hashMapOf<String, String>()
             genSnapshotAndSaveToCache(scanPath, mapNew)
-            Log.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
+            WinkLog.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
 
             var m1 = mapOrigin
             var m2 = mapNew
@@ -289,10 +283,10 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         repository: Repository,
         commit: RevCommit
     ): AbstractTreeIterator? {
-        println(commit.id)
+        WinkLog.d(commit.id.toString())
         try {
             RevWalk(repository).use { walk ->
-                println(commit.tree.id)
+                WinkLog.d(commit.tree.id.toString())
                 val tree: RevTree = walk.parseTree(commit.tree.id)
                 val oldTreeParser = CanonicalTreeParser()
                 repository.newObjectReader()
@@ -312,7 +306,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         //Log.v(TAG, mapOrigin)
 
         if (mapOrigin.isEmpty()) {
-            Log.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
+            WinkLog.v(TAG, "[${project.fixedInfo.name}]:原始数据为空")
             return
         } else {
             val mapNew = hashMapOf<String, String>()
@@ -321,11 +315,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
             //Log.v(TAG, "新数据:")
             //Log.v(TAG, mapNew)
 
-            Log.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
+            WinkLog.v(TAG, "[${project.fixedInfo.name}]:计算差异数据...")
             compareMap(mapOrigin, mapNew)
-                .also { if (it.isEmpty()) Log.v(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
+                .also { if (it.isEmpty()) WinkLog.v(TAG, "[${project.fixedInfo.name}]:差异数据为空") }
                 .forEach {
-                    System.out.println(it)
+                    WinkLog.v(it)
                     block(it)
                 }
 
@@ -333,7 +327,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
     }
 
     private fun compareMap(map1: Map<String, String>, map2: Map<String, String>): Set<String> {
-        Log.v(TAG, "[${project.fixedInfo.name}]:compareMap...")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:compareMap...")
 
         val rst = hashSetOf<String>()
         var m1 = map1
@@ -374,7 +368,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
                 map[it.absolutePath] = getSnapshot(it)
             }
 
-        Log.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
     }
 
     private fun genSnapshotAndSaveToDisk(path: String, csvPath: String) {
@@ -401,7 +395,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
                 }
             }
 
-        Log.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
+        WinkLog.v(TAG, "[${project.fixedInfo.name}]:耗时:${System.currentTimeMillis() - timeBegin}ms")
 
     }
 
@@ -409,7 +403,7 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 //        Log.v(TAG, "[${project.fixedInfo.name}]:从[${path}]加载md5信息...")
 
         return if (!File(path).exists()) {
-            Log.v(TAG, "[${project.fixedInfo.name}]:文件[${path}]不存在")
+            WinkLog.v(TAG, "[${project.fixedInfo.name}]:文件[${path}]不存在")
             hashMapOf()
         } else {
             val map = hashMapOf<String, String>()

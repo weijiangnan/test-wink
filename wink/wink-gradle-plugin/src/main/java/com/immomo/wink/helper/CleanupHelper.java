@@ -19,6 +19,7 @@ package com.immomo.wink.helper;
 import com.immomo.wink.Constant;
 import com.immomo.wink.Settings;
 import com.immomo.wink.util.Utils;
+import com.immomo.wink.util.WinkLog;
 
 import java.io.File;
 
@@ -64,7 +65,7 @@ public class CleanupHelper {
     }
 
     public void deleteAllApk() {
-        System.out.println("删除文件deleteAllApk :" + Settings.env.tmpPath);
+        WinkLog.d("删除文件deleteAllApk :" + Settings.env.tmpPath);
         File f = new File(Settings.env.tmpPath);
         if (f.exists() && f.isDirectory()) {
             File[] apks = f.listFiles(pathname -> pathname.getName().endsWith("apk"));
@@ -77,7 +78,7 @@ public class CleanupHelper {
     }
 
     public void deleteAllDex() {
-        System.out.println("删除文件deleteAllDex :" + Settings.env.tmpPath);
+        WinkLog.d("删除文件deleteAllDex :" + Settings.env.tmpPath);
         File f = new File(Settings.env.tmpPath);
         if (f.exists() && f.isDirectory()) {
             File[] files = f.listFiles(pathname -> (pathname.getName().endsWith("dex") || pathname.getName().endsWith("jar")));
@@ -90,7 +91,7 @@ public class CleanupHelper {
     }
 
     public void delete(String path) {
-        System.out.println("删除文件:" + Settings.env.tmpPath + "/" + path);
+        WinkLog.d("删除文件:" + Settings.env.tmpPath + "/" + path);
         File f = new File(Settings.env.tmpPath + "/" + path);
         deleteFile(f);
     }

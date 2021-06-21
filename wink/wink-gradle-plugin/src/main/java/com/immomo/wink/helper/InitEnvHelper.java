@@ -28,6 +28,7 @@ import com.immomo.wink.Settings;
 import com.immomo.wink.util.AndroidManifestUtils;
 import com.immomo.wink.util.LocalCacheUtil;
 import com.immomo.wink.util.ShareReflectUtil;
+import com.immomo.wink.util.WinkLog;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
@@ -81,7 +82,7 @@ public class InitEnvHelper {
         } else {
 //            createEnv(project);
 //            reloadEnv(project);
-            System.out.println("project.getRootDir() : " + project.getRootDir());
+            WinkLog.d("project.getRootDir() : " + project.getRootDir());
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
         }
@@ -163,10 +164,7 @@ public class InitEnvHelper {
         env.launcherActivity = AndroidManifestUtils.findLauncherActivity(manifestPath, env.packageName);
 
         WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
-        env.options = new WinkOptions();
-        env.options.moduleBlacklist = options.moduleBlacklist;
-        env.options.moduleWhitelist = options.moduleWhitelist;
-        env.options.kotlinSyntheticsEnable = options.kotlinSyntheticsEnable;
+        env.options = options.copy();
 
         // todo apt
 //        initKaptTaskParams(env);
@@ -223,7 +221,7 @@ public class InitEnvHelper {
         ArrayList<String> args = new ArrayList<>();
         ArrayList<String> kotlinArgs = new ArrayList<>();
 
-        System.out.println("ywb 2222222 initProjectData 1111 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
+        WinkLog.d("ywb 2222222 initProjectData 1111 耗时：" + (System.currentTimeMillis() - findModuleEndTime) + " ms");
 
         Object extension = project.getExtensions().findByName("android");
         JavaCompile javaCompile = null;
@@ -336,11 +334,11 @@ public class InitEnvHelper {
 //            kotlinArgs.add(getJavaHome());
 
         kotlinArgs.add("-classpath");
-//            System.out.println("=============");
-//            System.out.println("BootstrapClasspath =========== : " + javaCompile.getOptions().getBootstrapClasspath().getAsPath());
-//            System.out.println("=============");
+//            WinkLog.d("=============");
+//            WinkLog.d("BootstrapClasspath =========== : " + javaCompile.getOptions().getBootstrapClasspath().getAsPath());
+//            WinkLog.d("=============");
 
-        System.out.println("projectDir : " + project.getProjectDir().toString());
+        WinkLog.d("projectDir : " + project.getProjectDir().toString());
         kotlinArgs.add(javaCompile.getOptions().getBootstrapClasspath().getAsPath() + ":"
                 + fixedInfo.classPath);
 

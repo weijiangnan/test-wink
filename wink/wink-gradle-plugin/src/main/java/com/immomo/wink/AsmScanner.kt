@@ -2,7 +2,7 @@ package com.immomo.wink
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.immomo.wink.util.Log
+import com.immomo.wink.util.WinkLog
 import jdk.internal.org.objectweb.asm.*
 import org.gradle.api.Project
 import java.io.File
@@ -24,12 +24,12 @@ class WinkAsmTransform(val project: Project, val config: Any?) : Transform() {
     override fun isIncremental(): Boolean = true
 
     override fun transform(transformInvocation: TransformInvocation?) {
-        Log.v("[WinkAsmTransform] transform... transformInvocation")
+        WinkLog.vNoLimit("[WinkAsmTransform] transform... transformInvocation")
         val includeModules = config?.toString()?.split(",") ?: emptyList()
 
         val asmScanner = AsmScanner()
         transformInvocation?.inputs?.forEach { input ->
-            Log.v("[WinkAsmTransform] intput... ${input}")
+            WinkLog.vNoLimit("[WinkAsmTransform] intput... ${input}")
             input.directoryInputs.forEach { dirInput ->
                 val outputDir = transformInvocation.outputProvider.getContentLocation(
                     dirInput.name,
@@ -106,26 +106,26 @@ class AnnotationPrinterVisitor(annotationVisitor: AnnotationVisitor) :
 
     override fun visitEnd() {
         super.visitEnd()
-        Log.v("visitEnd")
+        WinkLog.vNoLimit("visitEnd")
     }
 
     override fun visitAnnotation(name: String?, descriptor: String?): AnnotationVisitor {
-        Log.v("visitAnnotation, name = $name, descriptor = $descriptor")
+        WinkLog.vNoLimit("visitAnnotation, name = $name, descriptor = $descriptor")
         return super.visitAnnotation(name, descriptor)
     }
 
     override fun visitEnum(name: String?, descriptor: String?, value: String?) {
-        Log.v("visitEnum, name = $name, descriptor = $descriptor, value = $value")
+        WinkLog.vNoLimit("visitEnum, name = $name, descriptor = $descriptor, value = $value")
         super.visitEnum(name, descriptor, value)
     }
 
     override fun visit(name: String?, value: Any?) {
         super.visit(name, value)
-        Log.v("visit, name = $name, value = $value")
+        WinkLog.vNoLimit("visit, name = $name, value = $value")
     }
 
     override fun visitArray(name: String?): AnnotationVisitor {
-        Log.v("visitArray, name = $name")
+        WinkLog.vNoLimit("visitArray, name = $name")
         return super.visitArray(name)
     }
 }
@@ -154,7 +154,7 @@ internal class WinkAsmScanVisitor(
 ) : ClassVisitor(Opcodes.ASM5) {
 
     override fun visitAnnotation(desc: String?, visible: Boolean): AnnotationVisitor {
-        Log.v("[visitAnnotation] desc=$desc, visible=$visible")
+        WinkLog.vNoLimit("[visitAnnotation] desc=$desc, visible=$visible")
         return super.visitAnnotation(desc, visible)
     }
 }
