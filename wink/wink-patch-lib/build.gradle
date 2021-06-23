@@ -61,7 +61,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.wink'
                     pom.artifactId = 'patch-lib'
-                    pom.version = '0.1.61i'
+                    pom.version = '0.2.0i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }

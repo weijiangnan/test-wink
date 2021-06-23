@@ -72,7 +72,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.wink'
                     pom.artifactId = 'plugin'
-                    pom.version = '0.1.60i'
+                    pom.version = '0.2.0i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }
