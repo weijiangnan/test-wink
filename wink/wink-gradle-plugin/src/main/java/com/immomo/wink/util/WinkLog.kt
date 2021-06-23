@@ -103,7 +103,6 @@ object WinkLog {
         return sw.toString()
     }
 
-
     @JvmStatic
     fun d(str: String) {
         winkPrintln(Constant.TAG, str, WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_YELLOW)
@@ -128,12 +127,8 @@ object WinkLog {
 
     @JvmStatic
     fun winkPrintln(tag: String, msg: String, level: Int, color: String) {
-        if (Settings.env.options == null || Settings.env.options!!.logLevel == -1 ) {
+        if (Settings.data.logLevel <= level) {
             println(color + "[${tag}] $msg" + TEXT_RESET)
-        } else {
-            if (Settings.env.options!!.logLevel <= level) {
-                println(color + "[${tag}] $msg" + TEXT_RESET)
-            }
         }
     }
 

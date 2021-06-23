@@ -5,13 +5,11 @@ import butterknife.BindView;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.immomo.wink.utils.Tools;
 import com.immomo.wink.utils.ZZ;
 
 @Route(path = "/com/Activity1")
@@ -33,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 //        textView.setText(Tools.getTitle() + "xx1");
 
         textView.setOnClickListener((v)->{
-            Toast.makeText(this, "1111" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "2" + new ZZ().getKK(), Toast.LENGTH_SHORT).show();
         });
     }
 }

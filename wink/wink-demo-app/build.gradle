@@ -7,7 +7,7 @@ plugins {
 
 winkOptions {
     kotlinSyntheticsEnable = false
-    logLevel = 4
+    logLevel = 0
 }
 
 android {

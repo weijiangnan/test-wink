@@ -60,6 +60,11 @@ public class IncrementPatchHelper {
 
         Utils.runShells("source ~/.bash_profile",
                 "adb shell mkdir " + Settings.data.patchPath);
+
+        result = Utils.runShells("adb shell ls " + Settings.data.patchPath);
+        if (result.getErrorResult().size() > 0) {
+            WinkLog.e("Can not create patch file " + Settings.data.patchPath);
+        }
     }
 
     public void patchDex() {
@@ -67,7 +72,7 @@ public class IncrementPatchHelper {
             return;
         }
 
-        WinkLog.i("Patching Dex...");
+        WinkLog.i("Dex patching...");
 
         String patchName = Settings.env.version + "_patch.jar";
         Utils.runShells("source ~/.bash_profile\n" + "adb push " + Settings.env.tmpPath + "/" + patchName
@@ -79,7 +84,7 @@ public class IncrementPatchHelper {
             return;
         }
 
-        WinkLog.i("Patching Resources...");
+        WinkLog.i("Resources patching...");
 
         String patchName = Settings.env.version + "_resources-debug.apk";
         Utils.runShells("source ~/.bash_profile\n" +

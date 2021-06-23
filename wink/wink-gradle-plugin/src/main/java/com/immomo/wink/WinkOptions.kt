@@ -11,7 +11,7 @@ open class WinkOptions(
     @JvmField
     var kotlinSyntheticsEnable: Boolean = false,
     @JvmField
-    var logLevel: Int = -1
+    var logLevel: Int = 4
 ) : Serializable {
 
     fun copy(): WinkOptions {

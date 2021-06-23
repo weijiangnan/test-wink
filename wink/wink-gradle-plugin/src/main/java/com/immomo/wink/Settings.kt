@@ -53,7 +53,7 @@ object Settings {
             data.projectBuildSortList.add(ProjectTmpInfo(it))
         }
 
-        data.beginTime = System.currentTimeMillis();
+        data.beginTime = System.currentTimeMillis()
         // todo apt
 //        data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
 
@@ -92,6 +92,7 @@ object Settings {
             @JvmField var patchPath: String = "",
             @JvmField var processorMapping: ProcessorMapping? = null,
             @JvmField var beginTime: Long? = null,
+            @JvmField var logLevel: Int = 4
     ) : Serializable
 
     data class ProjectFixedInfo(

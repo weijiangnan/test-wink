@@ -17,17 +17,16 @@
 package com.immomo.wink.helper;
 
 import com.android.build.gradle.AppExtension;
-import com.android.build.gradle.BaseExtension;
 import com.android.build.gradle.LibraryExtension;
 import com.android.build.gradle.api.ApplicationVariant;
 import com.android.build.gradle.api.LibraryVariant;
-import com.android.build.gradle.internal.dsl.AnnotationProcessorOptions;
 import com.android.utils.FileUtils;
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.Settings;
 import com.immomo.wink.util.AndroidManifestUtils;
 import com.immomo.wink.util.LocalCacheUtil;
 import com.immomo.wink.util.ShareReflectUtil;
+import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
 import org.gradle.api.Project;
@@ -88,8 +87,20 @@ public class InitEnvHelper {
         }
 
         // Data每次初始化
-        Settings.initData();
+        initData(project);
 //        Log.v(Constant.TAG, Settings.env.toString());
+    }
+
+    private void initData(Project project) {
+        // Data每次初始化
+        Settings.initData();
+
+        initLog(project);
+    }
+
+    public void initLog(Project project) {
+        WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
+        Settings.data.logLevel = options.logLevel;
     }
 
     public void initE() {
