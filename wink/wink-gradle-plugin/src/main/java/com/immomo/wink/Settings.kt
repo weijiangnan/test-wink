@@ -53,6 +53,7 @@ object Settings {
             data.projectBuildSortList.add(ProjectTmpInfo(it))
         }
 
+        data.beginTime = System.currentTimeMillis();
         // todo apt
 //        data.processorMapping = LocalCacheUtil.getCache(env.tmpPath + "/annotation/mapping")
 
@@ -85,11 +86,12 @@ object Settings {
             @JvmField var projectBuildSortList: MutableList<ProjectTmpInfo> = ArrayList(),
             @JvmField var hasResourceChanged: Boolean = false,
             @JvmField var hasResourceAddOrRename: Boolean = false,
-            @JvmField var hasClassChanged: Boolean = false,
+            @JvmField var classChangedCount: Int = 0,
             @JvmField var needProcessDebugResources: Boolean = false,
             @JvmField var newVersion: String = "",
             @JvmField var patchPath: String = "",
-            @JvmField var processorMapping: ProcessorMapping? = null
+            @JvmField var processorMapping: ProcessorMapping? = null,
+            @JvmField var beginTime: Long? = null,
     ) : Serializable
 
     data class ProjectFixedInfo(

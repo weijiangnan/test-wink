@@ -11,6 +11,6 @@ class MainActivity2 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main2)
-        Log.e("Test","tes33ddd3t");
+        Log.e("Test","121");
     }
 }

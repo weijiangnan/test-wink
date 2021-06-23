@@ -2,6 +2,9 @@ package com.immomo.wink.util
 
 import com.immomo.wink.Constant
 import com.immomo.wink.Settings
+import java.io.PrintWriter
+import java.io.StringWriter
+import java.net.UnknownHostException
 
 object WinkLog {
     object WinkLogLevel {
@@ -13,6 +16,9 @@ object WinkLog {
 
         // 正常信息，比如目前执行哪个阶段
         const val LOG_LEVEL_INFO = 4
+
+        // 正常信息，比如目前执行哪个阶段
+        const val LOG_LEVEL_WARNING = 5
 
         const val LOG_LEVEL_NONE = Int.MAX_VALUE
     }
@@ -52,19 +58,51 @@ object WinkLog {
     }
 
     @JvmStatic
+    fun w(str: String) {
+        winkPrintln(Constant.TAG, str, WinkLogLevel.LOG_LEVEL_WARNING, TEXT_RED)
+    }
+
+    @JvmStatic
     fun vNoLimit(str: String) {
         println("${Constant.TAG}: $str")
     }
 
     @JvmStatic
-    fun e(tag: String = Constant.TAG, str: String) {
-        winkPrintln(tag, str, WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_RED)
+    fun e(tag: String = Constant.TAG, msg: String) {
+        throw AssertionError("[${tag}] $msg")
     }
 
     @JvmStatic
-    fun e(str: String) {
-        winkPrintln(Constant.TAG, str, WinkLogLevel.LOG_LEVEL_DEBUG, TEXT_RED)
+    fun e(msg: String) {
+        throw AssertionError("[${Constant.TAG}] $msg")
     }
+
+    @JvmStatic
+    fun e(msg: String, tr: Throwable): Int {
+        throw AssertionError("[${Constant.TAG}] $msg\n${getStackTraceString(tr)}")
+    }
+
+    private fun getStackTraceString(tr: Throwable?): String? {
+        if (tr == null) {
+            return ""
+        }
+
+        // This is to reduce the amount of log spew that apps do in the non-error
+        // condition of the network being unavailable.
+        var t = tr
+        while (t != null) {
+            if (t is UnknownHostException) {
+                return ""
+            }
+            t = t.cause
+        }
+        val sw = StringWriter()
+        val pw = PrintWriter(sw)
+        tr.printStackTrace(pw)
+        pw.flush()
+        return sw.toString()
+    }
+
 
     @JvmStatic
     fun d(str: String) {

@@ -14,7 +14,7 @@ class ResourceHelper {
         WinkLog.d(" \n ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
         if (!Settings.data.hasResourceChanged) return
 
-        WinkLog.i("Process Resources...")
+        WinkLog.i("Process resources...")
 
         st = System.currentTimeMillis()
         compileResources()
@@ -23,9 +23,9 @@ class ResourceHelper {
     private fun compileResources() {
         val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
         if (stableId.exists()) {
-            WinkLog.i("stableIds存在")
+            WinkLog.d("stableIds存在")
         } else {
-            WinkLog.i("=================================")
+            WinkLog.d("=================================")
             throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
         }
 

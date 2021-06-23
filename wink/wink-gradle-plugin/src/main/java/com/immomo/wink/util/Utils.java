@@ -32,9 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
-
     public static List<String> runShell(String shStr) {
-//        WinkLog.v("准备运行shell : " + shStr);
+        return runShell(shStr, true);
+    }
+
+    public static List<String> runShell(String shStr, boolean outputError) {
+        WinkLog.d("准备运行shell : " + shStr);
         List<String> strList = new ArrayList<String>();
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "`" + shStr + "`"}, null, null);
@@ -47,10 +50,9 @@ public class Utils {
                 strList.add(line);
             }
 
-            while ((line = errorReader.readLine()) != null) {
-                WinkLog.i(line);
+            while (outputError && (line = errorReader.readLine()) != null) {
+                WinkLog.w(line);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,7 +60,7 @@ public class Utils {
         for (String str : strList) {
             System.out.print(str);
         }
-//        WinkLog.v("结束运行shell : " + shStr);
+
         return strList;
     }
 
@@ -69,13 +71,11 @@ public class Utils {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
-
         String line = "";
         while ((line = reader.readLine()) != null) {
             WinkLog.i(line);
         }
 
-        line = "";
         while ((line = errorReader.readLine()) != null) {
             WinkLog.i(line);
         }
@@ -128,9 +128,8 @@ public class Utils {
         cmdArray.add("/bin/sh");
         cmdArray.add("-c");
         for (String cmd: cmds) {
-//            cmdArray.add("`" + cmd + "`");
             cmdArray.add(cmd);
-            WinkLog.i("Execute shell: ", cmd);
+            WinkLog.d("Execute shell: ", cmd);
         }
 
         try {
@@ -142,16 +141,16 @@ public class Utils {
 
             while ((line = reader.readLine()) != null) {
                 result.getResult().add(line);
-                WinkLog.i("Shell result: ", line);
+                WinkLog.d("Shell result: ", line);
             }
 
             while ((line = errorReader.readLine()) != null) {
                 result.getErrorResult().add(line);
-                WinkLog.i("Shell error: ", line);
+                WinkLog.w("Shell error: " + line);
             }
 
         } catch (Exception e) {
-            WinkLog.i("Shell exception: ", e.getMessage());
+            WinkLog.e("Shell exception:", e);
             result.setE(e);
         }
 

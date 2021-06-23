@@ -31,45 +31,37 @@ public class CompileHelper {
     }
 
     private int compileJava(Settings.ProjectTmpInfo project) {
-        WinkLog.d("compileJava ================================");
-        WinkLog.d("changedJavaFiles : " + project.changedJavaFiles.toString());
-        WinkLog.d("compileJava ================================");
-
         if (project.changedJavaFiles.size() <= 0) {
             return 0;
         }
 
+        WinkLog.i("Compile " + project.changedJavaFiles.size() + " java files, module " + project.fixedInfo.name + ", " + project.changedJavaFiles.toString());
         StringBuilder sb = new StringBuilder();
         for (String path : project.changedJavaFiles) {
             sb.append(" ");
             sb.append(path);
         }
 
-
         String shellCommand = "javac" + project.fixedInfo.javacArgs
                 + sb.toString();
         WinkLog.d("[LiteBuild] : javac shellCommand = " + shellCommand);
         WinkLog.d("[LiteBuild] projectName : " + project.fixedInfo.name);
         Utils.runShell(
-//                "javac" + Settings.getEnv().getProperty(project + "_javac_args")
                 shellCommand
         );
 
-        Settings.data.hasClassChanged = true;
+        Settings.data.classChangedCount += 1;
 
         return project.changedJavaFiles.size();
     }
 
     private void compileKotlin(Settings.ProjectTmpInfo project) {
-
-        WinkLog.d("compileKotlin ================================");
-        WinkLog.d("changedKotlinFiles : " + project.changedKotlinFiles.toString());
-        WinkLog.d("compileKotlin ================================");
-
         if (project.changedKotlinFiles.size() <= 0) {
             WinkLog.d("LiteBuild: ================> 没有 Kotlin 文件变更。");
             return;
         }
+
+        WinkLog.i("Compile " + project.changedKotlinFiles.size() + " kotlin files, module " + project.fixedInfo.name + ", " + project.changedKotlinFiles.toString());
         StringBuilder sb = new StringBuilder();
         for (String path : project.changedKotlinFiles) {
             sb.append(" ");
@@ -101,16 +93,16 @@ public class CompileHelper {
                     + mainKotlincArgs + sb.toString();
 
 //            WinkLog.d("[LiteBuild] kotlinc shellCommand : " + shellCommand);
-            Utils.runShell(shellCommand);
+            Utils.ShellResult result = Utils.runShells(shellCommand);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        Settings.data.hasClassChanged = true;
+        Settings.data.classChangedCount += 1;
     }
 
     private String getKotlinc() {
-        String kotlinc = System.getenv("KOTLINC_HOME");
+        String kotlinc = System.getenv("KOTLINC_HOME") + "";
         if (kotlinc == null || kotlinc.equals("")) {
             kotlinc = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
         }
@@ -119,14 +111,12 @@ public class CompileHelper {
             kotlinc = "/Applications/AndroidStudio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
         }
 
-        if (kotlinc == null || kotlinc.equals("")) {
-            if (!new File(kotlinc).exists()) {
-                WinkLog.e("\n\n================== 请配置 KOTLINC_HOME ==================");
-                WinkLog.e("1. 打开：~/.bash_profile");
-                WinkLog.e("2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\"");
-                WinkLog.e("3. 执行：source ~/.bash_profile");
-                WinkLog.e("========================================================\n\n");
-            }
+        if (kotlinc == null || kotlinc.equals("") ||!new File(kotlinc).exists()) {
+            WinkLog.e("\n\n================== 请配置 KOTLINC_HOME =================="
+                    + "\n1. 打开：~/.bash_profile"
+                    + "\n2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\""
+                    + "\n3. 执行：source ~/.bash_profile"
+                    + "\n========================================================\n\n");
 
             return "";
         }
@@ -152,7 +142,7 @@ public class CompileHelper {
                     "-P plugin:org.jetbrains.kotlin.android:package=%s " +
                     "-P plugin:org.jetbrains.kotlin.android:variant='%s;%s' ", pluginHome, packageName, flavor, resPath);
         }
-        WinkLog.i("【compile kotlinx.android.synthetic】 \n" + args);
+        WinkLog.d("【compile kotlinx.android.synthetic】 \n" + args);
         return args;
     }
 
@@ -161,7 +151,7 @@ public class CompileHelper {
     }
 
     private void createDexPatch() {
-        if (!Settings.data.hasClassChanged) {
+        if (Settings.data.classChangedCount <= 0) {
             // 没有数据变更
             return;
         }
@@ -171,7 +161,7 @@ public class CompileHelper {
 
         WinkLog.TimerLog log = WinkLog.timerStart("开始打DexPatch！");
 
-        Utils.runShell(cmds);
+        Utils.runShell(cmds, false);
 
         log.end();
     }

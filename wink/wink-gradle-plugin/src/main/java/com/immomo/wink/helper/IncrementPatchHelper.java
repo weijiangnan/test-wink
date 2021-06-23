@@ -22,18 +22,21 @@ import com.immomo.wink.util.WinkLog;
 
 public class IncrementPatchHelper {
     public boolean patchToApp() {
-        if (!Settings.data.hasClassChanged && !Settings.data.hasResourceChanged) {
+        if (Settings.data.classChangedCount <= 0 && !Settings.data.hasResourceChanged) {
             WinkLog.i("No changed, nothing to do.");
             return false;
         }
 
-        WinkLog.d("[IncrementPatchHelper]->[patchToApp] \n是否有资源变动：" + Settings.data.hasClassChanged + "，是否新增改名：" + Settings.data.hasResourceChanged);
+        WinkLog.d("[IncrementPatchHelper]->[patchToApp] \n是否有资源变动：" + Settings.data.classChangedCount + "，是否新增改名：" + Settings.data.hasResourceChanged);
 
         createPatchFile();
         patchDex();
         patchResources();
         restartApp();
 
+        WinkLog.i("Patch finish in " + (System.currentTimeMillis() -  Settings.data.beginTime) / 1000 + "s.");
+        WinkLog.i(Settings.data.classChangedCount + " file changed, "
+                + (Settings.data.hasResourceChanged ? "has" : "no") + " resource changed.");
         return true;
     }
 
@@ -60,9 +63,11 @@ public class IncrementPatchHelper {
     }
 
     public void patchDex() {
-        if (!Settings.data.hasClassChanged) {
+        if (Settings.data.classChangedCount <= 0) {
             return;
         }
+
+        WinkLog.i("Patching Dex...");
 
         String patchName = Settings.env.version + "_patch.jar";
         Utils.runShells("source ~/.bash_profile\n" + "adb push " + Settings.env.tmpPath + "/" + patchName
@@ -73,6 +78,8 @@ public class IncrementPatchHelper {
         if (!Settings.data.hasResourceChanged) {
             return;
         }
+
+        WinkLog.i("Patching Resources...");
 
         String patchName = Settings.env.version + "_resources-debug.apk";
         Utils.runShells("source ~/.bash_profile\n" +
@@ -87,6 +94,6 @@ public class IncrementPatchHelper {
         cmds += "source ~/.bash_profile";
         cmds += '\n' + "adb shell am force-stop " + Settings.env.debugPackageName;
         cmds += '\n' + "adb shell am start -n " + Settings.env.debugPackageName + "/" + Settings.env.launcherActivity;
-        Utils.runShell(cmds);
+        Utils.runShells(cmds);
     }
 }

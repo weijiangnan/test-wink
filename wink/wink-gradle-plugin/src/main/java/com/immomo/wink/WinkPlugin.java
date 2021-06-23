@@ -129,7 +129,7 @@ public class WinkPlugin implements Plugin<Project> {
         isFirstCompile = !isStableFileExist;
 
         if (isStableFileExist) {
-            WinkLog.i("Wink Start...");
+            WinkLog.i("Wink start...");
 
             taskDiff.dependsOn(taskInit);
             taskResources.dependsOn(taskDiff);
@@ -143,7 +143,7 @@ public class WinkPlugin implements Plugin<Project> {
             taskProcessResources.mustRunAfter(taskResources);
             taskProcessResources.dependsOn(taskGradleProcessDebugResources);
         } else {
-            WinkLog.i("Wink Start...");
+            WinkLog.i("Wink start...");
             WinkLog.i("Cache invalid, start full build.");
             Task installDebug = getFlavorInstallDebug(project);
             taskWink.dependsOn(installDebug);
@@ -326,7 +326,7 @@ public class WinkPlugin implements Plugin<Project> {
         project.getTasks().register("winkDiff", task -> {
 
             task.doLast(it2 -> {
-                WinkLog.i("Diff Start...");
+                WinkLog.i("Diff start...");
                 long diffStartTime = System.currentTimeMillis();
 
                 for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
