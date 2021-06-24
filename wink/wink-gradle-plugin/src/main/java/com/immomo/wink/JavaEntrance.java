@@ -5,31 +5,30 @@ import com.immomo.wink.helper.CompileHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
-import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.Utils;
+import com.immomo.wink.util.WinkLog;
 
 import java.util.List;
 
 public class JavaEntrance {
 
     public static void main(String[] args) {
-
         if (args == null || args.length == 0) {
-            com.immomo.wink.util.WinkLog.e("Java 命令需要指定参数：path");
+            WinkLog.e("Java 命令需要指定参数：path");
             return;
         }
 
-        com.immomo.wink.util.WinkLog.i("====== 开始执行 Java 任务 ======");
+        WinkLog.i("====== 开始执行 Java 任务 ======");
 
         String path = args[0];
 //        String func = args[1];
 
-        com.immomo.wink.util.WinkLog.i("====== path : " + path);
+        WinkLog.i("====== path : " + path);
 //        WinkLog.v("====== Func : " + func);
 
         InitEnvHelper helper = new InitEnvHelper();
         boolean envFileExist = helper.isEnvExist(path);
-        com.immomo.wink.util.WinkLog.i("======> envFileExist : " + envFileExist);
+        WinkLog.i("======> envFileExist : " + envFileExist);
 
         if (!envFileExist) {
             runWinkCommand(path);
@@ -45,7 +44,7 @@ public class JavaEntrance {
         boolean hasFileChanged = diff();  // 更新：Settings.data.hasResourceChanged
 
         if (!hasFileChanged) {
-            com.immomo.wink.util.WinkLog.i("======>>> 没有文件变更");
+            WinkLog.i("======>>> 没有文件变更");
         }
 
         new ResourceHelper().checkResource(); // 内部判断：Settings.data.hasResourceChanged
@@ -53,7 +52,7 @@ public class JavaEntrance {
         // 编译资源
         if (com.immomo.wink.Settings.data.needProcessDebugResources) {
 //            new ResourceHelper().packageResources();
-            com.immomo.wink.util.WinkLog.i("======>>> 资源变更，执行 gradle task");
+            WinkLog.i("======>>> 资源变更，执行 gradle task");
             runWinkCommand(path);
             return;
         }
