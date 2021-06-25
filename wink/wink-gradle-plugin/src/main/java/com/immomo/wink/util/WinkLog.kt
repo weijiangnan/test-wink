@@ -68,17 +68,17 @@ object WinkLog {
     }
 
     @JvmStatic
-    fun e(tag: String = Constant.TAG, msg: String) {
+    fun throwAssert(tag: String = Constant.TAG, msg: String) {
         throw AssertionError("[${tag}] $msg")
     }
 
     @JvmStatic
-    fun e(msg: String) {
+    fun throwAssert(msg: String) {
         throw AssertionError("[${Constant.TAG}] $msg")
     }
 
     @JvmStatic
-    fun e(msg: String, tr: Throwable): Int {
+    fun throwAssert(msg: String, tr: Throwable): Int {
         throw AssertionError("[${Constant.TAG}] $msg\n${getStackTraceString(tr)}")
     }
 

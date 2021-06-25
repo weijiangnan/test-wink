@@ -63,7 +63,7 @@ public class IncrementPatchHelper {
 
         result = Utils.runShells("adb shell ls " + Settings.data.patchPath);
         if (result.getErrorResult().size() > 0) {
-            WinkLog.e("Can not create patch file " + Settings.data.patchPath);
+            WinkLog.throwAssert("Can not create patch file " + Settings.data.patchPath);
         }
     }
 

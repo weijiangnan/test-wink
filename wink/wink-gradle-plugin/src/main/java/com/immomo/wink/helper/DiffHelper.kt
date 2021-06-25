@@ -235,11 +235,11 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
             { newFile ->
                 projectInfo.hasResourceChanged = true
                 projectInfo.hasAddNewOrChangeResName = true
-                WinkLog.e(TAG, "[${project.fixedInfo.name}]:有资源被新增或改名了！！！！！！差异数据:$newFile")
+                WinkLog.d(TAG, "[${project.fixedInfo.name}]:有资源被新增或改名了！！！！！！差异数据:$newFile")
             }, { changeFile ->
 
                 projectInfo.hasResourceChanged = true
-                WinkLog.e(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$changeFile")
+                WinkLog.d(TAG, "[${project.fixedInfo.name}]:有资源被修改了！！！！！！差异数据:$changeFile")
             })
     }
 

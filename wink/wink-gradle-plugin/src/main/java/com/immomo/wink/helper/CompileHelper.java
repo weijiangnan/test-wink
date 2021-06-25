@@ -112,7 +112,7 @@ public class CompileHelper {
         }
 
         if (kotlinc == null || kotlinc.equals("") ||!new File(kotlinc).exists()) {
-            WinkLog.e("\n\n================== 请配置 KOTLINC_HOME =================="
+            WinkLog.throwAssert("\n\n================== 请配置 KOTLINC_HOME =================="
                     + "\n1. 打开：~/.bash_profile"
                     + "\n2. 添加：export KOTLINC_HOME=\"/Applications/Android\\ Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc\""
                     + "\n3. 执行：source ~/.bash_profile"

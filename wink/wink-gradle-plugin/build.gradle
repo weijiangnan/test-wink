@@ -121,7 +121,7 @@ jar {
             println("copyLib run ===================>>>>>>>>")
             def path = new File(System.getProperties().getProperty("user.home") + '/Wink');
             if (!path.exists()) {
-                path.mkdirs();
+                path.mkdirs()
             }
             configurations.compileClasspath.collect { file ->
                 map.each { entry ->

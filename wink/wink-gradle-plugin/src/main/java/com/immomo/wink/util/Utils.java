@@ -156,7 +156,7 @@ public class Utils {
             }
 
         } catch (Exception e) {
-            WinkLog.e("Shell exception:", e);
+            WinkLog.throwAssert("Shell exception:", e);
             result.setE(e);
         }
 

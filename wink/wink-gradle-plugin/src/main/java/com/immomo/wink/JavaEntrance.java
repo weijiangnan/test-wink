@@ -14,7 +14,7 @@ public class JavaEntrance {
 
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
-            WinkLog.e("Java 命令需要指定参数：path");
+            WinkLog.throwAssert("Java 命令需要指定参数：path");
             return;
         }
 
