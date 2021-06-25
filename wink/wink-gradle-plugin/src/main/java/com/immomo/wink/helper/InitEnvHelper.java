@@ -37,8 +37,8 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependency;
 import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.api.tasks.compile.JavaCompile;
-import org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask;
-import org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions;
+//import org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask;
+//import org.jetbrains.kotlin.gradle.tasks.CompilerPluginOptions;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -185,34 +185,34 @@ public class InitEnvHelper {
         Settings.storeEnv(env, project.getRootDir() + "/.idea/" + Settings.NAME + "/env");
     }
 
-    private void initKaptTaskParams(Settings.Env env) {
-        Settings.KaptTaskParam param = new Settings.KaptTaskParam();
-        Task kaptDebug = project.getTasks().getByName("kaptDebugKotlin");
-
-        if (kaptDebug instanceof KaptWithoutKotlincTask) {
-//            Object object = project.getConfigurations().getByName("kotlinCompilerClasspath").resolve();
-            KaptWithoutKotlincTask ktask = (KaptWithoutKotlincTask) kaptDebug;
-            param.compileClassPath = ktask.getClasspath().getAsPath();
-            param.javacOptions = ktask.getJavacOptions();
-            param.javaSourceRoots = null;
-//            param.processorOptions = ktask.processorOptions.getArguments();
-            try {
-                Field processorOptions = ShareReflectUtil.findField(ktask, "processorOptions");
-                CompilerPluginOptions options = (CompilerPluginOptions) processorOptions.get(ktask);
-                param.processorOptions = options.getArguments();
-
-                Field configurationContainer = ShareReflectUtil.findField(((DefaultProject) project), "configurationContainer");
-                ConfigurationContainer conf = (ConfigurationContainer) configurationContainer.get(((DefaultProject) project));
-                if (conf != null) {
-                    param.processingClassPath = conf.getByName("kapt").resolve();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        env.kaptTaskParam = param;
-    }
+//    private void initKaptTaskParams(Settings.Env env) {
+//        Settings.KaptTaskParam param = new Settings.KaptTaskParam();
+//        Task kaptDebug = project.getTasks().getByName("kaptDebugKotlin");
+//
+//        if (kaptDebug instanceof KaptWithoutKotlincTask) {
+////            Object object = project.getConfigurations().getByName("kotlinCompilerClasspath").resolve();
+//            KaptWithoutKotlincTask ktask = (KaptWithoutKotlincTask) kaptDebug;
+//            param.compileClassPath = ktask.getClasspath().getAsPath();
+//            param.javacOptions = ktask.getJavacOptions();
+//            param.javaSourceRoots = null;
+////            param.processorOptions = ktask.processorOptions.getArguments();
+//            try {
+//                Field processorOptions = ShareReflectUtil.findField(ktask, "processorOptions");
+//                CompilerPluginOptions options = (CompilerPluginOptions) processorOptions.get(ktask);
+//                param.processorOptions = options.getArguments();
+//
+//                Field configurationContainer = ShareReflectUtil.findField(((DefaultProject) project), "configurationContainer");
+//                ConfigurationContainer conf = (ConfigurationContainer) configurationContainer.get(((DefaultProject) project));
+//                if (conf != null) {
+//                    param.processingClassPath = conf.getByName("kapt").resolve();
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        env.kaptTaskParam = param;
+//    }
 
     private void initProjectData(Settings.ProjectFixedInfo fixedInfo, Project project) {
         initProjectData(fixedInfo, project, false);

@@ -127,10 +127,16 @@ public class Utils {
 
         cmdArray.add("/bin/sh");
         cmdArray.add("-c");
+
+        StringBuilder sb = new StringBuilder();
         for (String cmd: cmds) {
-            cmdArray.add(cmd);
+            if (sb.length() > 0) {
+                sb.append('\n');
+            }
+            sb.append(cmd);
             WinkLog.d("Execute shell: ", cmd);
         }
+        cmdArray.add(sb.toString());
 
         try {
             Process process = Runtime.getRuntime().exec(cmdArray.toArray(new String[cmdArray.size()]));

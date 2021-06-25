@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+//    implementation "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     implementation "com.android.tools.build:gradle:$gradleVersion"
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r'
@@ -74,7 +74,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.wink'
                     pom.artifactId = 'plugin'
-                    pom.version = '0.2.0i'
+                    pom.version = '0.2.2i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }
