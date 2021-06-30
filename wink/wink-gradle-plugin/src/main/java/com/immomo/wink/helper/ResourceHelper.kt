@@ -32,6 +32,33 @@ class ResourceHelper {
         Settings.data.needProcessDebugResources = true
     }
 
+    fun checkResourceWithoutTask() {
+        WinkLog.d(" \n ResourceHelper process, changed=${Settings.data.hasResourceChanged}")
+        if (!Settings.data.hasResourceChanged) return
+
+        WinkLog.i("Process resources...")
+
+        st = System.currentTimeMillis()
+        compileResourcesWithout()
+        packageResources()
+    }
+
+    private fun compileResourcesWithout() {
+        val stableId = File(Settings.env.tmpPath + "/stableIds.txt")
+        if (stableId.exists()) {
+            WinkLog.d("stableIds存在")
+        } else {
+            WinkLog.d("=================================")
+            throw FileNotFoundException("stableIds不存在，请先完整编译一遍项目！")
+        }
+
+        Settings.data.needProcessDebugResources = true
+        var ret = Utils.runShells("cd ${Settings.env.appProjectDir}/../", "./gradlew processDebugResources --offline")
+        if (ret.errorResult.size > 0) {
+//            WinkLog.throwAssert("Compile resources error.");
+        }
+    }
+
     var ap_path = ""
     fun findAp_(file: File) {
         if (file.isFile) {

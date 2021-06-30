@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 include ':wink-compiler-hook-lib'
-gradle.ext.dev = true
-
 include ':wink-patch-lib'
 include ':wink-demo-lib'
-//include ':litebuild-gradle-plugin'
-//include ':app'
-//include ':sunflower:buildSrc:litebuild-gradle-plugin'
 include ':wink-demo-app'
+
+gradle.ext.dev = true

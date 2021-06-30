@@ -79,8 +79,6 @@ public class InitEnvHelper {
         if (reload) {
             createEnv(project);
         } else {
-//            createEnv(project);
-//            reloadEnv(project);
             WinkLog.d("project.getRootDir() : " + project.getRootDir());
             Settings.restoreEnv(project.getRootDir()
                     + "/.idea/" + Settings.NAME + "/env");
@@ -99,8 +97,13 @@ public class InitEnvHelper {
     }
 
     public void initLog(Project project) {
-        WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
-        Settings.data.logLevel = options.logLevel;
+        if (project == null) {
+            Settings.data.logLevel = Settings.env.options.logLevel;
+        } else {
+            WinkOptions options = project.getExtensions().getByType(WinkOptions.class);
+            Settings.data.logLevel = options.logLevel;
+        }
+
     }
 
     public void initE() {

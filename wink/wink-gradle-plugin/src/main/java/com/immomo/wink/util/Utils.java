@@ -16,9 +16,14 @@
 
 package com.immomo.wink.util;
 
+import com.android.build.gradle.AppExtension;
+import com.android.build.gradle.internal.dsl.ProductFlavor;
 import com.immomo.wink.Settings;
 
+import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
+import org.gradle.api.UnknownTaskException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,6 +35,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Utils {
     public static List<String> runShell(String shStr) {
@@ -203,5 +209,25 @@ public class Utils {
         char[] arr = val.toCharArray();
         arr[0] = Character.toUpperCase(arr[0]);
         return new String(arr);
+    }
+
+    private static Task getFlavorTask(Project project, String pre, String post){
+        //preDebugBuild
+        AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
+        NamedDomainObjectContainer<ProductFlavor> flavors = appExtension.getProductFlavors();
+        if(flavors!=null && flavors.getNames().size()>0){
+            Set<String> flavorNames = flavors.getNames();
+            for(String name:flavorNames){
+                String processDebugResources = pre + Utils.upperCaseFirst(name) + post;
+                try {
+                    Task targetTask = project.getTasks().getByName(processDebugResources);
+                    return targetTask;
+                }catch (UnknownTaskException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return project.getTasks().getByName(pre + post);
     }
 }

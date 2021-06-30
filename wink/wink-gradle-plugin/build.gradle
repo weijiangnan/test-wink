@@ -45,6 +45,11 @@ dependencies {
     testImplementation "junit:junit:4.12"
 }
 
+test.enabled = false
+test.setOnlyIf {
+    false
+}
+
 gradlePlugin {
     plugins {
         winkPlugin {
@@ -74,7 +79,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.wink'
                     pom.artifactId = 'plugin'
-                    pom.version = '0.2.2i'
+                    pom.version = '0.2.3i'
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }

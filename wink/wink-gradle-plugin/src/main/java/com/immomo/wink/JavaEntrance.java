@@ -8,102 +8,78 @@ import com.immomo.wink.helper.InitEnvHelper;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
-import java.util.List;
-
 public class JavaEntrance {
-
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
             WinkLog.throwAssert("Java 命令需要指定参数：path");
             return;
         }
 
-        WinkLog.i("====== 开始执行 Java 任务 ======");
+        WinkLog.d("====== 开始执行 Java 任务 ======");
 
         String path = args[0];
 //        String func = args[1];
 
-        WinkLog.i("====== path : " + path);
-//        WinkLog.v("====== Func : " + func);
+        WinkLog.d("====== path : " + path);
 
         InitEnvHelper helper = new InitEnvHelper();
-        boolean envFileExist = helper.isEnvExist(path);
-        WinkLog.i("======> envFileExist : " + envFileExist);
 
-        if (!envFileExist) {
-            runWinkCommand(path);
+        WinkLog.i("Wink start...");
+        if (!helper.isEnvExist(path)) {
+            // Full build
+            WinkLog.i("Cache invalid, start full build.");
+            Utils.runShells("cd " + path + " && " + "./gradlew installDebug");
             return;
+        } else {
+            // Increment
+            helper.initEnvByPath(path);
         }
 
-        helper.initEnvByPath(path);
-//        new InitEnvHelper().initEnvByPath("/Users/momo/Documents/MomoProject/wink/sunflower");
+        // Diff file changed
+        runDiff();
 
-        List<com.immomo.wink.Settings.ProjectTmpInfo> projectBuildSortList = com.immomo.wink.Settings.data.projectBuildSortList;
-        WinkLog.d("projectBuildSortList : " + projectBuildSortList.toString());
-
-        boolean hasFileChanged = diff();  // 更新：Settings.data.hasResourceChanged
-
-        if (!hasFileChanged) {
-            WinkLog.i("======>>> 没有文件变更");
-        }
-
-        new ResourceHelper().checkResource(); // 内部判断：Settings.data.hasResourceChanged
-
-        // 编译资源
-        if (com.immomo.wink.Settings.data.needProcessDebugResources) {
-//            new ResourceHelper().packageResources();
-            WinkLog.i("======>>> 资源变更，执行 gradle task");
-            runWinkCommand(path);
-            return;
-        }
-
-        WinkLog.i("======>>> 没有资源变更");
+        new ResourceHelper().checkResourceWithoutTask(); // 内部判断：Settings.data.hasResourceChanged
         new CompileHelper().compileCode();
         if (new IncrementPatchHelper().patchToApp()) {
             updateSnapShot();
         }
-
-    }
-
-    private static void runWinkCommand(String path) {
-        String scriptStr = "cd " + path + " && " + " ./gradlew wink";
-        try {
-            Utils.executeScript(scriptStr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private static void updateSnapShot() {
-        for (com.immomo.wink.Settings.ProjectTmpInfo info : com.immomo.wink.Settings.data.projectBuildSortList) {
+        for (Settings.ProjectTmpInfo info : Settings.data.projectBuildSortList) {
             if (info.changedJavaFiles.size() > 0 || info.changedKotlinFiles.size() > 0) {
-                new com.immomo.wink.helper.DiffHelper(info).initSnapshotForCode();
+                new DiffHelper(info).initSnapshotForCode();
             }
 
             if (info.hasResourceChanged) {
-                new com.immomo.wink.helper.DiffHelper(info).initSnapshotForRes();
+                new DiffHelper(info).initSnapshotForRes();
             }
         }
     }
 
-    public static boolean diff() {
-        WinkLog.i("====== diff run ~~~ ======");
+    public static boolean runDiff() {
+        WinkLog.i("Diff start...");
+        WinkLog.TimerLog log = WinkLog.timerStart("diff");
 
-        for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
-            long startTime = System.currentTimeMillis();
+        for (Settings.ProjectTmpInfo projectInfo : Settings.data.projectBuildSortList) {
+            WinkLog.TimerLog timerLog = WinkLog.timerStart("Diff " + projectInfo.fixedInfo.name);
             new DiffHelper(projectInfo).diff(projectInfo);
-            WinkLog.i("=================>>>>>> " + projectInfo.fixedInfo.name + "结束一组耗时：" + (System.currentTimeMillis() - startTime) + " ms");
-        }
-//
-        for (com.immomo.wink.Settings.ProjectTmpInfo projectInfo : com.immomo.wink.Settings.data.projectBuildSortList) {
+
             if (projectInfo.hasResourceChanged) {
                 WinkLog.i("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir);
                 WinkLog.i("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged);
-                com.immomo.wink.Settings.data.hasResourceChanged = true;
-                break;
+                Settings.data.hasResourceChanged = true;
             }
+
+            if (projectInfo.hasAddNewOrChangeResName) {
+                Settings.data.hasResourceAddOrRename = true;
+            }
+
+            timerLog.end("name=" + projectInfo.fixedInfo.name
+                    + ", changed=" + projectInfo.hasResourceChanged);
         }
+
+        log.end("Has changed " + Settings.data.hasResourceChanged);
         return Settings.data.hasResourceChanged;
     }
-
 }
