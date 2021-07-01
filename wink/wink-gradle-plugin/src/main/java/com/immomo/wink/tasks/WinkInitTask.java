@@ -39,8 +39,8 @@ public class WinkInitTask extends DefaultTask {
         if (downlaodUrls == null || downlaodUrls.size() == 0) {
             System.out.println("文件已存在！");
             return;
-        }else {
-            File[] files = DownloadUtil.downloadFiles(downlaodUrls,dir);
+        } else {
+            File[] files = DownloadUtil.downloadFiles(downlaodUrls, dir);
             unzipFiles(files);
         }
         copyShell();
@@ -48,22 +48,29 @@ public class WinkInitTask extends DefaultTask {
     }
 
 
-    private void unzipFiles(File[] files){
+    private void unzipFiles(File[] files) {
         for (File file : files) {
-            ZipUtils.unZip(file,dir);
+            ZipUtils.unZip(file, dir);
         }
     }
 
-    private void copyShell(){
-        File shell = new File(getShellPath());
-        if(shell.exists()&&shell.isFile()){
-            File target = new File(getCopyShellPath());
-            target.setExecutable(true,false);
-            target.setReadable(true,false);
-            target.setWritable(true,false);
-            Utils.copyFile(shell,target);
-        }else {
-            System.out.println("wink.shell 文件不存在！");
+    private void copyShell() {
+        try {
+            File shell = new File(getShellPath());
+            if (shell.exists() && shell.isFile()) {
+                File target = new File(getCopyShellPath());
+                if (!target.exists()) {
+                    target.createNewFile();
+                }
+                target.setExecutable(true, false);
+                target.setReadable(true, false);
+                target.setWritable(true, false);
+                Utils.copyFile(shell, target);
+            } else {
+                System.out.println("wink.shell 文件不存在！");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -73,7 +80,7 @@ public class WinkInitTask extends DefaultTask {
         this.dir = getJarsPath();
         for (String url : urls) {
             String fileName = url.substring(url.lastIndexOf('/') + 1);
-            File target = new File(dir + File.pathSeparator + fileName);
+            File target = new File(dir + File.separator + fileName);
             if (!target.exists() || target.isDirectory()) {
                 downlaodUrls.add(url);
             }
@@ -81,16 +88,16 @@ public class WinkInitTask extends DefaultTask {
 
     }
 
-    private String getJarsPath(){
-        return projectPath+File.separator+Constant.IDEA+File.separator+Constant.TAG+File.separator+Constant.JARS;
+    private String getJarsPath() {
+        return projectPath + File.separator + Constant.IDEA + File.separator + Constant.TAG + File.separator + Constant.JARS;
     }
 
-    private String getShellPath(){
-        return projectPath+File.separator+Constant.IDEA+File.separator+Constant.TAG+File.separator+Constant.JARS+File.separator+Constant.SHELL;
+    private String getShellPath() {
+        return projectPath + File.separator + Constant.IDEA + File.separator + Constant.TAG + File.separator + Constant.JARS + File.separator + Constant.SHELL;
     }
 
-    private String getCopyShellPath(){
-        return projectPath+File.separator+Constant.SHELL;
+    private String getCopyShellPath() {
+        return projectPath + File.separator + Constant.SHELL;
     }
 
 }

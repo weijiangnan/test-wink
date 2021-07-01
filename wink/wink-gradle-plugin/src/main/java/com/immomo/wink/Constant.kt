@@ -6,7 +6,7 @@ object Constant {
 
     const val IDEA = ".idea"
 
-    const val JARS = "jars"
+    const val JARS = "lib"
 
     const val SHELL = "wink.sh"
 
