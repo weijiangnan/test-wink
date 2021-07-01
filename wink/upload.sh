@@ -1,4 +1,5 @@
 #!/bin/bash
+# execute: sh upload.sh false 0.2.6i
 is_upload_maven=$1
 version=$2
 echo "need upload maven: $1"
@@ -10,7 +11,7 @@ else
     echo "upload to inner maven!"
     sed -i '' 's/gradle.ext.uploadMavenCenter=true/gradle.ext.uploadMavenCenter=false/g' UploadProperties.gradle
 fi
-#sed -i '' "s/gradle.ext.winkVersion=*$/gradle.ext.winkVersion='"$version"'/g" UploadProperties.gradle
+sed -i '' "s/gradle.ext.winkVersion=.*/gradle.ext.winkVersion='"$version"'/g" UploadProperties.gradle
 
 #sed -i '4s/BROADCAST_PORT=.*$/BROADCAST_PORT=9999/g' file
 
