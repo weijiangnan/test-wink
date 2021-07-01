@@ -91,6 +91,10 @@ public class DataManager {
                             rootModule.setInstallPlugin(true);
                         }
                     }
+                    if(!rootModule.isInstallPlugin()){
+                        boolean rootInstall = FileWinkUtils.textInFile(new File(rootModule.getGradleBuild().getVirtualFile().getPath()),ConstantPool.PLUGIN_NAME)>0;
+                        rootModule.setInstallPlugin(rootInstall);
+                    }
                     projectInfo.setRootModule(rootModule);
                     //dependenciesModel.containsArtifact("classpath", ArtifactDependencySpec.create("gradle","com.android.tools.build","4.0.0"));
                 }
@@ -110,7 +114,12 @@ public class DataManager {
                             subModule.setInstallPlugin(true);
                         }
                     }
+
                     if(isAppModule){
+                        if(!subModule.isInstallPlugin()){
+                            boolean rootInstall = FileWinkUtils.textInFile(new File(subModule.getGradleBuild().getVirtualFile().getPath()),ConstantPool.PLUGIN_APP_NAME)>0;
+                            subModule.setInstallPlugin(rootInstall);
+                        }
                         projectInfo.addSubAppModules(subModule);
                     }else {
                         projectInfo.addSubLibModules(subModule);

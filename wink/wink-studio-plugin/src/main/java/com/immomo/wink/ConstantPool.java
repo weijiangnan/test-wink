@@ -49,7 +49,7 @@ public class ConstantPool {
     public static final String DOCUMENT = "Document: ";
 
     public static final String UPDATE_URL = "https://wink-build.github.io/docs/version.json";
-    public static final String CURRENT_IDEA_VERSION = "1.0.0";
+    public static final String CURRENT_IDEA_VERSION = "2.0.0";
     public static final String IDEA_VERSION = "idea_version";
     public static final String P_VERSION = "plugin_version";
 
