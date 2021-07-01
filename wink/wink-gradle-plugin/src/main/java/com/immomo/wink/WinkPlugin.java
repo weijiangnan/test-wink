@@ -19,7 +19,6 @@ package com.immomo.wink;
 import com.android.build.gradle.AppExtension;
 import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.DiffHelper;
-import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
 import com.immomo.wink.tasks.WinkJarsTask;
 import com.immomo.wink.util.GradleUtils;

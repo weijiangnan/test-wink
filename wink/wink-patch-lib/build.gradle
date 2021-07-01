@@ -3,7 +3,7 @@ plugins {
 //    id 'kotlin-android'
     id 'maven'
 }
-
+apply from: '../gradle/SharedProperties.gradle'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
@@ -51,8 +51,8 @@ def getRepositoryPassword() {
     return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
 }
 // ./gradlew wink-patch-lib:uploadArchives
-def isUploadMavenCenter = false
-if (isUploadMavenCenter) {
+println "[lib] uploadMavenCenter=${gradle.uploadMavenCenter}"
+if (gradle.uploadMavenCenter) {
     apply from: rootProject.file('wink-patch-lib/publish_to_maven_central.gradle')
 } else {
     afterEvaluate { project ->
@@ -61,7 +61,7 @@ if (isUploadMavenCenter) {
                 mavenDeployer {
                     pom.groupId = 'com.immomo.wink'
                     pom.artifactId = 'patch-lib'
-                    pom.version = '0.2.0i'
+                    pom.version = gradle.winkVersion
                     repository(url: MOMOAGORA_RELEASE_REPOSITORY_URL) {
                         authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
                     }

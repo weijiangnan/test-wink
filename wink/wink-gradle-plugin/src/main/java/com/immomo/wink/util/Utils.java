@@ -113,12 +113,6 @@ public class Utils {
         }
     }
 
-    /**
-     * 运行shell并获得结果，注意：如果sh中含有awk,一定要按new String[]{"/bin/sh","-c",shStr}写,才可以获得流
-     *
-     * @param
-     * @return
-     */
     public static ShellResult runShells(String... cmds) {
         ShellResult result = new ShellResult();
 
