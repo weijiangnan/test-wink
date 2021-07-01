@@ -102,7 +102,7 @@ public class CompileHelper {
     }
 
     private String getKotlinc() {
-        String kotlinc = System.getenv("KOTLINC_HOME") + "";
+        String kotlinc = System.getenv("KOTLINC_HOME");
         if (kotlinc == null || kotlinc.equals("")) {
             kotlinc = "/Applications/Android Studio.app/Contents/plugins/Kotlin/kotlinc/bin/kotlinc";
         }
