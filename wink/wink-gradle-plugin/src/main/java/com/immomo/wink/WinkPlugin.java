@@ -19,11 +19,9 @@ package com.immomo.wink;
 import com.android.build.gradle.AppExtension;
 import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.DiffHelper;
-import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
-import com.immomo.wink.tasks.WinkJarsTask;
+import com.immomo.wink.tasks.WinkInitTask;
 import com.immomo.wink.util.GradleUtils;
-import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
 import org.gradle.api.Action;
@@ -111,9 +109,9 @@ public class WinkPlugin implements Plugin<Project> {
     }
 
     public void createWinkInitTask(Project project) {
-        String path = project.getRootDir() + "/.idea/" + Constant.TAG + "/jars";
+        String path = project.getRootDir().getPath();
 
-        project.getTasks().register("winkInit", WinkJarsTask.class,Constant.JARS_URLS,path).get().setGroup(Settings.NAME);
+        project.getTasks().register("winkInit", WinkInitTask.class,Constant.JARS_URLS,path).get().setGroup(Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
