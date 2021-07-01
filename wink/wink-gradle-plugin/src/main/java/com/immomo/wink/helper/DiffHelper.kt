@@ -22,7 +22,9 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvWriterContext
 import com.immomo.wink.Constant
 import com.immomo.wink.Settings
 import com.immomo.wink.util.WinkLog
-import org.eclipse.jgit.lib.*
+import com.immomo.wink.util.WinkLog.i
+import com.immomo.wink.util.WinkLog.timerStart
+import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevTree
 import org.eclipse.jgit.revwalk.RevWalk
@@ -31,15 +33,44 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import java.io.File
 import java.io.FileReader
 import java.util.*
-import kotlin.collections.HashMap
 
 const val KEY_COMMIT_ID = "key_commit_id"
 
 class DiffHelper(var project: Settings.ProjectTmpInfo) {
     companion object {
         const val TAG = "wink.diff"
-    }
 
+        @JvmStatic
+        fun diffAllProject() {
+            i("Diff start...")
+
+            for (projectInfo in Settings.data.projectBuildSortList) {
+                val timerLog = timerStart("Diff " + projectInfo.fixedInfo.name)
+                DiffHelper(projectInfo).diff(projectInfo)
+                timerLog.end()
+            }
+
+            //
+            for (projectInfo in Settings.data.projectBuildSortList) {
+                if (projectInfo.hasResourceChanged) {
+                    i("遍历是否有资源修改, name=" + projectInfo.fixedInfo.dir)
+                    i("遍历是否有资源修改, changed=" + projectInfo.hasResourceChanged)
+                    Settings.data.hasResourceChanged = true
+                }
+                if (projectInfo.hasAddNewOrChangeResName) {
+                    Settings.data.hasResourceAddOrRename = true
+                }
+            }
+        }
+
+        @JvmStatic
+        fun initAllSnapshot() {
+            // 产生快照
+            for (info in Settings.data.projectBuildSortList) {
+                DiffHelper(info).initSnapshot()
+            }
+        }
+    }
 
     //private var git: Git
     //private var repo: Repository
@@ -87,7 +118,6 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
 
         //git = Git(repo)
     }
-
 
     fun initSnapshot() {
         WinkLog.d(TAG, "[${project.fixedInfo.name}]:initSnapshot ...")

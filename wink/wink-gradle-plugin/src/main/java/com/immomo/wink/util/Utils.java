@@ -211,7 +211,7 @@ public class Utils {
         return new String(arr);
     }
 
-    private static Task getFlavorTask(Project project, String pre, String post){
+    public static Task getFlavorTask(Project project, String pre, String post){
         //preDebugBuild
         AppExtension appExtension = (AppExtension) project.getExtensions().getByName("android");
         NamedDomainObjectContainer<ProductFlavor> flavors = appExtension.getProductFlavors();
