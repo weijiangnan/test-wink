@@ -143,7 +143,7 @@ jar {
         }
 
         attributes "Implementation-Title": project.name
-        attributes "Implementation-Version": '0.2.4i'
+        attributes "Implementation-Version": gradle.winkVersion
         attributes 'Main-Class': 'com.immomo.wink.JavaEntrance'//,
 //                    'Class-Path': configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
 //                    'Class-Path': '/Users/momo/Desktop/jar_test/kotlin-stdlib-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-stdlib-common-1.4.30.jar /Users/momo/Desktop/jar_test/kotlin-csv-jvm-0.15.2.jar /Users/momo/Desktop/jar_test/org.eclipse.jgit-5.11.0.202103091610-r.jar /Users/momo/Desktop/jar_test/slf4j-api-1.7.30.jar /Users/momo/Desktop/jar_test/kotlin-logging-1.7.9.jar'
