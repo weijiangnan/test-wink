@@ -22,6 +22,7 @@ import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
 import com.immomo.wink.tasks.WinkJarsTask;
+import com.immomo.wink.util.GradleUtils;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
@@ -86,11 +87,11 @@ public class WinkPlugin implements Plugin<Project> {
         clean.dependsOn(cleanUp);
 
         // Init wink info after packageDebug.
-        Task packageDebug = Utils.getFlavorTask(project, "package", "Debug");
+        Task packageDebug = GradleUtils.getFlavorTask(project, "package", "Debug");
         packageDebug.doLast(task -> afterFullBuild(project));
 
         // Embedded WINK_VERSION.
-        Utils.getFlavorTask(project, "pre", "DebugBuild").doFirst(task -> {
+        GradleUtils.getFlavorTask(project, "pre", "DebugBuild").doFirst(task -> {
             Settings.data.newVersion = System.currentTimeMillis() + "";
             ((AppExtension) project.getExtensions().getByName("android"))
                     .getDefaultConfig().buildConfigField("String",
