@@ -22,6 +22,7 @@ fi
 # package to CDN
 cp ./wink-gradle-plugin/build/libs/wink-gradle-plugin.jar ./externalLib
 cd externalLib
-zip -r -o -q wink_package_${version}.zip *
-sh cdn_upload.sh wink_package_${version}.zip
+zip -r -o -q ../wink_package_${version}.zip *
 cd ..
+sh cdn_upload.sh wink_package_${version}.zip
+rm wink_package_${version}.zip

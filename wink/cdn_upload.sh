@@ -17,8 +17,8 @@ file_name=$1
 echo "file to upload is "$file_name
 # echo `curl -X POST https://tickets.wemomo.com/api/open/ftp/api/uploadfile/ \-F "secret_key=9094c7970c9b28ce9822af586101410e" -F "username=videotech" -F "password=91sT7m" -F "upload_token=c4be4441-4647-4327-a420-cb244e3418d3" -F "upload_path=/ftp/android/" -F "files=@$file_name"  --progress-bar`
 echo `curl -X POST https://tickets.wemomo.com/api/open/ftp/api/uploadfile/ \-F "secret_key=9094c7970c9b28ce9822af586101410e" -F "username=videotech" -F "password=Cc5Y3V" -F "upload_token=c4be4441-4647-4327-a420-cb244e3418d3" -F "upload_path=/ftp/android/" -F "files=@$file_name"  --progress-bar`
-echo "\ncheck result"
-check_result
+#echo "\ncheck result"
+#check_result
 
 
 
