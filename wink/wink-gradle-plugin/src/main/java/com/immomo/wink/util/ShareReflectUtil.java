@@ -8,14 +8,7 @@ import java.util.Arrays;
 
 public class ShareReflectUtil {
 
-    /**
-     * Locates a given field anywhere in the class inheritance hierarchy.
-     *
-     * @param instance an object to search the field into.
-     * @param name     field name
-     * @return a field object
-     * @throws NoSuchFieldException if the field cannot be located
-     */
+
     public static Field findField(Object instance, String name) throws NoSuchFieldException {
         for (Class<?> clazz = instance.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
             try {
@@ -52,15 +45,7 @@ public class ShareReflectUtil {
         throw new NoSuchFieldException("Field " + name + " not found in " + originClazz);
     }
 
-    /**
-     * Locates a given method anywhere in the class inheritance hierarchy.
-     *
-     * @param instance       an object to search the method into.
-     * @param name           method name
-     * @param parameterTypes method parameter types
-     * @return a method object
-     * @throws NoSuchMethodException if the method cannot be located
-     */
+
     public static Method findMethod(Object instance, String name, Class<?>... parameterTypes)
             throws NoSuchMethodException {
         for (Class<?> clazz = instance.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
@@ -84,15 +69,7 @@ public class ShareReflectUtil {
                 + " not found in " + instance.getClass());
     }
 
-    /**
-     * Locates a given method anywhere in the class inheritance hierarchy.
-     *
-     * @param clazz          a class to search the method into.
-     * @param name           method name
-     * @param parameterTypes method parameter types
-     * @return a method object
-     * @throws NoSuchMethodException if the method cannot be located
-     */
+
     public static Method findMethod(Class<?> clazz, String name, Class<?>... parameterTypes)
             throws NoSuchMethodException {
         for (; clazz != null; clazz = clazz.getSuperclass()) {
@@ -116,14 +93,7 @@ public class ShareReflectUtil {
                 + " not found in " + clazz);
     }
 
-    /**
-     * Locates a given constructor anywhere in the class inheritance hierarchy.
-     *
-     * @param instance       an object to search the constructor into.
-     * @param parameterTypes constructor parameter types
-     * @return a constructor object
-     * @throws NoSuchMethodException if the constructor cannot be located
-     */
+
     public static Constructor<?> findConstructor(Object instance, Class<?>... parameterTypes)
             throws NoSuchMethodException {
         for (Class<?> clazz = instance.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
@@ -146,14 +116,7 @@ public class ShareReflectUtil {
                 + " not found in " + instance.getClass());
     }
 
-    /**
-     * Replace the value of a field containing a non null array, by a new array containing the
-     * elements of the original array plus the elements of extraElements.
-     *
-     * @param instance      the instance whose field is to be modified.
-     * @param fieldName     the field to modify.
-     * @param extraElements elements to append at the end of the array.
-     */
+
     public static void expandFieldArray(Object instance, String fieldName, Object[] extraElements)
             throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field jlrField = findField(instance, fieldName);
@@ -169,13 +132,7 @@ public class ShareReflectUtil {
         jlrField.set(instance, combined);
     }
 
-    /**
-     * Replace the value of a field containing a non null array, by a new array containing the
-     * elements of the original array plus the elements of extraElements.
-     *
-     * @param instance      the instance whose field is to be modified.
-     * @param fieldName     the field to modify.
-     */
+
     public static void reduceFieldArray(Object instance, String fieldName, int reduceSize)
             throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         if (reduceSize <= 0) {
@@ -198,13 +155,6 @@ public class ShareReflectUtil {
         jlrField.set(instance, combined);
     }
 
-    /**
-     * Handy method for fetching hidden integer constant value in system classes.
-     *
-     * @param clazz
-     * @param fieldName
-     * @return
-     */
     public static int getValueOfStaticIntField(Class<?> clazz, String fieldName, int defVal) {
         try {
             final Field field = findField(clazz, fieldName);

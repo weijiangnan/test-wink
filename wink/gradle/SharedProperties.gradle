@@ -1,0 +1,2 @@
+gradle.ext.uploadMavenCenter=false
+gradle.ext.winkVersion='0.2.5'

@@ -1,12 +1,14 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-version = '0.1.5' 	    // sdk版本号   需要更改
-group = 'com.immomo.wink'           // groupID， 必须com.immomo开头    需要更改
+println("[publish_to_maven-lib] wink version ${gradle.winkVersion}")
+version = gradle.winkVersion
+// groupID， com.immomo
+group = 'com.immomo.wink'
 //artifactId = 'build-lib'
 def ARTIFACT_ID = 'build-lib'
-def siteUrl = "https://git.wemomo.com/live/wink"      // 项目的主页  需要更改
-def gitUrl = "https://git.wemomo.com/live/wink"       // Git仓库的url   需要更改
+def siteUrl = "https://git.wemomo.com/live/wink"
+def gitUrl = "https://git.wemomo.com/live/wink"
 
 uploadArchives {
     repositories {
