@@ -4,7 +4,7 @@ import com.android.tools.idea.gradle.dsl.api.dependencies.ArtifactDependencySpec
 import com.intellij.openapi.project.Project;
 
 public class ConstantPool {
-    public static String COMMAND = "./gradlew litebuild";
+    public static String COMMAND = "./gradlew wink";
 
     public static String IEAD_WINK_DIR = ".idea/winkbuild/";
     public static String IEAD_DIR = IEAD_WINK_DIR+"backup";
@@ -21,12 +21,12 @@ public class ConstantPool {
 
     public static String BUILD_GRADLE_FILE = "build.gradle";
 
-    public static String PLUGIN_BASE = "com.immomo.litebuild";
+    public static String PLUGIN_BASE = "com.immomo.wink";
     public static String PLUGIN_EXT = "plugin";
     public static String PLUGIN_NAME = PLUGIN_BASE+":"+PLUGIN_EXT;
     public static String PLUGIN_APP_NAME = PLUGIN_BASE+"."+PLUGIN_EXT;
 
-    public static String PLUGIN_VERSION = "0.1.45";
+    public static String PLUGIN_VERSION = "0.2.3i";
 
     public static String CLASSPATH_MARK= "classpath";
 
