@@ -21,6 +21,7 @@ import com.immomo.wink.helper.CleanupHelper;
 import com.immomo.wink.helper.DiffHelper;
 import com.immomo.wink.helper.IncrementPatchHelper;
 import com.immomo.wink.helper.InitEnvHelper;
+import com.immomo.wink.tasks.WinkJarsTask;
 import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
@@ -62,6 +63,7 @@ public class WinkPlugin implements Plugin<Project> {
         project.afterEvaluate(it -> {
             WinkLog.TimerLog timerAfterEvaluate = WinkLog.timerStart("timerAfterEvaluate");
             createWinkTask(it);
+            createWinkInitTask(it);
             createCleanupTask(it);
             combineTask(it);
             timerAfterEvaluate.end();
@@ -105,6 +107,12 @@ public class WinkPlugin implements Plugin<Project> {
                 }
             });
         }).get().setGroup(Settings.NAME);
+    }
+
+    public void createWinkInitTask(Project project) {
+        String path = project.getRootDir() + "/.idea/" + Constant.TAG + "/jars";
+
+        project.getTasks().register("winkInit", WinkJarsTask.class,Constant.JARS_URLS,path).get().setGroup(Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
