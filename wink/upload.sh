@@ -13,17 +13,15 @@ else
 fi
 sed -i '' "s/gradle.ext.winkVersion=.*/gradle.ext.winkVersion='"$version"'/g" UploadProperties.gradle
 
-#sed -i '4s/BROADCAST_PORT=.*$/BROADCAST_PORT=9999/g' file
 
 ./gradlew wink-patch-lib:uploadArchives
 ./gradlew -p buildSrc :wink-gradle-plugin:uploadArchives
 
 
-
 # package to CDN
 cp ./wink-gradle-plugin/build/libs/wink-gradle-plugin.jar ./externalLib
 cd externalLib
-zip -r -o -q ../wink_package_${version}.zip *
+zip -r -o -q ../wink_lib_${version}.zip *
 cd ..
-sh cdn_upload.sh wink_package_${version}.zip
-rm wink_package_${version}.zip
+sh cdn_upload.sh wink_lib_${version}.zip
+rm wink_lib_${version}.zip
