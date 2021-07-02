@@ -64,7 +64,7 @@ public class WinkRunAction extends BaseAction {
 
     private void runWinkCompile() {
         if (currentProject != null) {
-            File shellFile = new File(currentProject.getBasePath(), ConstantPool.WINK_SHELL);
+            File shellFile = new File(currentProject.getBasePath()+File.separator+ConstantPool.IDEA_WINK_LIB_DIR, ConstantPool.WINK_SHELL);
             if (shellFile.exists() && shellFile.isFile()) {
                 WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
                 return;
