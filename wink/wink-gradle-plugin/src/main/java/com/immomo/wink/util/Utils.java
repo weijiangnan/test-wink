@@ -118,6 +118,10 @@ public class Utils {
     }
 
     public static ShellResult runShells(String... cmds) {
+        return runShells(true, cmds);
+    }
+
+    public static ShellResult runShells(boolean reportLog, String... cmds) {
         ShellResult result = new ShellResult();
 
         List<String> cmdArray = new ArrayList<>();
@@ -144,12 +148,18 @@ public class Utils {
 
             while ((line = reader.readLine()) != null) {
                 result.getResult().add(line);
-                WinkLog.d("Shell result: ", line);
+
+                if (reportLog) {
+                    WinkLog.d("Shell result: ", line);
+                }
             }
 
             while ((line = errorReader.readLine()) != null) {
                 result.getErrorResult().add(line);
-                WinkLog.w("Shell error: " + line);
+
+                if (reportLog) {
+                    WinkLog.w("Shell error: " + line);
+                }
             }
 
         } catch (Exception e) {
