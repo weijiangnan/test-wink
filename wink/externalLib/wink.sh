@@ -1,0 +1,1 @@
+java -Xbootclasspath/a:.idea/wink/lib/slf4j-nop-1.7.30.jar:.idea/wink/lib/kotlin-csv-jvm.jar:.idea/wink/lib/kotlin-logging-1.7.9.jar:.idea/wink/lib/kotlin-stdlib-common.jar:.idea/wink/lib/kotlin-stdlib.jar:.idea/wink/lib/org.eclipse.jgit.jar:.idea/wink/lib/slf4j-api.jar -jar .idea/wink/lib/wink-gradle-plugin.jar .

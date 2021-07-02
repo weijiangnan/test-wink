@@ -1,18 +1,27 @@
 #!/bin/bash
+# execute: sh upload.sh false 0.2.6i
 is_upload_maven=$1
 version=$2
 echo "need upload maven: $1"
 echo "wink version: $2"
 if [ $is_upload_maven == true ]; then
-    echo "need upload maven!"
-#    sed -e 'gradle/SharedProperties.gradle'
-    sed -i '' 's/gradle.ext.uploadMavenCenter=false/gradle.ext.uploadMavenCenter=true/g' gradle/SharedProperties.gradle
+    echo "upload maven center!!!"
+    sed -i '' 's/gradle.ext.uploadMavenCenter=false/gradle.ext.uploadMavenCenter=true/g' UploadProperties.gradle
 else
-    sed -i '' 's/gradle.ext.uploadMavenCenter=true/gradle.ext.uploadMavenCenter=false/g' gradle/SharedProperties.gradle
+    echo "upload to inner maven!"
+    sed -i '' 's/gradle.ext.uploadMavenCenter=true/gradle.ext.uploadMavenCenter=false/g' UploadProperties.gradle
 fi
-#sed -i '' "2c/gradle\.ext\.winkVersion\='"$version"'/g" 'gradle/SharedProperties.gradle'
-#sed -i '' '2c\/gradle.ext.winkVersion=false' gradle/SharedProperties.gradle
+sed -i '' "s/gradle.ext.winkVersion=.*/gradle.ext.winkVersion='"$version"'/g" UploadProperties.gradle
+
 
 ./gradlew wink-patch-lib:uploadArchives
 ./gradlew -p buildSrc :wink-gradle-plugin:uploadArchives
 
+
+# package to CDN
+cp ./wink-gradle-plugin/build/libs/wink-gradle-plugin.jar ./externalLib
+cd externalLib
+zip -r -o -q ../wink_lib_${version}.zip *
+cd ..
+sh cdn_upload.sh wink_lib_${version}.zip
+rm wink_lib_${version}.zip
