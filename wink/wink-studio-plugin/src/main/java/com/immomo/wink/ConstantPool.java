@@ -4,9 +4,10 @@ import com.android.tools.idea.gradle.dsl.api.dependencies.ArtifactDependencySpec
 import com.intellij.openapi.project.Project;
 
 public class ConstantPool {
-    public static String COMMAND = "./gradlew litebuild";
+    public static String COMMAND = "./gradlew wink";
+    public static String COMMAND_SHELL = "./wink.sh";
 
-    public static String IEAD_WINK_DIR = ".idea/winkbuild/";
+    public static String IEAD_WINK_DIR = ".idea/wink/plugin/";
     public static String IEAD_DIR = IEAD_WINK_DIR+"backup";
     public static String IEAD_WINK_JAR = IEAD_WINK_DIR+"jars";
     public static String WINK_CONFIG = IEAD_WINK_DIR+"wink.config";
@@ -55,6 +56,7 @@ public class ConstantPool {
 
     public static final String JAR_MAIN = "litebuild-gradle-plugin.jar";
     public static final String[] JAR_NAMES = new String[]{"kotlin-csv-jvm.jar","kotlin-logging-1.7.9.jar","kotlin-stdlib.jar","kotlin-stdlib-common.jar",JAR_MAIN,"org.eclipse.jgit.jar","slf4j-api.jar"};
+    public static String WINK_SHELL = "wink.sh";
     public static String[] getPluginMarks(){
         return new String[]{PLUGINS_MARK_1,PLUGINS_MARK_2,PLUGINS_MARK_3,PLUGINS_MARK_4};
     }
