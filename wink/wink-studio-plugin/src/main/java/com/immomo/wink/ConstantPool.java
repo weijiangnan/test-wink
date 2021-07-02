@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 public class ConstantPool {
     public static String COMMAND = "./gradlew wink";
     public static String COMMAND_SHELL = "./wink.sh";
+    public static String COMMAND_INIT = "./gradlew winkInit";
 
     public static String IEAD_WINK_DIR = ".idea/wink/plugin/";
     public static String IEAD_DIR = IEAD_WINK_DIR+"backup";

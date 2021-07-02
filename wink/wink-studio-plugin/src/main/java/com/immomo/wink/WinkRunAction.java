@@ -68,6 +68,9 @@ public class WinkRunAction extends BaseAction {
             if (shellFile.exists() && shellFile.isFile()) {
                 WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
                 return;
+            }else {
+                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_INIT);
+                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
             }
         }
         WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND);
