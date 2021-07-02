@@ -234,5 +234,15 @@ public class Utils {
             }
         }
     }
+
+
+    public static void deleteDirChilds(String fileParent){
+        File parent = new File(fileParent);
+        if(parent.exists() && parent.isDirectory()){
+            for(File file:parent.listFiles()){
+                file.delete();
+            }
+        }
+    }
 }
 

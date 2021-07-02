@@ -49,12 +49,12 @@ public class DownloadUtil {
             // 关闭资源
             bin.close();
             out.close();
-            System.out.println("文件下载成功！");
+            WinkLog.i("文件下载成功");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("文件下载失败！");
+            WinkLog.i("文件下载失败");
         }
 
         return file;

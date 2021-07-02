@@ -3,11 +3,11 @@ package com.immomo.wink.tasks;
 import com.immomo.wink.Constant;
 import com.immomo.wink.util.DownloadUtil;
 import com.immomo.wink.util.Utils;
+import com.immomo.wink.util.WinkLog;
 import com.immomo.wink.util.ZipUtils;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.internal.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class WinkInitTask extends DefaultTask {
     @TaskAction
     public void download() throws IOException {
         if (downlaodUrls == null || downlaodUrls.size() == 0) {
-            System.out.println("文件已存在！");
+            WinkLog.i("文件已存在！");
             return;
         } else {
             File[] files = DownloadUtil.downloadFiles(downlaodUrls, dir);
@@ -50,7 +50,9 @@ public class WinkInitTask extends DefaultTask {
 
     private void unzipFiles(File[] files) {
         for (File file : files) {
-            ZipUtils.unZip(file, dir);
+            if(file!=null){
+                ZipUtils.unZip(file, dir);
+            }
         }
     }
 
@@ -67,7 +69,7 @@ public class WinkInitTask extends DefaultTask {
                 target.setWritable(true, false);
                 Utils.copyFile(shell, target);
             } else {
-                System.out.println("wink.shell 文件不存在！");
+                WinkLog.i("wink.shell 文件不存在！");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,6 +84,7 @@ public class WinkInitTask extends DefaultTask {
             String fileName = url.substring(url.lastIndexOf('/') + 1);
             File target = new File(dir + File.separator + fileName);
             if (!target.exists() || target.isDirectory()) {
+                Utils.deleteDirChilds(dir);
                 downlaodUrls.add(url);
             }
         }
