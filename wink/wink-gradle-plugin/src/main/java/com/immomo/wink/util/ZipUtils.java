@@ -42,6 +42,11 @@ public class ZipUtils {
                         targetFile.getParentFile().mkdirs();
                     }
                     targetFile.createNewFile();
+                    if(targetFile.getName().endsWith(".sh")){
+                        targetFile.setReadable(true,false);
+                        targetFile.setWritable(true,false);
+                        targetFile.setExecutable(true,false);
+                    }
                     // 将压缩文件内容写入到这个文件中
                     InputStream is = zipFile.getInputStream(entry);
                     FileOutputStream fos = new FileOutputStream(targetFile);
