@@ -44,7 +44,7 @@ public class IncrementPatchHelper {
         String patch = "/sdcard/Android/data/" + Settings.env.debugPackageName;
         Utils.ShellResult result = Utils.runShells("source ~/.bash_profile\nadb shell ls " + patch);
         boolean noPermission = false;
-        Utils.runShell("adb shell mkdir " + patch);
+        Utils.runShells(false, "adb shell mkdir " + patch);
         for (String error: result.getErrorResult()) {
             if (error.contains("Permission denied")) {
                 // 标志没文件权限
@@ -59,7 +59,7 @@ public class IncrementPatchHelper {
             Settings.data.patchPath = "/sdcard/Android/data/" + Settings.env.debugPackageName + "/patch_file/";
         }
 
-        Utils.runShells("source ~/.bash_profile",
+        Utils.runShells(false, "source ~/.bash_profile",
                 "adb shell mkdir " + Settings.data.patchPath);
 
         result = Utils.runShells("adb shell ls " + Settings.data.patchPath);

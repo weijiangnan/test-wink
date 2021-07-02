@@ -23,10 +23,11 @@ public class WinkInitTask extends DefaultTask {
     private String projectPath;
     private String dir;
     private String JARS_PATH;
+    private boolean withShell;
 
     @Inject
-    public WinkInitTask(String[] urls, String projectPath) {
-        initAction(urls, projectPath);
+    public WinkInitTask(String[] urls, String projectPath, boolean withShell) {
+        initAction(urls, projectPath, withShell);
     }
 
     /**
@@ -43,8 +44,11 @@ public class WinkInitTask extends DefaultTask {
             File[] files = DownloadUtil.downloadFiles(downlaodUrls, dir);
             unzipFiles(files);
         }
-        copyShell();
 
+        // 拷贝shell脚本
+        if (withShell) {
+            copyShell();
+        }
     }
 
 
@@ -76,9 +80,10 @@ public class WinkInitTask extends DefaultTask {
         }
     }
 
-    private void initAction(String[] urls, String projectPath) {
+    private void initAction(String[] urls, String projectPath, boolean withShell) {
         this.downlaodUrls = new ArrayList<String>();
         this.projectPath = projectPath;
+        this.withShell = withShell;
         this.dir = getJarsPath();
         for (String url : urls) {
             String fileName = url.substring(url.lastIndexOf('/') + 1);

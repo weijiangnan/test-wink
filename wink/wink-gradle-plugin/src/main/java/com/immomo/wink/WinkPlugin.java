@@ -63,6 +63,7 @@ public class WinkPlugin implements Plugin<Project> {
             WinkLog.TimerLog timerAfterEvaluate = WinkLog.timerStart("timerAfterEvaluate");
             createWinkTask(it);
             createWinkInitTask(it);
+//            createWinkInitWithShellTask(it);
             createCleanupTask(it);
             combineTask(it);
             timerAfterEvaluate.end();
@@ -112,7 +113,14 @@ public class WinkPlugin implements Plugin<Project> {
         String path = project.getRootDir().getPath();
         String version = this.getClass().getPackage().getImplementationVersion();
         String[] downloads =  new String[]{String.format(Constant.DOWNLOADURL,version)};
-        project.getTasks().register("winkInit", WinkInitTask.class,downloads,path).get().setGroup(Settings.NAME);
+        project.getTasks().register("winkInit", WinkInitTask.class, downloads, path, true).get().setGroup(Settings.NAME);
+    }
+
+    public void createWinkInitWithShellTask(Project project) {
+        String path = project.getRootDir().getPath();
+        String version = this.getClass().getPackage().getImplementationVersion();
+        String[] downloads =  new String[]{String.format(Constant.DOWNLOADURL,version)};
+        project.getTasks().register("winkInitWithShell", WinkInitTask.class, downloads, path, true).get().setGroup(Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
