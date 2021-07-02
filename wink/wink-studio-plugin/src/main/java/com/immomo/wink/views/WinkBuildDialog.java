@@ -170,20 +170,21 @@ public class WinkBuildDialog extends JDialog {
                     ConstantPool.PLUGIN_VERSION = selectVersion;
 
                     ModuleInfo rootModule = projectInfo.getRootModule();
-                    DependenciesModel dependenciesModel = rootModule.getGradleBuild().buildscript().dependencies();
-
-                    boolean haveClassPath = dependenciesModel.containsArtifact("classpath", ConstantPool.pluginClassPathDependence());
-                    if (!haveClassPath) {
-                        dependenciesModel.addArtifact("classpath", ConstantPool.pluginClassPathDependence());
+                    if (!rootModule.isInstallPlugin()) {
+                        DependenciesModel dependenciesModel = rootModule.getGradleBuild().buildscript().dependencies();
+                        boolean haveClassPath = dependenciesModel.containsArtifact("classpath", ConstantPool.pluginClassPathDependence());
+                        if (!haveClassPath) {
+                            dependenciesModel.addArtifact("classpath", ConstantPool.pluginClassPathDependence());
+                        }
+                        rootModule.getGradleBuild().applyChanges();
                     }
-                    rootModule.getGradleBuild().applyChanges();
+
                     ModuleInfo moduleInfo = appBuildMap.get(apppath);
                     if (!moduleInfo.isInstallPlugin()) {
                         moduleInfo.getGradleBuild().applyPlugin(ConstantPool.PLUGIN_APP_NAME);
-                        FileWinkUtils.saveToPro(rootFile,ConstantPool.LAST_INSTALL_MODULE,moduleInfo.getModuleName());
+                        FileWinkUtils.saveToPro(rootFile, ConstantPool.LAST_INSTALL_MODULE, moduleInfo.getModuleName());
+                        moduleInfo.getGradleBuild().applyChanges();
                     }
-                    rootModule.getGradleBuild().applyChanges();
-                    moduleInfo.getGradleBuild().applyChanges();
                     DataManager.getInstance().updateWinkInstall(projectInfo.getCurrentProject());
                     NotificationUtils.infoNotification("WinkBuild Install Success");
                 } catch (Exception e) {
