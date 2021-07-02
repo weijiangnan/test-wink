@@ -25,8 +25,15 @@ import com.immomo.wink.Settings;
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.util.AndroidManifestUtils;
 import com.immomo.wink.util.LocalCacheUtil;
+import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
+import org.apache.http.util.TextUtils;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
@@ -119,12 +126,45 @@ public class InitEnvHelper {
         return envFile.exists();
     }
 
+    public boolean isBranchOK() {
+        WinkLog.i("[IniEnvHelper] [isBranchOK]...");
+        if (TextUtils.isEmpty(Settings.env.rootDir)) {
+            return false;
+        }
+        try {
+            Repository rep = new RepositoryBuilder()
+                    .findGitDir(new File(Settings.env.rootDir))
+                    .build();
+            Git git = new Git(rep);
+            ListBranchCommand listBranchCommand = git.branchList();
+            List<Ref> refList = listBranchCommand.call();
+            int size = refList.size();
+            WinkLog.d("[IniEnvHelper] branchList.size==" + size);
+            if (size > 0) {
+                String curBranchName = String.valueOf(refList.get(0));
+                WinkLog.d("curBranchName=" + curBranchName +
+                        ", env.branchName=" + Settings.env.curBranchName);
+                if (!Settings.env.curBranchName.equals(curBranchName)) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public void initEnvByPath(String path) {
         Settings.restoreEnv(path
                 + "/.idea/" + Settings.NAME + "/env");
 
         // Data每次初始化
         Settings.initData();
+    }
+
+    public void fullBuild(String path) {
+        WinkLog.i("Cache or Branch invalid, start full build...");
+        Utils.runShells("cd " + path + " && " + "./gradlew installDebug");
     }
 
     protected void createEnv(Project project) {
@@ -151,6 +191,24 @@ public class InitEnvHelper {
             env.version = Settings.data.newVersion;
             Settings.data.newVersion = "";
         }
+
+        try {
+            Repository rep = new RepositoryBuilder()
+                    .findGitDir(new File(env.rootDir))
+                    .build();
+            Git git = new Git(rep);
+            ListBranchCommand listBranchCommand = git.branchList();
+            List<Ref> refList = listBranchCommand.call();
+            int size = refList.size();
+            WinkLog.d("[IniEnvHelper] branchList.size==" + size);
+            if (size > 0) {
+                env.curBranchName = String.valueOf(refList.get(0));
+                WinkLog.i("[IniEnvHelper] curBranchName==" + env.curBranchName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         env.appProjectDir = project.getProjectDir().getAbsolutePath();
         env.tmpPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;

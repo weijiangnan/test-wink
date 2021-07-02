@@ -79,7 +79,8 @@ object Settings {
             @JvmField var options: WinkOptions? = null,
             @JvmField var defaultFlavor: String = "",
             @JvmField var variantName: String = "debug",
-            @JvmField var kaptTaskParam: KaptTaskParam? = null
+            @JvmField var kaptTaskParam: KaptTaskParam? = null,
+            @JvmField var curBranchName: String = "debug"
     ) : Serializable
 
     data class Data(

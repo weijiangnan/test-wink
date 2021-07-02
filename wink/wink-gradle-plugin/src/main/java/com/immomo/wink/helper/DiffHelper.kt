@@ -72,8 +72,8 @@ class DiffHelper(var project: Settings.ProjectTmpInfo) {
         }
     }
 
-    //private var git: Git
-    //private var repo: Repository
+//    private var git: Git? = null
+//    private var repo: Repository? = null
     private var diffDir: String
     private var diffPropertiesPath: String
     private var csvPathCode: String

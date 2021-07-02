@@ -25,14 +25,16 @@ public class JavaEntrance {
         InitEnvHelper helper = new InitEnvHelper();
 
         WinkLog.i("Wink start...");
-        if (!helper.isEnvExist(path)) {
-            // Full build
-            WinkLog.i("Cache invalid, start full build.");
-            Utils.runShells("cd " + path + " && " + "./gradlew installDebug");
-            return;
-        } else {
+        if (helper.isEnvExist(path)) {
             // Increment
             helper.initEnvByPath(path);
+            if (!helper.isBranchOK()) {
+                helper.fullBuild(path);
+                return;
+            }
+        } else {
+            helper.fullBuild(path);
+            return;
         }
 
         // Diff file changed
