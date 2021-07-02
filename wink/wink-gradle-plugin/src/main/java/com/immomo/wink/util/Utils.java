@@ -33,6 +33,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static List<String> runShell(String shStr) {
@@ -144,24 +145,25 @@ public class Utils {
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             String line;
-            process.waitFor();
 
-            while ((line = reader.readLine()) != null) {
-                result.getResult().add(line);
+            while (process.isAlive()) {
+                process.waitFor(200, TimeUnit.MILLISECONDS);
+                while ((line = reader.readLine()) != null) {
+                    result.getResult().add(line);
 
-                if (reportLog) {
-                    WinkLog.d("Shell result: ", line);
+                    if (reportLog) {
+                        WinkLog.d("Shell result: ", line);
+                    }
+                }
+
+                while ((line = errorReader.readLine()) != null) {
+                    result.getErrorResult().add(line);
+
+                    if (reportLog) {
+                        WinkLog.w("Shell error: " + line);
+                    }
                 }
             }
-
-            while ((line = errorReader.readLine()) != null) {
-                result.getErrorResult().add(line);
-
-                if (reportLog) {
-                    WinkLog.w("Shell error: " + line);
-                }
-            }
-
         } catch (Exception e) {
             WinkLog.throwAssert("Shell exception:", e);
             result.setE(e);
