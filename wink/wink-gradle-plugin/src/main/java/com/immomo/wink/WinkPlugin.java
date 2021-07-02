@@ -110,8 +110,9 @@ public class WinkPlugin implements Plugin<Project> {
 
     public void createWinkInitTask(Project project) {
         String path = project.getRootDir().getPath();
-
-        project.getTasks().register("winkInit", WinkInitTask.class,Constant.JARS_URLS,path).get().setGroup(Settings.NAME);
+        String version = this.getClass().getPackage().getImplementationVersion();
+        String[] downloads =  new String[]{String.format(Constant.DOWNLOADURL,version)};
+        project.getTasks().register("winkInit", WinkInitTask.class,downloads,path).get().setGroup(Settings.NAME);
     }
 
     public void createCleanupTask(Project project) {
@@ -147,4 +148,11 @@ public class WinkPlugin implements Plugin<Project> {
             }
         }
     }
+
+    private String[] getCurrentJarUrl(){
+        String version = this.getClass().getPackage().getImplementationVersion();
+        String url =String.format(Constant.DOWNLOADURL,version);
+        return new String[]{url};
+    }
+
 }
