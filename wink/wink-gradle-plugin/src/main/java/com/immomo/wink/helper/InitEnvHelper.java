@@ -29,9 +29,6 @@ import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
 import org.apache.http.util.TextUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gradle.api.Project;
@@ -135,18 +132,12 @@ public class InitEnvHelper {
             Repository rep = new RepositoryBuilder()
                     .findGitDir(new File(Settings.env.rootDir))
                     .build();
-            Git git = new Git(rep);
-            ListBranchCommand listBranchCommand = git.branchList();
-            List<Ref> refList = listBranchCommand.call();
-            int size = refList.size();
-            WinkLog.d("[IniEnvHelper] branchList.size==" + size);
-            if (size > 0) {
-                String curBranchName = String.valueOf(refList.get(0));
-                WinkLog.d("curBranchName=" + curBranchName +
-                        ", env.branchName=" + Settings.env.curBranchName);
-                if (!Settings.env.curBranchName.equals(curBranchName)) {
-                    return false;
-                }
+//            Git git = new Git(rep);
+            String curBranchName = rep.getBranch();
+            WinkLog.d("[IniEnvHelper] curBranch=" + curBranchName +
+                    ", env.branch=" + Settings.env.branch);
+            if (!Settings.env.branch.equals(curBranchName)) {
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,15 +187,8 @@ public class InitEnvHelper {
             Repository rep = new RepositoryBuilder()
                     .findGitDir(new File(env.rootDir))
                     .build();
-            Git git = new Git(rep);
-            ListBranchCommand listBranchCommand = git.branchList();
-            List<Ref> refList = listBranchCommand.call();
-            int size = refList.size();
-            WinkLog.d("[IniEnvHelper] branchList.size==" + size);
-            if (size > 0) {
-                env.curBranchName = String.valueOf(refList.get(0));
-                WinkLog.i("[IniEnvHelper] curBranchName==" + env.curBranchName);
-            }
+            env.branch = rep.getBranch();
+            WinkLog.d("[IniEnvHelper] current branch:" + env.branch);
         } catch (Exception e) {
             e.printStackTrace();
         }

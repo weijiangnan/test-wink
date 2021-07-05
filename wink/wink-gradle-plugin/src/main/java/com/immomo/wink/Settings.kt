@@ -80,7 +80,7 @@ object Settings {
             @JvmField var defaultFlavor: String = "",
             @JvmField var variantName: String = "debug",
             @JvmField var kaptTaskParam: KaptTaskParam? = null,
-            @JvmField var curBranchName: String = "debug"
+            @JvmField var branch: String = "debug"
     ) : Serializable
 
     data class Data(
