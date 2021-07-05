@@ -25,8 +25,12 @@ import com.immomo.wink.Settings;
 import com.immomo.wink.WinkOptions;
 import com.immomo.wink.util.AndroidManifestUtils;
 import com.immomo.wink.util.LocalCacheUtil;
+import com.immomo.wink.util.Utils;
 import com.immomo.wink.util.WinkLog;
 
+import org.apache.http.util.TextUtils;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
@@ -119,12 +123,39 @@ public class InitEnvHelper {
         return envFile.exists();
     }
 
+    public boolean isBranchOK() {
+        WinkLog.i("[IniEnvHelper] [isBranchOK]...");
+        if (TextUtils.isEmpty(Settings.env.rootDir)) {
+            return false;
+        }
+        try {
+            Repository rep = new RepositoryBuilder()
+                    .findGitDir(new File(Settings.env.rootDir))
+                    .build();
+//            Git git = new Git(rep);
+            String curBranchName = rep.getBranch();
+            WinkLog.d("[IniEnvHelper] curBranch=" + curBranchName +
+                    ", env.branch=" + Settings.env.branch);
+            if (!Settings.env.branch.equals(curBranchName)) {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public void initEnvByPath(String path) {
         Settings.restoreEnv(path
                 + "/.idea/" + Settings.NAME + "/env");
 
         // Data每次初始化
         Settings.initData();
+    }
+
+    public void fullBuild(String path) {
+        WinkLog.i("Cache or Branch invalid, start full build...");
+        Utils.runShells("cd " + path + " && " + "./gradlew installDebug");
     }
 
     protected void createEnv(Project project) {
@@ -151,6 +182,17 @@ public class InitEnvHelper {
             env.version = Settings.data.newVersion;
             Settings.data.newVersion = "";
         }
+
+        try {
+            Repository rep = new RepositoryBuilder()
+                    .findGitDir(new File(env.rootDir))
+                    .build();
+            env.branch = rep.getBranch();
+            WinkLog.d("[IniEnvHelper] current branch:" + env.branch);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         env.appProjectDir = project.getProjectDir().getAbsolutePath();
         env.tmpPath = project.getRootProject().getProjectDir().getAbsolutePath() + "/.idea/" + Settings.NAME;

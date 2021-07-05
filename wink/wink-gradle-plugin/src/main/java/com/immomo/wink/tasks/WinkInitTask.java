@@ -39,7 +39,6 @@ public class WinkInitTask extends DefaultTask {
     public void download() throws IOException {
         if (downlaodUrls == null || downlaodUrls.size() == 0) {
             WinkLog.i("文件已存在！");
-            return;
         } else {
             File[] files = DownloadUtil.downloadFiles(downlaodUrls, dir);
             unzipFiles(files);

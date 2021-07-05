@@ -28,7 +28,7 @@ public class ZipUtils {
             Enumeration<?> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
-                System.out.println("解压" + entry.getName());
+                WinkLog.d("解压" + entry.getName());
                 // 如果是文件夹，就创建个文件夹
                 if (entry.isDirectory()) {
                     String dirPath = destDirPath + "/" + entry.getName();
@@ -61,7 +61,7 @@ public class ZipUtils {
                 }
             }
             long end = System.currentTimeMillis();
-            WinkLog.i("解压完成，耗时：" + (end - start) +" ms");
+            WinkLog.d("解压完成，耗时：" + (end - start) +" ms");
         } catch (Exception e) {
             throw new RuntimeException("unzip error from ZipUtils", e);
         } finally {
@@ -75,12 +75,6 @@ public class ZipUtils {
         }
     }
 
-    /**
-     * 压缩成ZIP 方法
-     * @param srcFiles 需要压缩的文件列表
-     * @param out           压缩文件输出流
-     * @throws RuntimeException 压缩失败会抛出运行时异常
-     */
     public static void toZip(List<File> srcFiles , OutputStream out)throws Exception {
         long start = System.currentTimeMillis();
         ZipOutputStream zos = null ;
