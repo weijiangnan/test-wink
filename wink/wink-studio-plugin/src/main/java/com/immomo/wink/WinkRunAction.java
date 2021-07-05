@@ -26,24 +26,26 @@ public class WinkRunAction extends BaseAction {
     private void runWinkUseGradle() {
         try {
             DocumentUtil.saveDocument();
-            ProjectInfo projectInfo = DataManager.getInstance().checkWinkInstall(currentProject);
-            if (projectInfo != null) {
-                boolean isRootInstall = projectInfo.getRootModule().isInstallPlugin();
-                boolean isAppInstall = false;
-                if (projectInfo.getLastAppModule() != null && !projectInfo.getLastAppModule().equals("")) {
-                    String lastAppName = projectInfo.getLastAppModule();
-                    for (ModuleInfo moduleInfo : projectInfo.getSubAppModules()) {
-                        if (lastAppName.equals(moduleInfo.getModuleName()) && moduleInfo.isInstallPlugin()) {
-                            isAppInstall = true;
-                        }
-                    }
-                }
-                if (isRootInstall && isAppInstall) {
-                    runWinkCompile();
-                    return;
-                }
-            }
-            DialogUtil.showBuildInstallDialog(projectInfo);
+            runWinkCompile();
+
+//            ProjectInfo projectInfo = DataManager.getInstance().checkWinkInstall(currentProject);
+//            if (projectInfo != null) {
+//                boolean isRootInstall = projectInfo.getRootModule().isInstallPlugin();
+//                boolean isAppInstall = false;
+//                if (projectInfo.getLastAppModule() != null && !projectInfo.getLastAppModule().equals("")) {
+//                    String lastAppName = projectInfo.getLastAppModule();
+//                    for (ModuleInfo moduleInfo : projectInfo.getSubAppModules()) {
+//                        if (lastAppName.equals(moduleInfo.getModuleName()) && moduleInfo.isInstallPlugin()) {
+//                            isAppInstall = true;
+//                        }
+//                    }
+//                }
+//                if (isRootInstall && isAppInstall) {
+//                    runWinkCompile();
+//                    return;
+//                }
+//            }
+//            DialogUtil.showBuildInstallDialog(projectInfo);
         } catch (Exception e) {
             NotificationUtils.infoNotification(Utils.getErrorString(e));
         }
@@ -66,14 +68,14 @@ public class WinkRunAction extends BaseAction {
         if (currentProject != null) {
             File shellFile = new File(currentProject.getBasePath()+File.separator+ConstantPool.IDEA_WINK_LIB_DIR, ConstantPool.WINK_SHELL);
             if (shellFile.exists() && shellFile.isFile()) {
+                shellFile.setExecutable(true,false);
                 WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
-                return;
             }else {
-                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_INIT);
-                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
+                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_INIT +" && "+ConstantPool.COMMAND_SHELL );
+                //WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
             }
         }
-        WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND);
+       // WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND);
     }
 
 

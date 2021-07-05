@@ -33,6 +33,7 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 /**
  * Created by pengwei on 16/9/15.
@@ -288,7 +289,15 @@ public class WinkTerminal implements FocusListener, ProjectComponent {
 
         @Override
         public void doAction(AnActionEvent anActionEvent) {
-            terminal.executeShell(ConstantPool.COMMAND);
+            Project currentProject = anActionEvent.getProject();
+            File shellFile = new File(currentProject.getBasePath()+File.separator+ConstantPool.IDEA_WINK_LIB_DIR, ConstantPool.WINK_SHELL);
+            if (shellFile.exists() && shellFile.isFile()) {
+                shellFile.setExecutable(true,false);
+                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
+            }else {
+                WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_INIT +" && "+ConstantPool.COMMAND_SHELL );
+                //WinkTerminal.getInstance(currentProject).initAndExecute(ConstantPool.COMMAND_SHELL);
+            }
         }
 
         private String[] getArgs() {

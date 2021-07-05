@@ -3,15 +3,22 @@ package com.immomo.wink;
 import com.android.tools.idea.gradle.dsl.api.dependencies.ArtifactDependencySpec;
 import com.intellij.openapi.project.Project;
 
+import java.io.File;
+
 public class ConstantPool {
     public static String COMMAND = "./gradlew wink";
-    public static String COMMAND_SHELL = "./wink.sh";
+
     public static String COMMAND_INIT = "./gradlew winkInit";
 
-    public static String IEAD_WINK_DIR = ".idea/wink/plugin/";
-    public static String IEAD_DIR = IEAD_WINK_DIR+"backup";
-    public static String IEAD_WINK_JAR = IEAD_WINK_DIR+"jars";
-    public static String WINK_CONFIG = IEAD_WINK_DIR+"wink.config";
+    public static String IDEA_WINK_DIR = ".idea/wink/";
+
+    public static String IDEA_WINK_PLUGIN_DIR = IDEA_WINK_DIR+"/plugin/";
+
+    public static String IDEA_WINK_LIB_DIR = ".idea/wink/lib/";
+
+    public static String IEAD_DIR = IDEA_WINK_PLUGIN_DIR+"backup";
+    public static String IEAD_WINK_JAR = IDEA_WINK_PLUGIN_DIR+"jars";
+    public static String WINK_CONFIG = IDEA_WINK_PLUGIN_DIR+"wink.config";
 
     public static String LAST_INSTALL_MODULE = "last_install_module";
     public static String LAST_MAIN_PATH = "last_main_build";
@@ -58,6 +65,8 @@ public class ConstantPool {
     public static final String JAR_MAIN = "litebuild-gradle-plugin.jar";
     public static final String[] JAR_NAMES = new String[]{"kotlin-csv-jvm.jar","kotlin-logging-1.7.9.jar","kotlin-stdlib.jar","kotlin-stdlib-common.jar",JAR_MAIN,"org.eclipse.jgit.jar","slf4j-api.jar"};
     public static String WINK_SHELL = "wink.sh";
+
+    public static String COMMAND_SHELL = IDEA_WINK_LIB_DIR+WINK_SHELL;
     public static String[] getPluginMarks(){
         return new String[]{PLUGINS_MARK_1,PLUGINS_MARK_2,PLUGINS_MARK_3,PLUGINS_MARK_4};
     }
@@ -103,6 +112,5 @@ public class ConstantPool {
         sb.append(runJarPath).append(" ").append(projectPath);
         return sb.toString();
     }
-
 
 }

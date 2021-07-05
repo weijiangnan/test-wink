@@ -119,6 +119,10 @@ public class DataManager {
                         if(!subModule.isInstallPlugin()){
                             boolean rootInstall = FileWinkUtils.textInFile(new File(subModule.getGradleBuild().getVirtualFile().getPath()),ConstantPool.PLUGIN_APP_NAME)>0;
                             subModule.setInstallPlugin(rootInstall);
+                        }else {
+                            if(lastInstallModule==null || lastInstallModule.trim().length()==0){
+                                lastInstallModule = subModule.getModuleName();
+                            }
                         }
                         projectInfo.addSubAppModules(subModule);
                     }else {
